@@ -1,103 +1,169 @@
-import Image from "next/image";
+import Link from 'next/link'
+import { Button } from '../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
+import { Badge } from '../components/ui/badge'
+// Or, if the file does not exist, create 'src/components/ui/badge.tsx' with the Badge component.
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <main className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+      {/* Header */}
+      <nav className="flex items-center justify-between p-6 border-b bg-white/80 backdrop-blur-sm">
+        <div className="flex items-center space-x-2">
+          <span className="text-2xl">🌱</span>
+          <h1 className="text-2xl font-bold text-green-700">Desapegrow</h1>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" asChild>
+            <Link href="/auth/signin">Entrar</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/auth/signup">Cadastrar</Link>
+          </Button>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900">
+              🌱 Desapegrow
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
+              O primeiro <strong>marketplace de cultivo gamificado</strong> do Brasil
+            </p>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+              Compre equipamentos, ganhe pontos, suba de nível e cultive sua paixão! 🎮
+            </p>
+          </div>
+
+          {/* Gamification Preview */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Card className="w-full max-w-sm">
+              <CardHeader className="text-center">
+                <CardTitle className="flex items-center justify-center space-x-2">
+                  <span className="text-2xl">🪙</span>
+                  <span>CultivoCoins</span>
+                </CardTitle>
+                <CardDescription>Sistema de pontos gamificado</CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <div className="text-3xl font-bold text-green-600 mb-2">0</div>
+                <Badge className="bg-green-100 text-green-800">Iniciante</Badge>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Call to Action */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="text-lg px-8 py-6" asChild>
+              <Link href="/auth/signup">
+                🚀 Começar Jornada
+              </Link>
+            </Button>
+            <Button variant="outline" size="lg" className="text-lg px-8 py-6" asChild>
+              <Link href="/marketplace">
+                🛒 Ver Produtos
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Features */}
+        <div className="mt-24 grid md:grid-cols-3 gap-8">
+          <Card className="text-center hover:shadow-lg transition-all">
+            <CardHeader>
+              <div className="text-4xl mb-4">🎮</div>
+              <CardTitle>Sistema Gamificado</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">
+                Ganhe pontos, badges e suba de nível a cada compra!
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center hover:shadow-lg transition-all">
+            <CardHeader>
+              <div className="text-4xl mb-4">🌿</div>
+              <CardTitle>Equipamentos de Cultivo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">
+                Tudo que você precisa para seu jardim e horta
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center hover:shadow-lg transition-all">
+            <CardHeader>
+              <div className="text-4xl mb-4">🏆</div>
+              <CardTitle>Ranking & Desafios</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">
+                Compita com outros cultivadores e ganhe recompensas
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Levels Preview */}
+        <div className="mt-24">
+          <h2 className="text-3xl font-bold text-center mb-12">Sistema de Níveis</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="bg-green-50 border-green-200">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl mb-2">🌱</div>
+                <h3 className="font-bold">Iniciante</h3>
+                <p className="text-sm text-gray-600">0-999 pontos</p>
+                <Badge className="mt-2 bg-green-100 text-green-800">2% desconto</Badge>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl mb-2">🌿</div>
+                <h3 className="font-bold">Jardineiro</h3>
+                <p className="text-sm text-gray-600">1000-2499 pontos</p>
+                <Badge className="mt-2 bg-blue-100 text-blue-800">5% desconto</Badge>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-purple-50 border-purple-200">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl mb-2">🌳</div>
+                <h3 className="font-bold">Especialista</h3>
+                <p className="text-sm text-gray-600">2500-4999 pontos</p>
+                <Badge className="mt-2 bg-purple-100 text-purple-800">8% desconto</Badge>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-yellow-50 border-yellow-200">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl mb-2">🏆</div>
+                <h3 className="font-bold">Mestre</h3>
+                <p className="text-sm text-gray-600">5000+ pontos</p>
+                <Badge className="mt-2 bg-yellow-100 text-yellow-800">12% desconto</Badge>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12 mt-24">
+        <div className="container mx-auto px-4 text-center">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <span className="text-2xl">🌱</span>
+            <span className="text-xl font-bold">Desapegrow</span>
+          </div>
+          <p className="text-gray-400">
+            O marketplace de cultivo gamificado que está revolucionando o Brasil
+          </p>
+        </div>
       </footer>
-    </div>
-  );
+    </main>
+  )
 }

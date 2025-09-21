@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  name            String
+  phone           String?
+  avatar          String?
+  role            Role     @default(BUYER)
+  isEmailVerified Boolean  @default(false)
+  password        String
+  
+  // Gamification
+  gameProfile     GameProfile?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("users")
+}
+
+enum Role {
+  BUYER
+  SELLER
+  ADMIN
+}
+
+model GameProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  totalPoints     Int       @default(0)
+  availablePoints Int       @default(0)
+  currentLevel    GameLevel @default(INICIANTE)
+  loginStreak     Int       @default(0)
+  lastLoginDate   DateTime?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("game_profiles")
+}
+
+enum GameLevel {
+  INICIANTE
+  JARDINEIRO
+  ESPECIALISTA
+  MESTRE
+}
