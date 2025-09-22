@@ -42,7 +42,7 @@ export default function MarketplacePage() {
   const fetchData = async () => {
     try {
       const [productsRes, categoriesRes] = await Promise.all([
-        fetch('/api/products'),
+        fetch('/api/marketplace-products'),
         fetch('/api/categories')
       ])
 
