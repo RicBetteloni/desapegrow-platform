@@ -8,50 +8,180 @@ datasource db {
 }
 
 model User {
-  id               String   @id @default(cuid())
-  email            String   @unique
-  name             String
-  phone            String?
-  avatar           String?
-  role             Role     @default(BUYER)
-  isEmailVerified  Boolean  @default(false)
-  password         String
-  
-  // Gamification
-  gameProfile      GameProfile?
-  
-  // Commerce - ADICIONE ESTAS LINHAS:
-  sellerProfile    SellerProfile?
-  favorites        Favorite[]
-  reviews          Review[]
-  
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  
+  id              String         @id @default(cuid())
+  email           String         @unique
+  name            String
+  phone           String?
+  avatar          String?
+  role            Role           @default(BUYER)
+  isEmailVerified Boolean        @default(false)
+  password        String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  favorites       Favorite[]
+  gameProfile     GameProfile?
+  reviews         Review[]
+  sellerProfile   SellerProfile?
+
   @@map("users")
+}
+
+model GameProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  totalPoints     Int       @default(0)
+  availablePoints Int       @default(0)
+  currentLevel    GameLevel @default(INICIANTE)
+  loginStreak     Int       @default(0)
+  lastLoginDate   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("game_profiles")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  icon        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id           String               @id @default(cuid())
+  sellerId     String
+  name         String
+  slug         String               @unique
+  description  String
+  shortDesc    String?
+  categoryId   String
+  price        Decimal
+  comparePrice Decimal?
+  stock        Int                  @default(0)
+  weight       Decimal?
+  height       Decimal?
+  width        Decimal?
+  length       Decimal?
+  status       ProductStatus        @default(DRAFT)
+  avgRating    Decimal?
+  totalReviews Int                  @default(0)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  favorites    Favorite[]
+  images       ProductImage[]
+  tags         ProductTagRelation[]
+  category     Category             @relation(fields: [categoryId], references: [id])
+  seller       SellerProfile        @relation(fields: [sellerId], references: [id])
+  reviews      Review[]
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  url       String
+  alt       String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+model ProductTag {
+  id        String               @id @default(cuid())
+  name      String               @unique
+  slug      String               @unique
+  color     String               @default("#3B82F6")
+  createdAt DateTime             @default(now())
+  products  ProductTagRelation[]
+
+  @@map("product_tags")
+}
+
+model ProductTagRelation {
+  productId String
+  tagId     String
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag       ProductTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([productId, tagId])
+  @@map("product_tag_relations")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("favorites")
+}
+
+model Review {
+  id            String        @id @default(cuid())
+  userId        String
+  productId     String
+  rating        Int
+  title         String?
+  content       String
+  pointsAwarded Boolean       @default(false)
+  status        ReviewStatus  @default(PENDING)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  images        ReviewImage[]
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("reviews")
+}
+
+model ReviewImage {
+  id        String   @id @default(cuid())
+  reviewId  String
+  url       String
+  alt       String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@map("review_images")
+}
+
+model SellerProfile {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  businessName String?
+  cnpj         String?
+  ie           String?
+  recipientId  String?
+  totalSales   Decimal   @default(0)
+  totalOrders  Int       @default(0)
+  avgRating    Decimal?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  products     Product[]
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("seller_profiles")
 }
 
 enum Role {
   BUYER
   SELLER
   ADMIN
-}
-
-model GameProfile {
-  id              String    @id @default(cuid())
-  userId          String    @unique
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  totalPoints     Int       @default(0)
-  availablePoints Int       @default(0)
-  currentLevel    GameLevel @default(INICIANTE)
-  loginStreak     Int       @default(0)
-  lastLoginDate   DateTime?
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  @@map("game_profiles")
 }
 
 enum GameLevel {
@@ -61,61 +191,6 @@ enum GameLevel {
   MESTRE
 }
 
-model Category {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  slug        String    @unique
-  description String?
-  icon        String?
-  
-  products    Product[]
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  @@map("categories")
-}
-
-model Product {
-  id           String        @id @default(cuid())
-  sellerId     String
-  seller       SellerProfile @relation(fields: [sellerId], references: [id])
-  
-  name         String
-  slug         String        @unique
-  description  String
-  shortDesc    String?
-  
-  categoryId   String
-  category     Category      @relation(fields: [categoryId], references: [id])
-  
-  price        Decimal       @db.Decimal(10,2)
-  comparePrice Decimal?      @db.Decimal(10,2)
-  
-  stock        Int           @default(0)
-  
-  weight       Decimal?      @db.Decimal(8,3)
-  height       Decimal?      @db.Decimal(8,2)
-  width        Decimal?      @db.Decimal(8,2)
-  length       Decimal?      @db.Decimal(8,2)
-  
-  images       ProductImage[]
-  
-  status       ProductStatus @default(DRAFT)
-  
-  reviews      Review[]
-  avgRating    Decimal?      @db.Decimal(3,2)
-  totalReviews Int           @default(0)
-  
-  favorites    Favorite[]
-  tags         ProductTagRelation[]
-  
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  
-  @@map("products")
-}
-
 enum ProductStatus {
   DRAFT
   ACTIVE
@@ -123,120 +198,8 @@ enum ProductStatus {
   OUT_OF_STOCK
 }
 
-model ProductImage {
-  id        String  @id @default(cuid())
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
-  url       String
-  alt       String?
-  order     Int     @default(0)
-  
-  createdAt DateTime @default(now())
-  
-  @@map("product_images")
-}
-
-model ProductTag {
-  id       String @id @default(cuid())
-  name     String @unique
-  slug     String @unique
-  color    String @default("#3B82F6")
-  
-  products ProductTagRelation[]
-  
-  createdAt DateTime @default(now())
-  
-  @@map("product_tags")
-}
-
-model ProductTagRelation {
-  productId String
-  tagId     String
-  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
-  tag       ProductTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  
-  @@id([productId, tagId])
-  @@map("product_tag_relations")
-}
-
-model Favorite {
-  id        String  @id @default(cuid())
-  userId    String
-  productId String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
-  createdAt DateTime @default(now())
-  
-  @@unique([userId, productId])
-  @@map("favorites")
-}
-
-model Review {
-  id        String      @id @default(cuid())
-  userId    String
-  productId String
-  
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
-  rating    Int
-  title     String?
-  content   String
-  
-  images    ReviewImage[]
-  
-  pointsAwarded Boolean @default(false)
-  
-  status    ReviewStatus @default(PENDING)
-  
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  
-  @@unique([userId, productId])
-  @@map("reviews")
-}
-
 enum ReviewStatus {
   PENDING
   APPROVED
   REJECTED
-}
-
-model ReviewImage {
-  id       String @id @default(cuid())
-  reviewId String
-  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  
-  url      String
-  alt      String?
-  order    Int    @default(0)
-  
-  createdAt DateTime @default(now())
-  
-  @@map("review_images")
-}
-
-model SellerProfile {
-  id          String    @id @default(cuid())
-  userId      String    @unique
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  businessName String?
-  cnpj        String?
-  ie          String?
-  
-  recipientId String?
-  
-  totalSales  Decimal   @default(0) @db.Decimal(12,2)
-  totalOrders Int       @default(0)
-  avgRating   Decimal?  @db.Decimal(3,2)
-  
-  products    Product[]
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  @@map("seller_profiles")
 }

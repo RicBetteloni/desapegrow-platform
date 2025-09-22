@@ -2,10 +2,11 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Card, CardContent } from '../../components/ui/card'
-import { Button } from '../../components/ui/button'
-import { Badge } from '../../components/ui/badge'
+import { Card, CardContent } from '../ui/card'
+import { Button } from '../ui/button'
+import { Badge } from '../ui/badge'
 import { Heart, Star, ShoppingCart } from 'lucide-react'
+import { useState } from 'react'
 
 interface Product {
   id: string
@@ -13,12 +14,12 @@ interface Product {
   slug: string
   price: number
   comparePrice?: number
-  images: { url: string; alt?: string }[]
+  images: { url: string; alt?: string | null }[]
   avgRating?: number
   totalReviews: number
   stock: number
   category: { name: string }
-  seller: { businessName?: string; user: { name: string } }
+  seller: { businessName?: string | null; user: { name: string } }
 }
 
 interface ProductCardProps {
@@ -26,10 +27,29 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const [imageError, setImageError] = useState(false)
+  
   const pointsEarned = Math.floor(product.price * 0.05)
   const discountPercent = product.comparePrice 
     ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
     : 0
+
+  // Validar se a URL da imagem é válida
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url)
+      return url.startsWith('http://') || url.startsWith('https://')
+    } catch {
+      return false
+    }
+  }
+
+  const imageUrl = product.images[0]?.url
+  const validImageUrl = imageUrl && isValidUrl(imageUrl) && !imageError
+    ? imageUrl 
+    : 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400' // Placeholder
+
+  const imageAlt = product.images[0]?.alt || product.name
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-200">
@@ -37,10 +57,11 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="relative aspect-square overflow-hidden">
         <Link href={`/produtos/${product.slug}`}>
           <Image
-            src={product.images[0]?.url || '/placeholder-product.png'}
-            alt={product.name}
+            src={validImageUrl}
+            alt={imageAlt}
             fill
             className="object-cover hover:scale-105 transition-transform duration-200"
+            onError={() => setImageError(true)}
           />
         </Link>
         
@@ -54,6 +75,11 @@ export function ProductCard({ product }: ProductCardProps) {
           {product.stock === 0 && (
             <Badge variant="secondary" className="text-xs">
               Esgotado
+            </Badge>
+          )}
+          {product.stock < 5 && product.stock > 0 && (
+            <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
+              Últimas {product.stock}
             </Badge>
           )}
         </div>

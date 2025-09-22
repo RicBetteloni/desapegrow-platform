@@ -1,10 +1,71 @@
-import { Suspense } from 'react'
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
-import { Badge } from '../../components/ui/badge'
+import { ProductCard } from '../../components/marketplace/ProductCard'
+
+interface Product {
+  id: string
+  name: string
+  description: string
+  slug: string
+  price: number
+  comparePrice?: number
+  stock: number
+  images: { url: string; alt: string }[]
+  seller: {
+    businessName?: string
+    user: { name: string }
+  }
+  category: { name: string }
+  totalReviews: number
+  avgRating?: number
+}
+
+interface Category {
+  id: string
+  name: string
+  slug: string
+}
 
 export default function MarketplacePage() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      const [productsRes, categoriesRes] = await Promise.all([
+        fetch('/api/products'),
+        fetch('/api/categories')
+      ])
+
+      const productsData = await productsRes.json()
+      const categoriesData = await categoriesRes.json()
+
+      setProducts(productsData.products || [])
+      setCategories(categoriesData.categories || [])
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Carregando marketplace...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       {/* Header */}
@@ -36,93 +97,57 @@ export default function MarketplacePage() {
         </div>
 
         {/* Categories */}
+        {categories.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-6">📂 Categorias</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {categories.map((category) => (
+                <Card key={category.slug} className="hover:shadow-lg transition-all cursor-pointer">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-3xl mb-2">💡</div>
+                    <h3 className="font-semibold text-sm">{category.name}</h3>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Products */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">📂 Categorias</h2>
-          <Suspense fallback={<div>Carregando categorias...</div>}>
-            <CategoriesGrid />
-          </Suspense>
+          <h2 className="text-2xl font-bold mb-6">🌟 Produtos Disponíveis</h2>
+          
+          {products.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="max-w-2xl mx-auto">
+              <CardHeader>
+                <CardTitle className="text-center flex items-center justify-center space-x-2">
+                  <span>📦</span>
+                  <span>Nenhum produto cadastrado ainda</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-muted-foreground mb-4">
+                  Seja o primeiro a cadastrar um produto!
+                </p>
+                <Link href="/vendedor">
+                  <Button size="lg">
+                    Cadastrar Produto
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
         </div>
-
-        {/* Coming Soon Message */}
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle className="text-center flex items-center justify-center space-x-2">
-              <span>🚧</span>
-              <span>Produtos em Breve!</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              O catálogo de produtos está sendo preparado. Em breve você poderá:
-            </p>
-            
-            <div className="grid md:grid-cols-2 gap-4 text-left">
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <span>✅</span>
-                  <span>Navegar por produtos</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span>✅</span>
-                  <span>Ganhar pontos nas compras</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span>✅</span>
-                  <span>Sistema de favoritos</span>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <span>✅</span>
-                  <span>Reviews com pontos</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span>✅</span>
-                  <span>Busca avançada</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span>✅</span>
-                  <span>Dashboard do vendedor</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4">
-              <Link href="/dashboard">
-                <Button size="lg">
-                  Voltar ao Dashboard
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
       </div>
-    </div>
-  )
-}
-
-// Componente separado para as categorias
-async function CategoriesGrid() {
-  // Por enquanto, vamos simular as categorias
-  const categories = [
-    { name: "Equipamentos de Iluminação", slug: "iluminacao", icon: "💡" },
-    { name: "Ventilação e Climatização", slug: "ventilacao", icon: "🌀" },
-    { name: "Sistemas Hidropônicos", slug: "hidroponia", icon: "💧" },
-    { name: "Fertilizantes e Nutrição", slug: "fertilizantes", icon: "🧪" },
-    { name: "Substratos e Vasos", slug: "substratos", icon: "🏺" }
-  ]
-
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-      {categories.map((category) => (
-        <Card key={category.slug} className="hover:shadow-lg transition-all cursor-pointer">
-          <CardContent className="p-4 text-center">
-            <div className="text-3xl mb-2">{category.icon}</div>
-            <h3 className="font-semibold text-sm">{category.name}</h3>
-          </CardContent>
-        </Card>
-      ))}
     </div>
   )
 }
