@@ -7,6 +7,8 @@ import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Heart, Star, ShoppingCart } from 'lucide-react'
 import { useState } from 'react'
+import { useFavorites } from '../../hooks/useFavorites'
+import { cn } from '../../lib/utils'
 
 interface Product {
   id: string
@@ -28,13 +30,13 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const [imageError, setImageError] = useState(false)
+  const { toggleFavorite, isFavorited } = useFavorites()
   
   const pointsEarned = Math.floor(product.price * 0.05)
   const discountPercent = product.comparePrice 
     ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
     : 0
 
-  // Validar se a URL da imagem é válida
   const isValidUrl = (url: string) => {
     try {
       new URL(url)
@@ -47,9 +49,10 @@ export function ProductCard({ product }: ProductCardProps) {
   const imageUrl = product.images[0]?.url
   const validImageUrl = imageUrl && isValidUrl(imageUrl) && !imageError
     ? imageUrl 
-    : 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400' // Placeholder
+    : 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'
 
   const imageAlt = product.images[0]?.alt || product.name
+  const favorited = isFavorited(product.id)
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-200">
@@ -84,13 +87,22 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        {/* Favorite Button */}
+        {/* Favorite Button - ATUALIZADO */}
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/80 hover:bg-white"
+          className={cn(
+            'absolute top-2 right-2 h-8 w-8 rounded-full transition-all',
+            favorited 
+              ? 'bg-red-100 hover:bg-red-200 text-red-600' 
+              : 'bg-white/80 hover:bg-white text-gray-600'
+          )}
+          onClick={(e) => {
+            e.preventDefault()
+            toggleFavorite(product.id)
+          }}
         >
-          <Heart className="h-4 w-4" />
+          <Heart className={cn('h-4 w-4', favorited && 'fill-current')} />
         </Button>
       </div>
 

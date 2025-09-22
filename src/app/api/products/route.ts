@@ -22,6 +22,7 @@ interface Product {
   avgRating?: number
 }
 
+// Array simples para armazenar produtos temporariamente
 const products: Product[] = []
 
 export async function POST(req: NextRequest) {
