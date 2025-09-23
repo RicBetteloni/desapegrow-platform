@@ -28,10 +28,11 @@ const products = [
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const product = products.find(p => p.slug === params.slug)
+    const { slug } = await params
+    const product = products.find(p => p.slug === slug)
     
     if (!product) {
       return NextResponse.json({ error: 'Produto não encontrado' }, { status: 404 })
