@@ -35,6 +35,7 @@ export function ProductCard({ product }: ProductCardProps) {
   
   const pointsEarned = Math.floor(product.price * 0.05)
   const { addToCart } = useCart()
+  const [addingToCart, setAddingToCart] = useState(false)
   const discountPercent = product.comparePrice 
     ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
     : 0
@@ -160,13 +161,18 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Add to Cart */}
-       <Button 
+        <Button 
         className="w-full mt-3" 
-        disabled={product.stock === 0}
-        onClick={() => addToCart(product, 1)}
+        disabled={product.stock === 0 || addingToCart}
+        onClick={async () => {
+            setAddingToCart(true)
+            addToCart(product, 1)
+            // Feedback visual
+            setTimeout(() => setAddingToCart(false), 500)
+        }}
         >
         <ShoppingCart className="h-4 w-4 mr-2" />
-        {product.stock === 0 ? 'Esgotado' : 'Adicionar ao Carrinho'}
+        {addingToCart ? 'Adicionando...' : product.stock === 0 ? 'Esgotado' : 'Adicionar ao Carrinho'}
         </Button>
 
         {/* Seller */}
