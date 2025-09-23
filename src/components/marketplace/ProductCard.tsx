@@ -9,6 +9,7 @@ import { Heart, Star, ShoppingCart } from 'lucide-react'
 import { useState } from 'react'
 import { useFavorites } from '../../hooks/useFavorites'
 import { cn } from '../../lib/utils'
+import { useCart } from '../../hooks/useCart'
 
 interface Product {
   id: string
@@ -33,6 +34,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const { toggleFavorite, isFavorited } = useFavorites()
   
   const pointsEarned = Math.floor(product.price * 0.05)
+  const { addToCart } = useCart()
   const discountPercent = product.comparePrice 
     ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
     : 0
@@ -158,12 +160,13 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Add to Cart */}
-        <Button 
-          className="w-full mt-3" 
-          disabled={product.stock === 0}
+       <Button 
+        className="w-full mt-3" 
+        disabled={product.stock === 0}
+        onClick={() => addToCart(product, 1)}
         >
-          <ShoppingCart className="h-4 w-4 mr-2" />
-          {product.stock === 0 ? 'Esgotado' : 'Adicionar ao Carrinho'}
+        <ShoppingCart className="h-4 w-4 mr-2" />
+        {product.stock === 0 ? 'Esgotado' : 'Adicionar ao Carrinho'}
         </Button>
 
         {/* Seller */}

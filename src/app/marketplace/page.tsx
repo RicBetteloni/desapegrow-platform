@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Button } from '../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
 import { ProductCard } from '../../components/marketplace/ProductCard'
+import { CartSheet } from '../../components/cart/CartSheet'
 
 interface Product {
   id: string
@@ -76,14 +77,15 @@ export default function MarketplacePage() {
             <span>Desapegrow</span>
           </Link>
           
-          <div className="flex items-center space-x-4">
-            <Link href="/dashboard">
-              <Button variant="ghost">Dashboard</Button>
-            </Link>
-            <Link href="/vendedor">
-              <Button>Vender</Button>
-            </Link>
-          </div>
+        <div className="flex items-center space-x-4">
+        <CartSheet />
+        <Link href="/dashboard">
+            <Button variant="ghost">Dashboard</Button>
+        </Link>
+        <Link href="/vendedor">
+            <Button>Vender</Button>
+        </Link>
+        </div>
         </div>
       </nav>
 
