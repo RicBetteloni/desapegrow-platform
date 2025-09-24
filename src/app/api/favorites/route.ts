@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../../../lib/auth'
+import { authOptions } from '@/lib/auth'
 
 // Armazenamento temporário em memória (como os produtos)
 const favorites: { userId: string; productId: string }[] = []

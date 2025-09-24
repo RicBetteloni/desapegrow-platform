@@ -6,7 +6,7 @@ import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { ShoppingCart, Plus, Minus, X, Zap } from 'lucide-react'
-import { useCart } from '../../hooks/useCart'
+import { useCart } from '@/hooks/useCart'
 
 export function CartSheet() {
   const [isOpen, setIsOpen] = useState(false)

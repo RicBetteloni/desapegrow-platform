@@ -1,48 +1,14 @@
-// src/components/reviews/ReviewList.tsx
 'use client'
 
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
-import { Button } from '../../components/ui/button'
-import { Badge } from '../../components/ui/badge'
-import {
-  Star,
-  ThumbsUp,
-  ThumbsDown,
-  Flag,
-  MessageSquare,
-  ChevronDown,
-  ChevronUp,
-  CheckCircle,
-  Award,
-  Camera,
-  X,
-} from 'lucide-react'
-import { cn, formatDate } from '../../lib/utils'
+import React, { useState } from 'react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Star, X } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { ReviewCard } from './ReviewCard'
-
-// Simple StarRating component
-function StarRating({ rating, size = 'md' }: { rating: number; size?: 'sm' | 'md' | 'lg' }) {
-  const starSize = size === 'lg' ? 24 : size === 'md' ? 18 : 14
-  return (
-    <div className="flex">
-      {[...Array(5)].map((_, i) => (
-        <Star
-          key={i}
-          className={
-            i < rating
-              ? `fill-yellow-400 text-yellow-400 mr-1`
-              : `text-gray-300 mr-1`
-          }
-          width={starSize}
-          height={starSize}
-        />
-      ))}
-    </div>
-  )
-}
 
 interface Review {
   id: string
@@ -75,18 +41,16 @@ interface Review {
       }>
     }
   }
-  replies?: ReviewReply[]
-}
-
-interface ReviewReply {
-  id: string
-  content: string
-  isSellerReply: boolean
-  createdAt: string
-  user: {
-    name: string
-    avatar?: string
-  }
+  replies?: {
+    id: string
+    content: string
+    isSellerReply: boolean
+    createdAt: string
+    user: {
+      name: string
+      avatar?: string
+    }
+  }[]
 }
 
 interface ReviewDisplayProps {
@@ -105,6 +69,25 @@ interface ReviewDisplayProps {
   className?: string
 }
 
+type SortBy = 'newest' | 'oldest' | 'helpful' | 'rating'
+type FilterBy = 'all' | '5' | '4' | '3' | '2' | '1' | 'images'
+
+const StarRating = ({ rating, size = 'md' }: { rating: number; size?: 'sm' | 'md' | 'lg' }) => {
+  const starSize = size === 'lg' ? 24 : size === 'md' ? 18 : 14
+  return (
+    <div className="flex">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Star
+          key={i}
+          className={cn(i <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300')}
+          width={starSize}
+          height={starSize}
+        />
+      ))}
+    </div>
+  )
+}
+
 export function ReviewDisplay({
   reviews,
   totalReviews,
@@ -114,9 +97,8 @@ export function ReviewDisplay({
   onReply,
   className,
 }: ReviewDisplayProps) {
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'helpful' | 'rating'>('newest')
-  type FilterType = 'all' | '5' | '4' | '3' | '2' | '1' | 'images';
-  const [filterBy, setFilterBy] = useState<FilterType>('all')
+  const [sortBy, setSortBy] = useState<SortBy>('newest')
+  const [filterBy, setFilterBy] = useState<FilterBy>('all')
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
   const handleVote = (reviewId: string, helpful: boolean) => {
@@ -196,7 +178,8 @@ export function ReviewDisplay({
               <Button
                 key={filter}
                 variant={filterBy === filter ? 'default' : 'outline'}
-                onClick={() => setFilterBy(filter as FilterType)}
+                size="sm"
+                onClick={() => setFilterBy(filter as FilterBy)}
               >
                 {filter === 'all'
                   ? 'Todas'
@@ -211,9 +194,9 @@ export function ReviewDisplay({
         <div className="flex items-center space-x-2">
           <span className="text-sm font-medium">Ordenar:</span>
           <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'helpful' | 'rating')}
+            onChange={(e) => setSortBy(e.target.value as SortBy)}
             className="rounded border px-3 py-1 text-sm"
+            value={sortBy}
           >
             <option value="newest">Mais Recentes</option>
             <option value="oldest">Mais Antigas</option>

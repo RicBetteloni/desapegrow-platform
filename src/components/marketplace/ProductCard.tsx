@@ -7,9 +7,9 @@ import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Heart, Star, ShoppingCart } from 'lucide-react'
 import { useState } from 'react'
-import { useFavorites } from '../../hooks/useFavorites'
-import { cn } from '../../lib/utils'
-import { useCart } from '../../hooks/useCart'
+import { useFavorites } from '@/hooks/useFavorites'
+import { cn } from '@/lib/utils'
+import { useCart } from '@/hooks/useCart'
 
 interface Product {
   id: string

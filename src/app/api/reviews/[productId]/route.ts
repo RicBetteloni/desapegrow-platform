@@ -1,5 +1,6 @@
+// src/app/api/reviews/[productId]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
@@ -48,7 +49,6 @@ export async function GET(
       orderBy: { createdAt: 'desc' },
     });
 
-    // Calcula a média de avaliações e a contagem de reviews por estrela
     const reviewsCount = await prisma.review.aggregate({
       where: {
         productId,
