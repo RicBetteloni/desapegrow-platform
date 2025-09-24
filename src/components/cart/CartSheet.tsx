@@ -35,10 +35,10 @@ export function CartSheet() {
           className="fixed inset-0 bg-black bg-opacity-50 z-50"
           onClick={() => setIsOpen(false)}
         >
-          <div 
-            className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg transform transition-transform duration-300"
+        <div 
+            className="bg-white w-96 h-full shadow-2xl overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
-          >
+        >
             <div className="flex flex-col h-full">
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b">
