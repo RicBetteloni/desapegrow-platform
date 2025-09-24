@@ -1,0 +1,14 @@
+# Define quebra de linha padrão para arquivos de texto como LF
+* text=auto
+
+# Certifica-se de que arquivos de código e markdown usam LF
+*.js text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.prisma text eol=lf
+
+# Força quebra de linha LF para todos os arquivos de texto
+* text eol=lf
