@@ -1,3 +1,5 @@
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -31,8 +33,74 @@ model User {
   reviewQuestions ReviewQuestion[]
   questionAnswers QuestionAnswer[]
   sellerProfile   SellerProfile?
+  virtualGrow     VirtualGrow?
 
   @@map("users")
+}
+
+model VirtualGrow {
+  id              String           @id @default(cuid())
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id])
+  growType        GrowType         @default(INDOOR)
+  growSize        GrowSize         @default(SMALL)
+  automationLevel AutoLevel        @default(MANUAL)
+  plants          VirtualPlant[]
+  inventory       VirtualItem[]
+  dailyRewards    DailyRewardLog[]
+  cultivoCoins    Int              @default(100)
+  growthGems      Int              @default(0)
+  harvestTokens   Int              @default(0)
+  experiencePoints Int             @default(0)
+  prestigeLevel   Int              @default(1)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model VirtualPlant {
+  id              String        @id @default(cuid())
+  growId          String
+  grow            VirtualGrow   @relation(fields: [growId], references: [id])
+  name            String
+  strain          PlantStrain
+  genetics        Json
+  stage           GrowthStage   @default(SEED)
+  daysGrowing     Int           @default(0)
+  health          Int           @default(100)
+  size            Float         @default(0.1)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model VirtualItem {
+  id              String      @id @default(cuid())
+  growId          String
+  grow            VirtualGrow @relation(fields: [growId], references: [id])
+  itemType        ItemType
+  rarity          ItemRarity
+  name            String
+  iconUrl         String
+  effects         Json
+  sourceType      SourceType
+  sourceId        String?
+  realProductId   String?
+  createdAt       DateTime    @default(now())
+}
+
+model DailyRewardLog {
+  id            String      @id @default(cuid())
+  userId        String
+  growId        String
+  grow          VirtualGrow @relation(fields: [growId], references: [id])
+  rewardDate    DateTime    @default(now()) @db.Date
+  streakDay     Int
+  totalStreak   Int
+  coinsEarned   Int
+  gemsEarned    Int         @default(0)
+  tokensEarned  Int         @default(0)
+  itemsReceived String[]    @default([])
+  rngSeed       String
+  rarityRolled  ItemRarity
 }
 
 model GameProfile {
@@ -439,4 +507,60 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELED
+}
+
+enum GrowType { 
+  INDOOR 
+  OUTDOOR 
+  HYDROPONIC 
+  GREENHOUSE 
+}
+enum GrowSize { 
+  SMALL 
+  MEDIUM 
+  LARGE 
+  WAREHOUSE 
+}
+enum AutoLevel { 
+  MANUAL 
+  SEMI_AUTO 
+  FULL_AUTO 
+  AI_DRIVEN 
+}
+enum PlantStrain { 
+  SATIVA 
+  INDICA 
+  HYBRID 
+  AUTOFLOWER 
+}
+enum GrowthStage { 
+  SEED 
+  SEEDLING 
+  VEGETATIVE 
+  PRE_FLOWER 
+  FLOWERING 
+  HARVEST_READY 
+}
+enum ItemType { 
+  LIGHTING 
+  NUTRIENTS 
+  SUBSTRATE 
+  TOOLS 
+  GENETICS 
+  AUTOMATION 
+  DECORATION 
+  BOOSTER 
+}
+enum ItemRarity { 
+  COMMON 
+  RARE 
+  EPIC 
+  LEGENDARY 
+}
+enum SourceType { 
+  PURCHASE 
+  DAILY_REWARD 
+  ACHIEVEMENT 
+  SOCIAL_REWARD 
+  EVENT_REWARD 
 }
