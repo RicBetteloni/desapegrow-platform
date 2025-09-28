@@ -1,4 +1,3 @@
-// src/app/analytics/page.tsx
 'use client'
 
 import { useSession } from 'next-auth/react'
@@ -7,7 +6,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '../../components/ui/button'
 import { ArrowLeft } from 'lucide-react'
-import { MainDashboard } from '../../components/dashboard/MainDashboard'
+import { AnalyticsDashboard } from '../../components/dashboard/AnalyticsDashboard'
+
 export default function AnalyticsPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -68,9 +68,9 @@ export default function AnalyticsPage() {
         </div>
       </nav>
 
-      {/* Dashboard Content */}
+      {/* Analytics Content */}
       <div className="container mx-auto p-6">
-        <MainDashboard />
+        <AnalyticsDashboard />
       </div>
     </div>
   )

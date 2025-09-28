@@ -25,6 +25,7 @@ import {
   RefreshCw
 } from 'lucide-react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 
 interface DashboardData {
   kpis: {
@@ -251,6 +252,10 @@ export function MainDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
+      <Link href="/grow-virtual" className="flex items-center space-x-2 text-green-600 hover:text-green-700">
+      <span>🌱</span>
+      <span>Grow Virtual</span>
+    </Link>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Dashboard Gamificado</h1>

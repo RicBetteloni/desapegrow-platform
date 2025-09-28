@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
-// Or, if the file does not exist, create 'src/components/ui/badge.tsx' with the Badge component.
 
 export default function Home() {
   return (

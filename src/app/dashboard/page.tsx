@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { MainDashboard } from '@/components/dashboard/MainDashboard' // Importa o componente do dashboard
+import { DailyRewards } from '@/components/grow-virtual/DailyRewards';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()

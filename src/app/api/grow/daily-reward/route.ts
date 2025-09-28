@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { ItemRarity, ItemType, SourceType } from '@prisma/client';
+// CORRIJA ESTA LINHA - use o arquivo de tipos que criamos
+import { ItemRarity, ItemType, SourceType } from '@/types/prisma'
+
+// resto do código permanece igual...
 
 // Interface para o item virtual (baseado no seu schema.prisma)
 interface VirtualItemData {

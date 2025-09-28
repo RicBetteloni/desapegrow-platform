@@ -7,7 +7,6 @@ import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { Label } from '../../components/ui/label'
-import { Textarea } from '../../components/ui/textarea'
 import { useSession } from 'next-auth/react'
 
 interface Category {
@@ -97,7 +96,6 @@ export default function VendedorPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      {/* Header */}
       <nav className="bg-white/80 backdrop-blur-sm border-b p-4">
         <div className="container mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2 text-xl font-bold text-green-700">
@@ -144,7 +142,7 @@ export default function VendedorPage() {
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, name: e.target.value})}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
                   placeholder="Ex: LED Grow Light 150W Full Spectrum"
                   required
                 />
@@ -155,20 +153,21 @@ export default function VendedorPage() {
                 <Input
                   id="shortDesc"
                   value={formData.shortDesc}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, shortDesc: e.target.value})}
+                  onChange={(e) => setFormData({...formData, shortDesc: e.target.value})}
                   placeholder="Descrição de uma linha"
                 />
               </div>
 
               <div>
                 <Label htmlFor="description">Descrição Completa</Label>
-                <Textarea
+                <textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({...formData, description: e.target.value})}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
                   placeholder="Descrição detalhada do produto..."
                   rows={4}
                   required
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
               </div>
 
@@ -180,7 +179,7 @@ export default function VendedorPage() {
                     type="number"
                     step="0.01"
                     value={formData.price}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, price: e.target.value})}
+                    onChange={(e) => setFormData({...formData, price: e.target.value})}
                     placeholder="99.90"
                     required
                   />
@@ -192,7 +191,7 @@ export default function VendedorPage() {
                     type="number"
                     step="0.01"
                     value={formData.comparePrice}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, comparePrice: e.target.value})}
+                    onChange={(e) => setFormData({...formData, comparePrice: e.target.value})}
                     placeholder="149.90"
                   />
                 </div>
@@ -205,7 +204,7 @@ export default function VendedorPage() {
                     id="stock"
                     type="number"
                     value={formData.stock}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, stock: e.target.value})}
+                    onChange={(e) => setFormData({...formData, stock: e.target.value})}
                     placeholder="10"
                     required
                   />
@@ -215,7 +214,7 @@ export default function VendedorPage() {
                   <select
                     id="categoryId"
                     value={formData.categoryId}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, categoryId: e.target.value})}
+                    onChange={(e) => setFormData({...formData, categoryId: e.target.value})}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     required
                   >
@@ -234,7 +233,7 @@ export default function VendedorPage() {
                 <Input
                   id="image"
                   value={formData.images[0]}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, images: [e.target.value]})}
+                  onChange={(e) => setFormData({...formData, images: [e.target.value]})}
                   placeholder="https://exemplo.com/imagem.jpg"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
