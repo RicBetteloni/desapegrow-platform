@@ -1,58 +1,13 @@
+// src/app/api/grow/unlock-item/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { ItemType, ItemRarity, SourceType } from '@prisma/client';
-
-// Mapeamento de produtos reais para items virtuais
-interface VirtualItem {
-  itemType: ItemType;
-  rarity: ItemRarity;
-  name: string;
-  iconUrl: string;
-  effects: Record<string, number | boolean>;
-}
-
-function getVirtualItemForProduct(productId: string, categorySlug: string): VirtualItem {
-  const mappings: Record<string, VirtualItem> = {
-    'iluminacao': {
-      itemType: ItemType.LIGHTING,
-      rarity: ItemRarity.RARE,
-      name: 'Grow Light Virtual',
-      iconUrl: '/icons/light.png',
-      effects: { light_quality: 85, power_efficiency: 90 }
-    },
-    'fertilizantes': {
-      itemType: ItemType.NUTRIENTS,
-      rarity: ItemRarity.COMMON,
-      name: 'Nutrient Booster',
-      iconUrl: '/icons/nutrients.png',
-      effects: { growth_boost: 20 }
-    },
-    'hidroponia': {
-      itemType: ItemType.AUTOMATION,
-      rarity: ItemRarity.EPIC,
-      name: 'Hydro System',
-      iconUrl: '/icons/hydro.png',
-      effects: { auto_water: true, efficiency: 95 }
-    },
-    'substratos': {
-      itemType: ItemType.SUBSTRATE,
-      rarity: ItemRarity.COMMON,
-      name: 'Premium Substrate',
-      iconUrl: '/icons/substrate.png',
-      effects: { root_health: 30 }
-    }
-  };
-
-  return mappings[categorySlug] || {
-    itemType: ItemType.DECORATION,
-    rarity: ItemRarity.COMMON,
-    name: 'Mystery Item',
-    iconUrl: '/icons/mystery.png',
-    effects: { prestige: 5 }
-  };
-}
+import { 
+  mapProductToVirtualItem, 
+  getCoinsReward, 
+  getGemsReward 
+} from '@/lib/productItemMapping';
 
 export async function POST(req: NextRequest) {
   try {
@@ -61,57 +16,177 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const { productId, categorySlug } = await req.json();
+    const { productId, orderId } = await req.json();
+
+    // Validar dados
+    if (!productId || !orderId) {
+      return NextResponse.json(
+        { error: 'productId e orderId são obrigatórios' },
+        { status: 400 }
+      );
+    }
+
     const userId = session.user.id;
 
-    // Buscar ou criar VirtualGrow
-    let virtualGrow = await prisma.virtualGrow.findUnique({ 
-      where: { userId } 
+    // Buscar produto
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: { category: true }
     });
-    
+
+    if (!product) {
+      return NextResponse.json({ error: 'Produto não encontrado' }, { status: 404 });
+    }
+
+    // Verificar se usuário tem VirtualGrow
+    let virtualGrow = await prisma.virtualGrow.findUnique({
+      where: { userId }
+    });
+
+    // Criar VirtualGrow se não existir
     if (!virtualGrow) {
-      virtualGrow = await prisma.virtualGrow.create({ 
-        data: { userId } 
+      virtualGrow = await prisma.virtualGrow.create({
+        data: { userId }
       });
     }
 
-    // Gerar item virtual baseado no produto
-    const virtualItem = getVirtualItemForProduct(productId, categorySlug);
-    
-    // Criar item no inventário
-    const createdItem = await prisma.virtualItem.create({
+    // Mapear produto → item virtual
+    const virtualItemData = mapProductToVirtualItem(
+      product.name,
+      product.category.slug,
+      Number(product.price)
+    );
+
+    if (!virtualItemData) {
+      return NextResponse.json(
+        { error: 'Não foi possível mapear produto para item virtual' },
+        { status: 500 }
+      );
+    }
+
+    // Calcular recompensas
+    const coinsReward = getCoinsReward(virtualItemData.rarity);
+    const gemsReward = getGemsReward(virtualItemData.rarity);
+
+    // Criar item virtual no inventário
+    const virtualItem = await prisma.virtualItem.create({
       data: {
         growId: virtualGrow.id,
-        itemType: virtualItem.itemType,
-        rarity: virtualItem.rarity,
-        name: virtualItem.name,
-        iconUrl: virtualItem.iconUrl,
-        effects: virtualItem.effects,
-        sourceType: SourceType.PURCHASE,
+        itemType: virtualItemData.itemType,
+        rarity: virtualItemData.rarity,
+        name: virtualItemData.nameTemplate,
+        iconUrl: virtualItemData.iconUrl,
+        effects: JSON.stringify(virtualItemData.effects), // JSON field
+        sourceType: 'PURCHASE',
+        sourceId: orderId,
         realProductId: productId
       }
     });
 
-    // Bonus coins por compra
+    // Atualizar moedas do VirtualGrow
     await prisma.virtualGrow.update({
+      where: { id: virtualGrow.id },
+      data: {
+        cultivoCoins: { increment: coinsReward },
+        growthGems: { increment: gemsReward }
+      }
+    });
+
+    // Atualizar pontos do GameProfile
+    await prisma.gameProfile.update({
       where: { userId },
       data: {
-        cultivoCoins: { increment: 25 },
-        experiencePoints: { increment: 15 }
+        totalPoints: { increment: coinsReward },
+        availablePoints: { increment: coinsReward }
       }
+    });
+
+    // Log de transação (analytics)
+    console.log('[Item Unlocked]', {
+      userId,
+      productId,
+      itemName: virtualItem.name,
+      rarity: virtualItem.rarity,
+      coinsReward,
+      gemsReward
     });
 
     return NextResponse.json({
       success: true,
-      item: createdItem,
-      bonusCoins: 25,
-      message: 'Item virtual desbloqueado! +25 Cultivo Coins'
+      item: {
+        id: virtualItem.id,
+        name: virtualItem.name,
+        rarity: virtualItem.rarity,
+        itemType: virtualItem.itemType,
+        iconUrl: virtualItem.iconUrl,
+        effects: virtualItem.effects
+      },
+      rewards: {
+        cultivoCoins: coinsReward,
+        growthGems: gemsReward,
+        totalCoins: virtualGrow.cultivoCoins + coinsReward,
+        totalGems: virtualGrow.growthGems + gemsReward
+      },
+      message: `🎉 Você desbloqueou: ${virtualItem.name}!`
     });
 
   } catch (error) {
-    console.error('Erro ao desbloquear item virtual:', error);
-    return NextResponse.json({ 
-      error: 'Erro interno do servidor' 
-    }, { status: 500 });
+    console.error('Erro ao desbloquear item:', error);
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    );
+  }
+}
+
+// GET - Listar itens do inventário
+export async function GET(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
+    const virtualGrow = await prisma.virtualGrow.findUnique({
+      where: { userId: session.user.id },
+      include: {
+        inventory: {
+          orderBy: { createdAt: 'desc' }
+        }
+      }
+    });
+
+    if (!virtualGrow) {
+      return NextResponse.json({
+        inventory: [],
+        stats: {
+          totalItems: 0,
+          byRarity: { COMMON: 0, RARE: 0, EPIC: 0, LEGENDARY: 0 }
+        }
+      });
+    }
+
+    // Estatísticas do inventário
+    const stats = {
+      totalItems: virtualGrow.inventory.length,
+      byRarity: {
+        COMMON: virtualGrow.inventory.filter(i => i.rarity === 'COMMON').length,
+        RARE: virtualGrow.inventory.filter(i => i.rarity === 'RARE').length,
+        EPIC: virtualGrow.inventory.filter(i => i.rarity === 'EPIC').length,
+        LEGENDARY: virtualGrow.inventory.filter(i => i.rarity === 'LEGENDARY').length
+      }
+    };
+
+    return NextResponse.json({
+      inventory: virtualGrow.inventory,
+      stats
+    });
+
+  } catch (error) {
+    console.error('Erro ao buscar inventário:', error);
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    );
   }
 }

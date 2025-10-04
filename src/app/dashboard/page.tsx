@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { MainDashboard } from '@/components/dashboard/MainDashboard' // Importa o componente do dashboard
 import { DailyRewards } from '@/components/grow-virtual/DailyRewards';
+import { VirtualGarden } from '../../components/grow-virtual/VirtualGarden';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
@@ -62,6 +63,8 @@ export default function DashboardPage() {
       {/* Dashboard Content */}
       <div className="container mx-auto p-6">
         <MainDashboard />
+          {/* Adicione o Jardim Virtual aqui para visualização */}
+        <VirtualGarden />
       </div>
     </div>
   )
