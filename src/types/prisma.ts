@@ -1,66 +1,79 @@
-// src/types/prisma.ts - Corrigido para corresponder ao schema
+// Prisma Enums
 
 export enum ItemRarity {
-  COMMON = 'COMMON',
-  RARE = 'RARE', 
-  EPIC = 'EPIC',
-  LEGENDARY = 'LEGENDARY'
+    COMMON = 'COMMON',
+    UNCOMMON = 'UNCOMMON',
+    RARE = 'RARE',
+    LEGENDARY = 'LEGENDARY'
 }
 
 export enum ItemType {
-  LIGHTING = 'LIGHTING',
-  NUTRIENTS = 'NUTRIENTS', 
-  SUBSTRATE = 'SUBSTRATE',
-  TOOLS = 'TOOLS',
-  GENETICS = 'GENETICS',
-  AUTOMATION = 'AUTOMATION',
-  DECORATION = 'DECORATION',
-  BOOSTER = 'BOOSTER'
+    SEED = 'SEED',
+    PLANT = 'PLANT',
+    PRODUCT = 'PRODUCT'
 }
 
 export enum SourceType {
-  PURCHASE = 'PURCHASE',
-  DAILY_REWARD = 'DAILY_REWARD',
-  ACHIEVEMENT = 'ACHIEVEMENT', 
-  SOCIAL_REWARD = 'SOCIAL_REWARD',
-  EVENT_REWARD = 'EVENT_REWARD'
+    NATURE = 'NATURE',
+    MANUFACTURED = 'MANUFACTURED'
 }
 
 export enum GrowType {
-  INDOOR = 'INDOOR',
-  OUTDOOR = 'OUTDOOR',
-  HYDROPONIC = 'HYDROPONIC',
-  GREENHOUSE = 'GREENHOUSE'
+    INDOOR = 'INDOOR',
+    OUTDOOR = 'OUTDOOR'
 }
 
 export enum GrowSize {
-  SMALL = 'SMALL',
-  MEDIUM = 'MEDIUM',
-  LARGE = 'LARGE',
-  WAREHOUSE = 'WAREHOUSE'
+    SMALL = 'SMALL',
+    MEDIUM = 'MEDIUM',
+    LARGE = 'LARGE'
 }
 
 export enum AutoLevel {
-  MANUAL = 'MANUAL',
-  SEMI_AUTO = 'SEMI_AUTO',
-  FULL_AUTO = 'FULL_AUTO',
-  AI_DRIVEN = 'AI_DRIVEN'
+    ENABLED = 'ENABLED',
+    DISABLED = 'DISABLED'
 }
 
 export enum PlantStrain {
-  SATIVA = 'SATIVA',
-  INDICA = 'INDICA',
-  HYBRID = 'HYBRID',
-  AUTOFLOWER = 'AUTOFLOWER'
+    INDICA = 'INDICA',
+    SATIVA = 'SATIVA',
+    HYBRID = 'HYBRID'
 }
 
 export enum GrowthStage {
-  SEED = 'SEED',
-  SEEDLING = 'SEEDLING',
-  VEGETATIVE = 'VEGETATIVE',
-  PRE_FLOWER = 'PRE_FLOWER',
-  FLOWERING = 'FLOWERING',
-  HARVEST_READY = 'HARVEST_READY'
+    SEEDLING = 'SEEDLING',
+    VEG = 'VEG',
+    FLOWERING = 'FLOWERING',
+    HARVEST = 'HARVEST'
 }
 
-// ... outros enums conforme seu schema
+export enum GameLevel {
+    BEGINNER = 'BEGINNER',
+    INTERMEDIATE = 'INTERMEDIATE',
+    ADVANCED = 'ADVANCED'
+}
+
+export enum ProductStatus {
+    AVAILABLE = 'AVAILABLE',
+    OUT_OF_STOCK = 'OUT_OF_STOCK',
+    DISCONTINUED = 'DISCONTINUED'
+}
+
+export enum ReviewStatus {
+    PENDING = 'PENDING',
+    APPROVED = 'APPROVED',
+    REJECTED = 'REJECTED'
+}
+
+export enum Role {
+    USER = 'USER',
+    ADMIN = 'ADMIN'
+}
+
+export enum OrderStatus {
+    PENDING = 'PENDING',
+    COMPLETED = 'COMPLETED',
+    CANCELLED = 'CANCELLED'
+}
+
+// Add other enums used in the application as necessary.
