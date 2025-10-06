@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useItemUnlock } from '@/hooks/useItemUnlock'
-import ItemUnlockedModal from '@/components/ItemUnlockedModal'
+import ItemUnlockedModal from '@/components/ItemUnlockedModal';
 import { ShoppingCart, CreditCard, Package, Gift } from 'lucide-react'
 
 interface CartItem {
@@ -324,7 +324,7 @@ export default function CheckoutPage() {
       {/* Modal de Item Desbloqueado */}
       <ItemUnlockedModal
         isOpen={showModal}
-        item={unlockedItem}
+        item={unlockedItem || { name: '' }}
         rewards={rewards || { cultivoCoins: 0, growthGems: 0 }}
         onClose={closeModal}
       />
