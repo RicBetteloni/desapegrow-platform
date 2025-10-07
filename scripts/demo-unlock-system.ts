@@ -137,26 +137,40 @@ async function demoUnlockSystem() {
     console.log('   🎨 Tipo:', virtualItem.itemType)
 
     // 6. Atualizar moedas
-    console.log('\n📍 Passo 6: Atualizando moedas...')
-    await prisma.virtualGrow.update({
-      where: { id: virtualGrow.id },
-      data: {
-        cultivoCoins: { increment: coinsReward },
-        growthGems: { increment: gemsReward }
-      }
-    })
+  console.log('\n📍 Passo 6: Atualizando moedas...')
+    
+  // Encontrar ou criar GameProfile
+  let gameProfile = await prisma.gameProfile.findUnique({
+   where: { userId: user.id }
+  })
 
-    await prisma.gameProfile.update({
-      where: { userId: user.id },
-      data: {
-        totalPoints: { increment: coinsReward },
-        availablePoints: { increment: coinsReward }
-      }
-    })
+  if (!gameProfile) {
+   console.log(' ⚠️ Nenhum GameProfile encontrado. Criando...')
+   gameProfile = await prisma.gameProfile.create({
+    data: { userId: user.id, totalPoints: 0, availablePoints: 0, currentLevel: 'INICIANTE' }
+   })
+   console.log(' ✅ GameProfile criado.')
+  }
 
-    console.log('   ✅ Recompensas creditadas!')
-    console.log('   🪙 CultivoCoins:', coinsReward)
-    console.log('   💎 GrowthGems:', gemsReward)
+  await prisma.virtualGrow.update({
+   where: { id: virtualGrow.id },
+   data: {
+    cultivoCoins: { increment: coinsReward },
+    growthGems: { increment: gemsReward }
+   }
+  })
+
+  await prisma.gameProfile.update({
+   where: { userId: user.id },
+   data: {
+    totalPoints: { increment: coinsReward },
+    availablePoints: { increment: coinsReward }
+   }
+  })
+
+  console.log(' ✅ Recompensas creditadas!')
+  console.log(' 🪙 CultivoCoins:', coinsReward)
+ console.log(' 💎 GrowthGems:', gemsReward)
 
     // 7. Mostrar resumo final
     console.log('\n' + '='.repeat(60))

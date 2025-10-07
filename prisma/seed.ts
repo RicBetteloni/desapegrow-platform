@@ -102,19 +102,32 @@ const PRODUCTS = [
 async function main() {
   console.log('🌱 Iniciando seed do banco de dados...');
   try {
-    console.log('🗑️  Dados anteriores limpos');
-    await prisma.reviewHelpful.deleteMany();
-    await prisma.reviewReply.deleteMany();
-    await prisma.reviewMedia.deleteMany();
-    await prisma.review.deleteMany();
-    await prisma.order.deleteMany();
-    await prisma.productTagRelation.deleteMany();
-    await prisma.productTag.deleteMany();
-    await prisma.productImage.deleteMany();
-    await prisma.product.deleteMany();
-    await prisma.sellerProfile.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.category.deleteMany();
+    // ...
+console.log('🗑️  Dados anteriores limpos');
+  await prisma.reviewHelpful.deleteMany();
+  await prisma.reviewReply.deleteMany();
+  await prisma.reviewMedia.deleteMany();
+  await prisma.review.deleteMany();
+  await prisma.pointTransaction.deleteMany();
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.userExpertiseBadge.deleteMany();
+  await prisma.reputationAchievement.deleteMany();
+  await prisma.userReputation.deleteMany();
+  await prisma.reviewQuestion.deleteMany();
+  await prisma.questionAnswer.deleteMany();
+  await prisma.virtualPlant.deleteMany();
+  await prisma.virtualItem.deleteMany();
+  await prisma.dailyRewardLog.deleteMany();
+  await prisma.virtualGrow.deleteMany();
+  await prisma.gameProfile.deleteMany();
+  await prisma.sellerProfile.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.productTagRelation.deleteMany();
+  await prisma.productTag.deleteMany();
+  await prisma.productImage.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
 
     console.log('📂 Criando categorias...');
     for (const category of CATEGORIES) {

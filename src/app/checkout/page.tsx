@@ -27,14 +27,9 @@ export default function CheckoutPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(false)
   const [processingPayment, setProcessingPayment] = useState(false)
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   
-  const { 
-    unlockItem, 
-    unlockedItem, 
-    rewards, 
-    showModal, 
-    closeModal 
-  } = useItemUnlock()
+const { unlockItem, unlockedItem, rewards, showModal, closeModal } = useItemUnlock()
 
   // Carregar itens do carrinho do localStorage
   useEffect(() => {
@@ -55,63 +50,43 @@ export default function CheckoutPage() {
   const shipping = subtotal > 200 ? 0 : 15.90
   const total = subtotal + shipping
 
-  const handleCheckout = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setProcessingPayment(true)
+// SUBSTITUIR handleCheckout por:
+const handleCheckout = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setProcessingPayment(true)
 
-    try {
-      // Simular processamento de pagamento
-      await new Promise(resolve => setTimeout(resolve, 2000))
+  try {
+    await new Promise(resolve => setTimeout(resolve, 2000))
 
-      // Criar pedido no backend
-      const orderResponse = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cartItems,
-          total,
-          paymentMethod: 'credit_card'
-        })
-      })
+    const orderResponse = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cartItems, total, paymentMethod: 'credit_card' })
+    })
 
-      if (!orderResponse.ok) {
-        throw new Error('Erro ao criar pedido')
+    if (!orderResponse.ok) throw new Error('Erro ao criar pedido')
+    const orderData = await orderResponse.json()
+
+    // UNLOCK ITEMS
+    for (const item of cartItems) {
+      try {
+        await unlockItem({ productId: item.productId, orderId: orderData.orderId })
+        await new Promise(resolve => setTimeout(resolve, 500))
+      } catch (error) {
+        console.error('Erro ao desbloquear item:', error)
       }
-
-      const orderData = await orderResponse.json()
-      const orderId = orderData.orderId
-
-      // Desbloquear itens virtuais para cada produto
-      for (const item of cartItems) {
-        try {
-          await unlockItem({
-            productId: item.productId,
-            orderId: orderId
-          })
-          
-          // Pequeno delay entre unlocks para melhor UX
-          await new Promise(resolve => setTimeout(resolve, 500))
-        } catch (error) {
-          console.error('Erro ao desbloquear item:', error)
-          // Continua mesmo se um item falhar
-        }
-      }
-
-      // Limpar carrinho
-      localStorage.removeItem('cart')
-      
-      // Aguardar fechamento do modal antes de redirecionar
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 3000)
-
-    } catch (error) {
-      console.error('Erro no checkout:', error)
-      alert('Erro ao processar pagamento. Tente novamente.')
-    } finally {
-      setProcessingPayment(false)
     }
+
+    localStorage.removeItem('cart')
+    setShowSuccessMessage(true)
+
+  } catch (error) {
+    console.error('Erro no checkout:', error)
+    alert('Erro ao processar pagamento.')
+  } finally {
+    setProcessingPayment(false)
   }
+}
 
   if (status === 'loading') {
     return (
@@ -324,7 +299,7 @@ export default function CheckoutPage() {
       {/* Modal de Item Desbloqueado */}
       <ItemUnlockedModal
         isOpen={showModal}
-        item={unlockedItem || { name: '' }}
+        item={unlockedItem || null}
         rewards={rewards || { cultivoCoins: 0, growthGems: 0 }}
         onClose={closeModal}
       />
