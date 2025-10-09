@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import { Package, Sparkles, Filter, TrendingUp } from 'lucide-react'
+import Link from 'next/link'
 
 interface ItemEffect {
   type: 'growth_speed' | 'health_boost' | 'yield_multiplier' | 'automation'
@@ -176,9 +177,9 @@ export default function VirtualInventoryComponent() {
             {inventory.length === 0 ? 'Compre produtos no marketplace para desbloquear itens virtuais!' : 'Tente ajustar os filtros'}
           </p>
           {inventory.length === 0 && (
-            <a href="/marketplace" className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <Link href="/marketplace" className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
               🛒 Ir para Marketplace
-            </a>
+            </Link>
           )}
         </div>
       ) : (
