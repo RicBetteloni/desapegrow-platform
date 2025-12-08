@@ -1,257 +1,271 @@
 'use client'
-
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
+import { AuthLoading } from '@/components/auth/AuthLoading'
 import Link from 'next/link'
-import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
-import { Label } from '../../components/ui/label'
-import { useSession } from 'next-auth/react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { 
+  Package, 
+  DollarSign, 
+  ShoppingBag, 
+  TrendingUp,
+  Plus,
+  Edit,
+  Trash2
+} from 'lucide-react'
 
-interface Category {
+interface Product {
   id: string
   name: string
   slug: string
+  price: number
+  stock: number
+  status: string
+  images: { url: string }[]
+  totalReviews: number
+  avgRating: number | null
 }
 
-export default function VendedorPage() {
-  const { data: session, status } = useSession()
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const router = useRouter()
+interface Stats {
+  totalProducts: number
+  activeProducts: number
+  totalOrders: number
+  totalRevenue: number
+}
 
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    shortDesc: '',
-    price: '',
-    comparePrice: '',
-    stock: '',
-    categoryId: '',
-    images: ['']
-  })
+export default function VendedorDashboard() {
+  const { session, loading } = useRequireAuth()
+  const [products, setProducts] = useState<Product[]>([])
+  const [stats, setStats] = useState<Stats | null>(null)
+  const [loadingData, setLoadingData] = useState(true)
 
   useEffect(() => {
-    if (status === 'loading') return
-    if (!session) {
-      router.push('/auth/signin')
-      return
+    if (session) {
+      fetchDashboardData()
     }
-    fetchCategories()
-  }, [session, status, router])
+  }, [session])
 
-  const fetchCategories = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const response = await fetch('/api/categories')
-      const data = await response.json()
-      setCategories(data.categories || [])
+      const [productsRes, statsRes] = await Promise.all([
+        fetch('/api/vendedor/products'),
+        fetch('/api/vendedor/stats')
+      ])
+
+      const productsData = await productsRes.json()
+      const statsData = await statsRes.json()
+
+      setProducts(productsData.products || [])
+      setStats(statsData.stats || {
+        totalProducts: 0,
+        activeProducts: 0,
+        totalOrders: 0,
+        totalRevenue: 0
+      })
     } catch (error) {
-      console.error('Erro ao carregar categorias:', error)
+      console.error('Erro ao carregar dados:', error)
+    } finally {
+      setLoadingData(false)
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
-    setMessage('')
+  const deleteProduct = async (id: string) => {
+    if (!confirm('Deseja realmente excluir este produto?')) return
 
     try {
-      const response = await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          images: formData.images.filter(img => img.trim() !== '')
-        })
+      const response = await fetch(`/api/vendedor/products/${id}`, {
+        method: 'DELETE'
       })
 
-      const data = await response.json()
-
       if (response.ok) {
-        setMessage('🎉 Produto criado com sucesso!')
-        setTimeout(() => {
-          router.push('/marketplace')
-        }, 2000)
-      } else {
-        setMessage(`❌ ${data.error}`)
+        setProducts(products.filter(p => p.id !== id))
+        alert('Produto excluído com sucesso!')
       }
     } catch (error) {
-      setMessage('❌ Erro ao criar produto. Tente novamente.')
-    } finally {
-      setLoading(false)
+      console.error('Erro ao excluir produto:', error)
+      alert('Erro ao excluir produto')
     }
   }
 
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Carregando...</p>
-      </div>
-    )
+  if (loading || !session) {
+    return <AuthLoading />
   }
-
-  if (!session) return null
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      <nav className="bg-white/80 backdrop-blur-sm border-b p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2 text-xl font-bold text-green-700">
-            <span>🌱</span>
-            <span>Desapegrow</span>
-          </Link>
-          
-          <div className="flex items-center space-x-4">
-            <Link href="/marketplace">
-              <Button variant="ghost">Marketplace</Button>
+      <div className="container mx-auto p-6">
+        {/* Header da Página */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">🏪 Painel do Vendedor</h1>
+            <p className="text-gray-600">Gerencie seus produtos e vendas</p>
+          </div>
+          <div className="flex gap-2">
+            <Link href="/vendedor/produtos/novo">
+              <Button size="lg">
+                <Plus className="w-5 h-5 mr-2" />
+                Novo Produto
+              </Button>
             </Link>
-            <Link href="/dashboard">
-              <Button variant="ghost">Dashboard</Button>
+            <Link href="/vendedor/pedidos">
+              <Button variant="outline" size="lg">
+                📋 Ver Pedidos
+              </Button>
             </Link>
           </div>
         </div>
-      </nav>
 
-      <div className="container mx-auto p-6 max-w-2xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">🛍️ Vender Produto</h1>
-          <p className="text-gray-600">Cadastre seu produto e comece a vender!</p>
-        </div>
+        {/* Cards de Estatísticas */}
+        {loadingData ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          </div>
+        ) : (
+          <>
+            <div className="grid md:grid-cols-4 gap-6 mb-8">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Total de Produtos
+                  </CardTitle>
+                  <Package className="w-4 h-4 text-gray-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats?.totalProducts || 0}</div>
+                </CardContent>
+              </Card>
 
-        {message && (
-          <Card className={message.includes('🎉') ? 'bg-green-50 border-green-200 mb-6' : 'bg-red-50 border-red-200 mb-6'}>
-            <CardContent className="p-4">
-              <p className={`font-medium ${message.includes('🎉') ? 'text-green-800' : 'text-red-800'}`}>
-                {message}
-              </p>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Produtos Ativos
+                  </CardTitle>
+                  <TrendingUp className="w-4 h-4 text-green-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">
+                    {stats?.activeProducts || 0}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Total de Vendas
+                  </CardTitle>
+                  <ShoppingBag className="w-4 h-4 text-blue-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {stats?.totalOrders || 0}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Receita Total
+                  </CardTitle>
+                  <DollarSign className="w-4 h-4 text-yellow-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-yellow-600">
+                    R$ {stats?.totalRevenue.toFixed(2) || '0.00'}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Lista de Produtos */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Meus Produtos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {products.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Package className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                    <p className="text-gray-500 mb-4">Você ainda não tem produtos cadastrados</p>
+                    <Link href="/vendedor/produtos/novo">
+                      <Button>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Cadastrar Primeiro Produto
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {products.map((product) => (
+                      <div
+                        key={product.id}
+                        className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        {/* Imagem */}
+                        <img
+                          src={product.images[0]?.url || '/placeholder.png'}
+                          alt={product.name}
+                          className="w-20 h-20 object-cover rounded-lg"
+                        />
+
+                        {/* Info */}
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{product.name}</h3>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                            <span>Preço: R$ {product.price.toFixed(2)}</span>
+                            <span>Estoque: {product.stock}</span>
+                            <span className={`font-semibold ${
+                              product.status === 'ACTIVE' ? 'text-green-600' : 'text-gray-400'
+                            }`}>
+                              {product.status === 'ACTIVE' ? '✓ Ativo' : '○ Inativo'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Ações */}
+                        <div className="flex gap-2">
+                          <Link href={`/produtos/${product.slug}`} target="_blank">
+                            <Button variant="outline" size="sm" title="Ver como aparece no marketplace">
+                              👁️
+                            </Button>
+                          </Link>
+
+                          <Link href={`/vendedor/produtos/${product.id}/editar`}>
+                            <Button variant="outline" size="sm" title="Editar produto">
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </Link>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deleteProduct(product.id)}
+                            className="text-red-600 hover:text-red-700"
+                            title="Excluir produto"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </>
         )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações do Produto</CardTitle>
-            <CardDescription>Preencha os dados do seu produto</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <Label htmlFor="name">Nome do Produto</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  placeholder="Ex: LED Grow Light 150W Full Spectrum"
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="shortDesc">Descrição Curta</Label>
-                <Input
-                  id="shortDesc"
-                  value={formData.shortDesc}
-                  onChange={(e) => setFormData({...formData, shortDesc: e.target.value})}
-                  placeholder="Descrição de uma linha"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="description">Descrição Completa</Label>
-                <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  placeholder="Descrição detalhada do produto..."
-                  rows={4}
-                  required
-                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="price">Preço (R$)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({...formData, price: e.target.value})}
-                    placeholder="99.90"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="comparePrice">Preço Original (R$)</Label>
-                  <Input
-                    id="comparePrice"
-                    type="number"
-                    step="0.01"
-                    value={formData.comparePrice}
-                    onChange={(e) => setFormData({...formData, comparePrice: e.target.value})}
-                    placeholder="149.90"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="stock">Estoque</Label>
-                  <Input
-                    id="stock"
-                    type="number"
-                    value={formData.stock}
-                    onChange={(e) => setFormData({...formData, stock: e.target.value})}
-                    placeholder="10"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="categoryId">Categoria</Label>
-                  <select
-                    id="categoryId"
-                    value={formData.categoryId}
-                    onChange={(e) => setFormData({...formData, categoryId: e.target.value})}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    required
-                  >
-                    <option value="">Selecione uma categoria</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="image">URL da Imagem</Label>
-                <Input
-                  id="image"
-                  value={formData.images[0]}
-                  onChange={(e) => setFormData({...formData, images: [e.target.value]})}
-                  placeholder="https://exemplo.com/imagem.jpg"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Por enquanto, use uma URL de imagem externa
-                </p>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full"
-                size="lg"
-                disabled={loading}
-              >
-                {loading ? 'Criando produto...' : '🚀 Criar Produto'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+        {/* BOTÕES DE NAVEGAÇÃO - NOVO */}
+        <div className="mt-12 flex flex-col sm:flex-row gap-4">
+          <Link href="/marketplace">
+            <Button className="w-full sm:w-auto">🛒 Ver Marketplace</Button>
+          </Link>
+          <Link href="/vendedor/pedidos">
+            <Button variant="outline" className="w-full sm:w-auto">📋 Meus Pedidos</Button>
+          </Link>
+        </div>
       </div>
     </div>
   )

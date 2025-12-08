@@ -1,159 +1,312 @@
 'use client'
 
-import { useState } from 'react'
-import Image from 'next/image'
-import { Button } from '../ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { Badge } from '../ui/badge'
-import { ShoppingCart, Plus, Minus, X, Zap } from 'lucide-react'
-import { useCart } from '@/hooks/useCart'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react'
+
+interface CartItem {
+  productId: string
+  name: string
+  price: number
+  quantity: number
+  image: string
+}
 
 export function CartSheet() {
   const [isOpen, setIsOpen] = useState(false)
-  const { items, removeFromCart, updateQuantity, clearCart, total, totalItems, pointsEarned } = useCart()
+  const [cartItems, setCartItems] = useState<CartItem[]>([])
+
+  useEffect(() => {
+    loadCart()
+    
+    window.addEventListener('cartUpdated', loadCart)
+    return () => window.removeEventListener('cartUpdated', loadCart)
+  }, [])
+
+  const loadCart = () => {
+    const savedCart = localStorage.getItem('cart')
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart))
+    }
+  }
+
+  const updateQuantity = (productId: string, change: number) => {
+    const updatedCart = cartItems.map(item => {
+      if (item.productId === productId) {
+        const newQuantity = Math.max(1, item.quantity + change)
+        return { ...item, quantity: newQuantity }
+      }
+      return item
+    })
+    
+    localStorage.setItem('cart', JSON.stringify(updatedCart))
+    setCartItems(updatedCart)
+  }
+
+  const removeItem = (productId: string) => {
+    const updatedCart = cartItems.filter(item => item.productId !== productId)
+    localStorage.setItem('cart', JSON.stringify(updatedCart))
+    setCartItems(updatedCart)
+  }
+
+  const clearCart = () => {
+    if (confirm('Deseja limpar o carrinho?')) {
+      localStorage.removeItem('cart')
+      setCartItems([])
+    }
+  }
+
+  const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <>
       {/* Botão do Carrinho */}
-      <Button
-        variant="outline"
+      <button
         onClick={() => setIsOpen(true)}
-        className="relative"
+        className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
       >
-        <ShoppingCart className="h-4 w-4 mr-2" />
-        Carrinho
-        {totalItems > 0 && (
-          <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-            {totalItems}
-          </Badge>
+        <ShoppingCart className="w-6 h-6" />
+        {itemCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            {itemCount}
+          </span>
         )}
-      </Button>
+      </button>
 
-      {/* Overlay do Carrinho */}
+      {/* Overlay */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-50"
+        <div
+          className="fixed inset-0 bg-black/50 z-40"
           onClick={() => setIsOpen(false)}
-        >
-        <div 
-            className="bg-white w-96 h-full shadow-2xl overflow-hidden flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-        >
-            <div className="flex flex-col h-full">
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b">
-                <h2 className="text-lg font-semibold flex items-center space-x-2">
-                  <ShoppingCart className="h-5 w-5" />
-                  <span>Carrinho ({totalItems})</span>
-                </h2>
-                <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
+        />
+      )}
 
-              {/* Conteúdo */}
-              <div className="flex-1 overflow-y-auto p-4">
-                {items.length === 0 ? (
-                  <div className="text-center py-12">
-                    <ShoppingCart className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                    <p className="text-gray-600">Carrinho vazio</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {items.map(item => (
-                      <div key={item.id} className="border rounded-lg p-3">
-                        <div className="flex items-start space-x-3">
-                          <div className="w-12 h-12 relative rounded overflow-hidden">
-                            <Image
-                              src={item.image || 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=100'}
-                              alt={item.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          
-                          <div className="flex-1">
-                            <h3 className="font-medium text-sm">{item.name}</h3>
-                            <p className="text-sm font-bold text-green-600 mt-1">
-                              R$ {item.price.toFixed(2).replace('.', ',')}
-                            </p>
-                            
-                            <div className="flex items-center justify-between mt-2">
-                              <div className="flex items-center space-x-1">
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-6 w-6"
-                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                >
-                                  <Minus className="h-3 w-3" />
-                                </Button>
-                                <span className="text-sm w-8 text-center">
-                                  {item.quantity}
-                                </span>
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-6 w-6"
-                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                >
-                                  <Plus className="h-3 w-3" />
-                                </Button>
-                              </div>
-                              
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 text-red-600"
-                                onClick={() => removeFromCart(item.id)}
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+      {/* Sheet Lateral */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          height: '100vh',
+          width: '100%',
+          maxWidth: '28rem',
+          display: 'flex',
+          flexDirection: 'column',
+          zIndex: 50,
+          transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 300ms',
+          backgroundColor: 'white',
+          boxShadow: '-4px 0 24px rgba(0,0,0,0.15)'
+        }}
+      >
+        {/* Header Fixo */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '1rem',
+          borderBottom: '1px solid #e5e7eb',
+          flexShrink: 0
+        }}>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: 'bold' }}>
+            🛒 Carrinho ({itemCount} {itemCount === 1 ? 'item' : 'itens'})
+          </h2>
+          <button
+            onClick={() => setIsOpen(false)}
+            style={{
+              padding: '0.5rem',
+              borderRadius: '0.5rem',
+              cursor: 'pointer',
+              border: 'none',
+              background: 'transparent'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-              {/* Footer com total */}
-              {items.length > 0 && (
-                <div className="border-t p-4 space-y-3">
-                  <div className="bg-green-50 p-3 rounded">
-                    <div className="flex justify-between text-sm">
-                      <span className="flex items-center space-x-1">
-                        <Zap className="h-4 w-4 text-green-600" />
-                        <span>CultivoCoins:</span>
+        {/* Área de Items (Com Scroll) */}
+        <div style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '1rem'
+        }}>
+          {cartItems.length === 0 ? (
+            <div style={{ textAlign: 'center', paddingTop: '3rem' }}>
+              <ShoppingCart style={{ 
+                width: '4rem', 
+                height: '4rem', 
+                margin: '0 auto 1rem',
+                color: '#d1d5db'
+              }} />
+              <p style={{ color: '#6b7280' }}>Carrinho vazio</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {cartItems.map((item) => (
+                <div key={item.productId} style={{
+                  display: 'flex',
+                  gap: '0.75rem',
+                  paddingBottom: '1rem',
+                  borderBottom: '1px solid #e5e7eb'
+                }}>
+                  {/* Imagem */}
+                  <div style={{ flexShrink: 0 }}>
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        objectFit: 'cover',
+                        borderRadius: '0.5rem',
+                        display: 'block'
+                      }}
+                    />
+                  </div>
+
+                  {/* Informações */}
+                  <div style={{ 
+                    flex: 1, 
+                    minWidth: 0,
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}>
+                    <h3 style={{
+                      fontWeight: 600,
+                      fontSize: '0.875rem',
+                      marginBottom: '0.25rem',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      lineHeight: '1.25rem'
+                    }}>
+                      {item.name}
+                    </h3>
+                    
+                    <p style={{ 
+                      color: '#059669', 
+                      fontWeight: 'bold',
+                      marginBottom: '0.5rem'
+                    }}>
+                      R$ {item.price.toFixed(2)}
+                    </p>
+                    
+                    {/* Controles */}
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '0.5rem' 
+                    }}>
+                      <button
+                        onClick={() => updateQuantity(item.productId, -1)}
+                        disabled={item.quantity <= 1}
+                        style={{
+                          padding: '0.25rem',
+                          borderRadius: '0.25rem',
+                          border: 'none',
+                          background: item.quantity <= 1 ? '#f3f4f6' : 'transparent',
+                          cursor: item.quantity <= 1 ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      
+                      <span style={{ 
+                        fontWeight: 600, 
+                        width: '2rem', 
+                        textAlign: 'center' 
+                      }}>
+                        {item.quantity}
                       </span>
-                      <span className="font-bold text-green-600">
-                        +{pointsEarned}
-                      </span>
+                      
+                      <button
+                        onClick={() => updateQuantity(item.productId, 1)}
+                        style={{
+                          padding: '0.25rem',
+                          borderRadius: '0.25rem',
+                          border: 'none',
+                          background: 'transparent',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                      
+                      <button
+                        onClick={() => removeItem(item.productId)}
+                        style={{
+                          padding: '0.25rem',
+                          borderRadius: '0.25rem',
+                          border: 'none',
+                          background: 'transparent',
+                          color: '#dc2626',
+                          marginLeft: 'auto',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-
-                  <div className="flex justify-between items-center text-lg font-bold">
-                    <span>Total:</span>
-                    <span className="text-green-600">
-                      R$ {total.toFixed(2).replace('.', ',')}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Button className="w-full">
-                      Finalizar Compra
-                    </Button>
-                    <Button variant="outline" className="w-full" onClick={clearCart}>
-                      Limpar
-                    </Button>
-                  </div>
                 </div>
-              )}
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer Fixo */}
+        {cartItems.length > 0 && (
+          <div style={{
+            borderTop: '1px solid #e5e7eb',
+            padding: '1rem',
+            backgroundColor: 'white',
+            flexShrink: 0
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '1.125rem',
+              fontWeight: 'bold',
+              marginBottom: '1rem'
+            }}>
+              <span>Total:</span>
+              <span style={{ color: '#059669' }}>R$ {total.toFixed(2)}</span>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <Link href="/checkout" onClick={() => setIsOpen(false)}>
+                <Button className="w-full" size="lg">
+                  Finalizar Compra
+                </Button>
+              </Link>
+              
+              <button
+                onClick={clearCart}
+                style={{
+                  width: '100%',
+                  fontSize: '0.875rem',
+                  color: '#dc2626',
+                  padding: '0.5rem',
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#991b1b'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#dc2626'}
+              >
+                Limpar Carrinho
+              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   )
 }

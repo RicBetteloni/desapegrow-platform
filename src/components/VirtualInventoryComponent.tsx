@@ -61,9 +61,10 @@ export default function VirtualInventoryComponent() {
 
   const fetchInventory = async () => {
     try {
-      const response = await fetch('/api/grow/unlock-item')
+      const response = await fetch('/api/grow/inventory')
       if (!response.ok) throw new Error('Erro ao carregar inventário')
       const data = await response.json()
+      console.log('Inventário recebido:', data) // Debug
       setInventory(data.inventory || [])
       setStats(data.stats)
     } catch (error) {
@@ -148,14 +149,22 @@ export default function VirtualInventoryComponent() {
       <div className="bg-white rounded-xl p-4 shadow-sm">
         <div className="flex items-center space-x-4">
           <Filter className="w-5 h-5 text-gray-600" />
-          <select value={filterRarity} onChange={(e) => setFilterRarity(e.target.value)} className="px-4 py-2 border rounded-lg">
+          <select 
+            value={filterRarity} 
+            onChange={(e) => setFilterRarity(e.target.value)} 
+            className="px-4 py-2 border rounded-lg"
+          >
             <option value="ALL">Todas Raridades</option>
             <option value="COMMON">⚪ Common</option>
             <option value="RARE">🔵 Rare</option>
             <option value="EPIC">🟣 Epic</option>
             <option value="LEGENDARY">🟠 Legendary</option>
           </select>
-          <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="px-4 py-2 border rounded-lg">
+          <select 
+            value={filterType} 
+            onChange={(e) => setFilterType(e.target.value)} 
+            className="px-4 py-2 border rounded-lg"
+          >
             <option value="ALL">Todos os Tipos</option>
             <option value="LIGHTING">💡 Iluminação</option>
             <option value="NUTRIENTS">🧪 Nutrientes</option>
@@ -177,7 +186,10 @@ export default function VirtualInventoryComponent() {
             {inventory.length === 0 ? 'Compre produtos no marketplace para desbloquear itens virtuais!' : 'Tente ajustar os filtros'}
           </p>
           {inventory.length === 0 && (
-            <Link href="/marketplace" className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <Link 
+              href="/marketplace" 
+              className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            >
               🛒 Ir para Marketplace
             </Link>
           )}
@@ -188,7 +200,10 @@ export default function VirtualInventoryComponent() {
             const config = RARITY_COLORS[item.rarity]
             const typeIcon = ITEM_TYPE_ICONS[item.itemType] || '📦'
             return (
-              <div key={item.id} className={`${config.bg} ${config.border} border-2 rounded-xl p-4 hover:shadow-lg transition-all hover:scale-105 cursor-pointer`}>
+              <div 
+                key={item.id} 
+                className={`${config.bg} ${config.border} border-2 rounded-xl p-4 hover:shadow-lg transition-all hover:scale-105 cursor-pointer`}
+              >
                 <div className="flex items-start justify-between mb-3">
                   <div className="text-3xl p-2 rounded-lg bg-white/50">{typeIcon}</div>
                   <div className="text-2xl">{config.emoji}</div>
@@ -221,13 +236,16 @@ export default function VirtualInventoryComponent() {
         </div>
       )}
 
-      {/* Rarity Distribution */}
-      {inventory.length > 0 && (
-        <div className="bg-white rounded-xl p-6 shadow-sm">
-          <h3 className="text-lg font-bold mb-4">📊 Distribuição por Raridade</h3>
+      {/* Rarity Distribution - SEÇÃO IMPORTANTE */}
+      {inventory.length > 0 && stats && (
+        <div className="bg-white rounded-xl p-6 shadow-sm border-2 border-gray-200">
+          <h3 className="text-lg font-bold mb-4 flex items-center">
+            <span className="mr-2">📊</span>
+            Distribuição por Raridade
+          </h3>
           <div className="space-y-3">
-            {Object.entries(stats?.byRarity || {}).map(([rarity, count]) => {
-              const percentage = ((count / (stats?.totalItems || 1)) * 100).toFixed(1)
+            {Object.entries(stats.byRarity).map(([rarity, count]) => {
+              const percentage = stats.totalItems > 0 ? ((count / stats.totalItems) * 100).toFixed(1) : '0.0'
               const config = RARITY_COLORS[rarity as keyof typeof RARITY_COLORS]
               return (
                 <div key={rarity}>
@@ -239,12 +257,29 @@ export default function VirtualInventoryComponent() {
                     <span className="text-sm text-gray-600">{count} ({percentage}%)</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                    <div className={`h-full ${config.bg.replace('100', '500')} transition-all duration-500`} style={{ width: `${percentage}%` }} />
+                    <div 
+                      className={`h-full transition-all duration-500 ${
+                        rarity === 'COMMON' ? 'bg-gray-500' :
+                        rarity === 'RARE' ? 'bg-blue-500' :
+                        rarity === 'EPIC' ? 'bg-purple-500' :
+                        'bg-orange-500'
+                      }`} 
+                      style={{ width: `${percentage}%` }} 
+                    />
                   </div>
                 </div>
               )
             })}
           </div>
+        </div>
+      )}
+
+      {/* Debug info - remover em produção */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-xs">
+          <p><strong>Debug:</strong></p>
+          <p>Total items: {inventory.length}</p>
+          <p>Stats: {JSON.stringify(stats)}</p>
         </div>
       )}
     </div>

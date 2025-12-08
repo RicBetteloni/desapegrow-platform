@@ -1,13 +1,34 @@
 import { NextResponse } from 'next/server'
-
-const categories = [
-  { id: '1', name: 'Equipamentos de Iluminação', slug: 'iluminacao' },
-  { id: '2', name: 'Ventilação e Climatização', slug: 'ventilacao' },
-  { id: '3', name: 'Sistemas Hidropônicos', slug: 'hidroponia' },
-  { id: '4', name: 'Fertilizantes e Nutrição', slug: 'fertilizantes' },
-  { id: '5', name: 'Substratos e Vasos', slug: 'substratos' }
-]
+import { prisma } from '@/lib/prisma'
 
 export async function GET() {
-  return NextResponse.json({ categories })
+  try {
+    console.log('📂 Buscando categorias...')
+
+    const categories = await prisma.category.findMany({
+      orderBy: { name: 'asc' },
+      include: {
+        _count: {
+          select: {
+            products: {
+              where: {
+                status: 'ACTIVE'
+              }
+            }
+          }
+        }
+      }
+    })
+
+    console.log('✅ Categorias encontradas:', categories.length)
+
+    return NextResponse.json({ categories })
+
+  } catch (error) {
+    console.error('❌ Erro ao buscar categorias:', error)
+    return NextResponse.json(
+      { error: 'Erro ao buscar categorias' },
+      { status: 500 }
+    )
+  }
 }

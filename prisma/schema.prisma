@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,88 +8,87 @@ datasource db {
 }
 
 model User {
-  id              String         @id @default(cuid())
-  email           String         @unique
-  name            String
-  phone           String?
-  avatar          String?
-  role            Role           @default(BUYER)
-  isEmailVerified Boolean        @default(false)
-  password        String
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  favorites       Favorite[]
-  gameProfile     GameProfile?
-  reviews         Review[]
-  orders          Order[]
+  id                String                  @id @default(cuid())
+  email             String                  @unique
+  name              String
+  phone             String?
+  avatar            String?
+  role              Role                    @default(BUYER)
+  isEmailVerified   Boolean                 @default(false)
+  password          String
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  virtualGrow       VirtualGrow?
+  favorites         Favorite[]
+  gameProfile       GameProfile?
+  orders            Order[]
   pointTransactions PointTransaction[]
-  reviewHelpful   ReviewHelpful[]
-  reviewReplies   ReviewReply[]
-  reputation      UserReputation?
-  expertiseBadges UserExpertiseBadge[]
-  achievements    ReputationAchievement[]
-  reviewQuestions ReviewQuestion[]
-  questionAnswers QuestionAnswer[]
-  sellerProfile   SellerProfile?
-  virtualGrow     VirtualGrow?
+  questionAnswers   QuestionAnswer[]
+  achievements      ReputationAchievement[]
+  reviewHelpful     ReviewHelpful[]
+  reviewQuestions   ReviewQuestion[]
+  reviewReplies     ReviewReply[]
+  reviews           Review[]
+  sellerProfile     SellerProfile?
+  expertiseBadges   UserExpertiseBadge[]
+  reputation        UserReputation?
 
   @@map("users")
 }
 
 model VirtualGrow {
-  id              String           @id @default(cuid())
-  userId          String           @unique
-  user            User             @relation(fields: [userId], references: [id])
-  growType        GrowType         @default(INDOOR)
-  growSize        GrowSize         @default(SMALL)
-  automationLevel AutoLevel        @default(MANUAL)
-  plants          VirtualPlant[]
-  inventory       VirtualItem[]
-  dailyRewards    DailyRewardLog[]
-  cultivoCoins    Int              @default(100)
-  growthGems      Int              @default(0)
-  harvestTokens   Int              @default(0)
-  experiencePoints Int             @default(0)
-  prestigeLevel   Int              @default(1)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id               String           @id @default(cuid())
+  userId           String           @unique
+  growType         GrowType         @default(INDOOR)
+  growSize         GrowSize         @default(SMALL)
+  automationLevel  AutoLevel        @default(MANUAL)
+  cultivoCoins     Int              @default(100)
+  growthGems       Int              @default(0)
+  harvestTokens    Int              @default(0)
+  experiencePoints Int              @default(0)
+  prestigeLevel    Int              @default(1)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  dailyRewards     DailyRewardLog[]
+  user             User             @relation(fields: [userId], references: [id])
+  inventory        VirtualItem[]
+  plants           VirtualPlant[]
 }
 
 model VirtualPlant {
-  id              String        @id @default(cuid())
-  growId          String
-  grow            VirtualGrow   @relation(fields: [growId], references: [id])
-  name            String
-  strain          PlantStrain
-  genetics        Json
-  stage           GrowthStage   @default(SEED)
-  daysGrowing     Int           @default(0)
-  health          Int           @default(100)
-  size            Float         @default(0.1)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id          String      @id @default(cuid())
+  growId      String
+  name        String
+  strain      PlantStrain
+  genetics    Json
+  stage       GrowthStage @default(SEED)
+  daysGrowing Int         @default(0)
+  health      Int         @default(100)
+  size        Float       @default(0.1)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  grow        VirtualGrow @relation(fields: [growId], references: [id])
 }
 
 model VirtualItem {
-  id              String      @id @default(cuid())
-  growId          String
-  grow            VirtualGrow @relation(fields: [growId], references: [id])
-  itemType        ItemType
-  rarity          ItemRarity
-  name            String
-  iconUrl         String
-  effects         Json
-  sourceType      SourceType
-  sourceId        String?
-  realProductId   String?
-  createdAt       DateTime    @default(now())
+  id            String      @id @default(cuid())
+  growId        String
+  itemType      ItemType
+  rarity        ItemRarity
+  name          String
+  iconUrl       String
+  effects       Json
+  sourceType    SourceType
+  sourceId      String?
+  realProductId String?
+  createdAt     DateTime    @default(now())
+  grow          VirtualGrow @relation(fields: [growId], references: [id])
 }
 
 model DailyRewardLog {
   id            String      @id @default(cuid())
   userId        String
   growId        String
-  grow          VirtualGrow @relation(fields: [growId], references: [id])
   rewardDate    DateTime    @default(now()) @db.Date
   streakDay     Int
   totalStreak   Int
@@ -101,6 +98,7 @@ model DailyRewardLog {
   itemsReceived String[]    @default([])
   rngSeed       String
   rarityRolled  ItemRarity
+  grow          VirtualGrow @relation(fields: [growId], references: [id])
 }
 
 model GameProfile {
@@ -120,53 +118,53 @@ model GameProfile {
 
 model Category {
   id          String    @id @default(cuid())
-  name        String    @unique
+  name        String
   slug        String    @unique
   description String?
   icon        String?
+  products    Product[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  products    Product[]
 
   @@map("categories")
 }
 
 model Product {
-  id                  String               @id @default(cuid())
-  sellerId            String
-  name                String
-  slug                String @unique
-  description         String
-  shortDesc           String?
-  categoryId          String
-  price               Decimal
-  comparePrice        Decimal?
-  stock               Int                  @default(0)
-  weight              Decimal?
-  height              Decimal?
-  width               Decimal?
-  length              Decimal?
-  status              ProductStatus        @default(DRAFT)
-  avgRating           Decimal? @db.Decimal(3,2)
-  totalReviews        Int                  @default(0)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  favorites           Favorite[]
-  images              ProductImage[]
-  tags                ProductTagRelation[]
-  orderItems          OrderItem[]
-  category            Category             @relation(fields: [categoryId], references: [id])
-  seller              SellerProfile        @relation(fields: [sellerId], references: [id])
-  reviews             Review[]
-  reviewQuestions     ReviewQuestion[]
-  rating5Count        Int @default(0)
-  rating4Count        Int @default(0)
-  rating3Count        Int @default(0)
-  rating2Count        Int @default(0)
-  rating1Count        Int @default(0)
-  avgQualityRating    Decimal? @db.Decimal(3,2)
-  avgValueRating      Decimal? @db.Decimal(3,2)
-  avgShippingRating   Decimal? @db.Decimal(3,2)
+  id                String               @id @default(cuid())
+  sellerId          String
+  name              String
+  slug              String               @unique
+  description       String
+  shortDesc         String?
+  categoryId        String
+  price             Decimal
+  comparePrice      Decimal?
+  stock             Int                  @default(0)
+  weight            Decimal?
+  height            Decimal?
+  width             Decimal?
+  length            Decimal?
+  status            ProductStatus        @default(DRAFT)
+  avgRating         Decimal?             @db.Decimal(3, 2)
+  totalReviews      Int                  @default(0)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  rating5Count      Int                  @default(0)
+  rating4Count      Int                  @default(0)
+  rating3Count      Int                  @default(0)
+  rating2Count      Int                  @default(0)
+  rating1Count      Int                  @default(0)
+  avgQualityRating  Decimal?             @db.Decimal(3, 2)
+  avgValueRating    Decimal?             @db.Decimal(3, 2)
+  avgShippingRating Decimal?             @db.Decimal(3, 2)
+  favorites         Favorite[]
+  orderItems        OrderItem[]
+  images            ProductImage[]
+  tags              ProductTagRelation[]
+  category          Category             @relation(fields: [categoryId], references: [id])
+  seller            SellerProfile        @relation(fields: [sellerId], references: [id])
+  reviewQuestions   ReviewQuestion[]
+  reviews           Review[]
 
   @@map("products")
 }
@@ -186,7 +184,7 @@ model ProductImage {
 model ProductTag {
   id        String               @id @default(cuid())
   name      String               @unique
-  slug      String @unique
+  slug      String               @unique
   color     String               @default("#3B82F6")
   createdAt DateTime             @default(now())
   products  ProductTagRelation[]
@@ -217,208 +215,208 @@ model Favorite {
 }
 
 model Review {
-  id                String      @id @default(cuid())
-  userId            String
-  productId         String
-  orderId           String?
-  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product           Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  order             Order?      @relation(fields: [orderId], references: [id])
-  rating            Int
-  title             String?
-  content           String
-  qualityRating     Int?
-  valueRating       Int?
-  shippingRating    Int?
-  images            ReviewMedia[]
-  pointsAwarded     Int         @default(0)
-  expertisePoints   Int         @default(0)
-  helpfulVotes      ReviewHelpful[]
-  helpfulScore      Int         @default(0)
-  status            ReviewStatus @default(PENDING)
-  moderatedBy       String?
-  moderatedAt       DateTime?
-  moderationNotes   String?
-  isVerifiedPurchase Boolean  @default(false)
-  viewCount         Int         @default(0)
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-  replies           ReviewReply[]
-  
+  id                 String          @id @default(cuid())
+  userId             String
+  productId          String
+  orderId            String?
+  rating             Int
+  title              String?
+  content            String
+  qualityRating      Int?
+  valueRating        Int?
+  shippingRating     Int?
+  pointsAwarded      Int             @default(0)
+  expertisePoints    Int             @default(0)
+  helpfulScore       Int             @default(0)
+  status             ReviewStatus    @default(PENDING)
+  moderatedBy        String?
+  moderatedAt        DateTime?
+  moderationNotes    String?
+  isVerifiedPurchase Boolean         @default(false)
+  viewCount          Int             @default(0)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  helpfulVotes       ReviewHelpful[]
+  images             ReviewMedia[]
+  replies            ReviewReply[]
+  order              Order?          @relation(fields: [orderId], references: [id])
+  product            Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([userId, productId])
   @@map("reviews")
 }
 
 model ReviewMedia {
-  id        String     @id @default(cuid())
+  id        String    @id @default(cuid())
   reviewId  String
-  review    Review     @relation(fields: [reviewId], references: [id], onDelete: Cascade)
   type      MediaType
   url       String
   thumbnail String?
   caption   String?
-  order     Int        @default(0)
-  approved  Boolean    @default(false)
-  createdAt DateTime   @default(now())
+  order     Int       @default(0)
+  approved  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  review    Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 
   @@map("review_media")
 }
 
 model ReviewHelpful {
-  id       String  @id @default(cuid())
-  reviewId String
-  userId   String
-  review   Review  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  helpful  Boolean
+  id        String   @id @default(cuid())
+  reviewId  String
+  userId    String
+  helpful   Boolean
   createdAt DateTime @default(now())
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([reviewId, userId])
   @@map("review_helpful")
 }
 
 model ReviewReply {
-  id        String    @id @default(cuid())
-  reviewId  String
-  userId    String
-  review    Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  content   String
-  isSellerReply Boolean @default(false)
-  status    ReviewStatus @default(APPROVED)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            String       @id @default(cuid())
+  reviewId      String
+  userId        String
+  content       String
+  isSellerReply Boolean      @default(false)
+  status        ReviewStatus @default(APPROVED)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  review        Review       @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("review_replies")
 }
 
 model UserReputation {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  totalScore      Int      @default(0)
-  level           ReputationLevel @default(NOVICE)
-  totalReviews    Int      @default(0)
-  averageRating   Decimal? @db.Decimal(3,2)
-  helpfulVotes    Int      @default(0)
+  id              String                  @id @default(cuid())
+  userId          String                  @unique
+  totalScore      Int                     @default(0)
+  level           ReputationLevel         @default(NOVICE)
+  totalReviews    Int                     @default(0)
+  averageRating   Decimal?                @db.Decimal(3, 2)
+  helpfulVotes    Int                     @default(0)
   expertiseScores Json
-  verifiedReviews Int      @default(0)
-  flaggedReviews  Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  badges          UserExpertiseBadge[]
+  verifiedReviews Int                     @default(0)
+  flaggedReviews  Int                     @default(0)
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
   achievements    ReputationAchievement[]
+  badges          UserExpertiseBadge[]
+  user            User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_reputation")
 }
 
 model ExpertiseBadge {
-  id            String   @id @default(cuid())
-  name          String   @unique
-  description   String
-  categorySlug  String
-  icon          String
-  minReviews    Int
-  minScore      Int
-  minHelpful    Int
-  level         BadgeLevel
-  users         UserExpertiseBadge[]
-  createdAt     DateTime @default(now())
+  id           String               @id @default(cuid())
+  name         String               @unique
+  description  String
+  categorySlug String
+  icon         String
+  minReviews   Int
+  minScore     Int
+  minHelpful   Int
+  level        BadgeLevel
+  createdAt    DateTime             @default(now())
+  users        UserExpertiseBadge[]
 
   @@map("expertise_badges")
 }
 
 model UserExpertiseBadge {
-  id            String         @id @default(cuid())
-  userId        String
-  badgeId       String
-  reputationId  String
-  user          User           @relation(fields: [userId], references: [id])
-  badge         ExpertiseBadge @relation(fields: [badgeId], references: [id])
-  reputation    UserReputation @relation(fields: [reputationId], references: [id])
-  earnedAt      DateTime       @default(now())
+  id           String         @id @default(cuid())
+  userId       String
+  badgeId      String
+  reputationId String
+  earnedAt     DateTime       @default(now())
+  badge        ExpertiseBadge @relation(fields: [badgeId], references: [id])
+  reputation   UserReputation @relation(fields: [reputationId], references: [id])
+  user         User           @relation(fields: [userId], references: [id])
 
   @@unique([userId, badgeId])
   @@map("user_expertise_badges")
 }
 
 model ReputationAchievement {
-  id            String          @id @default(cuid())
-  userId        String
-  reputationId  String
-  user          User            @relation(fields: [userId], references: [id])
-  reputation    UserReputation  @relation(fields: [reputationId], references: [id])
-  type          AchievementType
-  title         String
-  description   String
-  points        Int
-  metadata      Json?
-  earnedAt      DateTime        @default(now())
+  id           String          @id @default(cuid())
+  userId       String
+  reputationId String
+  type         AchievementType
+  title        String
+  description  String
+  points       Int
+  metadata     Json?
+  earnedAt     DateTime        @default(now())
+  reputation   UserReputation  @relation(fields: [reputationId], references: [id])
+  user         User            @relation(fields: [userId], references: [id])
 
   @@map("reputation_achievements")
 }
 
 model ReviewQuestion {
-  id            String        @id @default(cuid())
-  productId     String
-  userId        String
-  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  question      String
-  answered      Boolean       @default(false)
-  answers       QuestionAnswer[]
-  createdAt     DateTime      @default(now())
+  id        String           @id @default(cuid())
+  productId String
+  userId    String
+  question  String
+  answered  Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  answers   QuestionAnswer[]
+  product   Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("review_questions")
 }
 
 model QuestionAnswer {
-  id          String         @id @default(cuid())
-  questionId  String
-  userId      String
-  question    ReviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  answer      String
-  helpful     Int            @default(0)
-  createdAt   DateTime       @default(now())
+  id         String         @id @default(cuid())
+  questionId String
+  userId     String
+  answer     String
+  helpful    Int            @default(0)
+  createdAt  DateTime       @default(now())
+  question   ReviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("question_answers")
 }
 
 model Order {
-  id           String @id @default(cuid())
-  reviews      Review[]
-  userId       String
-  items        OrderItem[]
-  status       OrderStatus
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User @relation(fields: [userId], references: [id])
-  
+  id        String      @id @default(cuid())
+  userId    String
+  status    OrderStatus
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  items     OrderItem[]
+  user      User        @relation(fields: [userId], references: [id])
+  reviews   Review[]
+
   @@map("orders")
 }
 
 model OrderItem {
-  id          String @id @default(cuid())
-  orderId     String
-  productId   String
-  quantity    Int
-  price       Decimal
-  product     Product @relation(fields: [productId], references: [id])
-  order       Order @relation(fields: [orderId], references: [id])
-  
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Decimal
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
   @@map("order_items")
 }
 
 model PointTransaction {
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   userId      String
   type        String
   amount      Int
   description String
   reference   String?
   createdAt   DateTime @default(now())
-  user        User @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
 
   @@map("point_transactions")
 }
@@ -509,58 +507,65 @@ enum OrderStatus {
   CANCELED
 }
 
-enum GrowType { 
-  INDOOR 
-  OUTDOOR 
-  HYDROPONIC 
-  GREENHOUSE 
+enum GrowType {
+  INDOOR
+  OUTDOOR
+  HYDROPONIC
+  GREENHOUSE
 }
-enum GrowSize { 
-  SMALL 
-  MEDIUM 
-  LARGE 
-  WAREHOUSE 
+
+enum GrowSize {
+  SMALL
+  MEDIUM
+  LARGE
+  WAREHOUSE
 }
-enum AutoLevel { 
-  MANUAL 
-  SEMI_AUTO 
-  FULL_AUTO 
-  AI_DRIVEN 
+
+enum AutoLevel {
+  MANUAL
+  SEMI_AUTO
+  FULL_AUTO
+  AI_DRIVEN
 }
-enum PlantStrain { 
-  SATIVA 
-  INDICA 
-  HYBRID 
-  AUTOFLOWER 
+
+enum PlantStrain {
+  SATIVA
+  INDICA
+  HYBRID
+  AUTOFLOWER
 }
-enum GrowthStage { 
-  SEED 
-  SEEDLING 
-  VEGETATIVE 
-  PRE_FLOWER 
-  FLOWERING 
-  HARVEST_READY 
+
+enum GrowthStage {
+  SEED
+  SEEDLING
+  VEGETATIVE
+  PRE_FLOWER
+  FLOWERING
+  HARVEST_READY
 }
-enum ItemType { 
-  LIGHTING 
-  NUTRIENTS 
-  SUBSTRATE 
-  TOOLS 
-  GENETICS 
-  AUTOMATION 
-  DECORATION 
-  BOOSTER 
+
+enum ItemType {
+  LIGHTING
+  NUTRIENTS
+  SUBSTRATE
+  TOOLS
+  GENETICS
+  AUTOMATION
+  DECORATION
+  BOOSTER
 }
-enum ItemRarity { 
-  COMMON 
-  RARE 
-  EPIC 
-  LEGENDARY 
+
+enum ItemRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
 }
-enum SourceType { 
-  PURCHASE 
-  DAILY_REWARD 
-  ACHIEVEMENT 
-  SOCIAL_REWARD 
-  EVENT_REWARD 
+
+enum SourceType {
+  PURCHASE
+  DAILY_REWARD
+  ACHIEVEMENT
+  SOCIAL_REWARD
+  EVENT_REWARD
 }

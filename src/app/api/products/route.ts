@@ -1,76 +1,104 @@
 import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
-// Produtos mock para garantir que sempre funcione
-const mockProducts = [
-  {
-    id: '1',
-    name: 'LED Grow Light 150W Full Spectrum',
-    description: 'LED de alta qualidade com espectro completo para todas as fases do cultivo. Consumo eficiente de energia e vida útil de mais de 50.000 horas. Ideal para cultivo indoor profissional.\n\nCaracterísticas:\n• Espectro completo 380-800nm\n• Consumo real: 150W\n• Cobertura: 60x60cm\n• Vida útil: 50.000 horas\n• Certificado IP65',
-    shortDesc: 'Iluminação profissional para cultivo indoor',
-    slug: 'led-grow-light-150w-full-spectrum',
-    price: 189.90,
-    comparePrice: 249.90,
-    stock: 15,
-    categoryId: '1',
-    status: 'ACTIVE',
-    images: [
-      { url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600', alt: 'LED Grow Light' },
-      { url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600', alt: 'LED em funcionamento' }
-    ],
-    seller: {
-      businessName: 'Cultivo Pro',
-      user: { name: 'João Silva' }
-    },
-    category: { name: 'Equipamentos de Iluminação' },
-    totalReviews: 23,
-    avgRating: 4.8
-  },
-  {
-    id: '2', 
-    name: 'Sistema Hidropônico NFT Completo',
-    description: 'Sistema completo de hidroponia NFT para até 20 plantas. Inclui bomba d\'água, tubulações, reservatório de 40L e manual completo de instalação. Perfeito para verduras e ervas.\n\nInclui:\n• Reservatório 40L\n• Bomba submersa 400L/h\n• 4 tubos NFT\n• Suportes e conexões\n• Manual de instalação',
-    shortDesc: 'Sistema completo para cultivo hidropônico',
-    slug: 'sistema-hidroponico-nft-completo',
-    price: 299.90,
-    stock: 8,
-    categoryId: '3',
-    status: 'ACTIVE',
-    images: [
-      { url: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600', alt: 'Sistema Hidropônico' },
-      { url: 'https://images.unsplash.com/photo-1464207687429-7505649dae38?w=600', alt: 'Plantas no sistema' }
-    ],
-    seller: {
-      businessName: 'HidroTech',
-      user: { name: 'Maria Santos' }
-    },
-    category: { name: 'Sistemas Hidropônicos' },
-    totalReviews: 15,
-    avgRating: 4.6
-  },
-  {
-    id: '3',
-    name: 'Fertilizante Orgânico Premium 1kg',
-    description: 'Fertilizante 100% orgânico rico em nutrientes essenciais. Formulado especialmente para plantas de crescimento rápido. Melhora a estrutura do solo e aumenta a produtividade.\n\nComposição:\n• NPK 10-10-10\n• Matéria orgânica 60%\n• Micronutrientes quelados\n• pH balanceado',
-    shortDesc: 'Nutrição orgânica premium para plantas',
-    slug: 'fertilizante-organico-premium-1kg',
-    price: 45.90,
-    comparePrice: 59.90,
-    stock: 25,
-    categoryId: '4', 
-    status: 'ACTIVE',
-    images: [
-      { url: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600', alt: 'Fertilizante Orgânico' }
-    ],
-    seller: {
-      businessName: 'BioCultivo',
-      user: { name: 'Pedro Costa' }
-    },
-    category: { name: 'Fertilizantes e Nutrição' },
-    totalReviews: 31,
-    avgRating: 4.9
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const category = searchParams.get('category')
+    const search = searchParams.get('search')
+    const sortBy = searchParams.get('sortBy') || 'newest'
+
+    console.log('🔍 Buscando produtos:', { category, search, sortBy })
+
+    // Construir filtros
+    const where: Prisma.ProductWhereInput = {
+      status: 'ACTIVE'
+    }
+
+    if (category && category !== 'all') {
+      where.category = {
+        slug: category
+      }
+    }
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { shortDesc: { contains: search, mode: 'insensitive' } }
+      ]
+    }
+    // Definir ordenação
+    let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' }
+    
+    switch (sortBy) {
+      case 'price-asc':
+        orderBy = { price: 'asc' }
+        break
+      case 'price-desc':
+        orderBy = { price: 'desc' }
+        break
+      case 'popular':
+        orderBy = { totalReviews: 'desc' }
+        break
+      case 'rating':
+        orderBy = { avgRating: 'desc' }
+        break
+      default:
+        orderBy = { createdAt: 'desc' }
+    }
+
+    // Buscar produtos
+    const products = await prisma.product.findMany({
+      where,
+      orderBy,
+      include: {
+        images: {
+          orderBy: { order: 'asc' },
+          take: 3
+        },
+        category: {
+          select: {
+            name: true,
+            slug: true,
+            icon: true
+          }
+        },
+        seller: {
+          select: {
+            businessName: true,
+            avgRating: true
+          }
+        }
+      }
+    })
+
+    console.log('✅ Produtos encontrados:', products.length)
+
+    // Converter Decimal para number para JSON
+    const productsJSON = products.map(product => ({
+      ...product,
+      price: Number(product.price),
+      comparePrice: product.comparePrice ? Number(product.comparePrice) : null,
+      weight: product.weight ? Number(product.weight) : null,
+      height: product.height ? Number(product.height) : null,
+      width: product.width ? Number(product.width) : null,
+      length: product.length ? Number(product.length) : null,
+      avgRating: product.avgRating ? Number(product.avgRating) : null,
+      seller: {
+        ...product.seller,
+        avgRating: product.seller.avgRating ? Number(product.seller.avgRating) : null
+      }
+    }))
+
+    return NextResponse.json({ products: productsJSON })
+
+  } catch (error) {
+    console.error('❌ Erro ao buscar produtos:', error)
+    return NextResponse.json(
+      { error: 'Erro ao buscar produtos', details: error instanceof Error ? error.message : 'Erro desconhecido' },
+      { status: 500 }
+    )
   }
-]
-
-export async function GET() {
-  return NextResponse.json({ products: mockProducts })
 }

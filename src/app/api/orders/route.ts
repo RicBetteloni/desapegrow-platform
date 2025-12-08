@@ -1,155 +1,137 @@
-// src/app/api/orders/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server'
+import { getSession } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
-export async function POST(req: NextRequest) {
+type IncomingItem = {
+  productId: string
+  quantity: number
+  price: number
+}
+
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSession()
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const { items, total, paymentMethod } = await req.json();
+    const body = await request.json()
+    const { items, total, paymentMethod } = body as {
+      items?: IncomingItem[]
+      total?: number
+      paymentMethod?: string
+    }
 
-    // Validar dados
-    if (!items || items.length === 0) {
+    if (!items?.length || typeof total !== 'number' || !paymentMethod) {
+      return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 })
+    }
+
+    // 1. Validar estoque
+    const stockErrors: string[] = []
+    for (const item of items) {
+      const product = await prisma.product.findUnique({
+        where: { id: item.productId }
+      })
+
+      if (!product || product.stock < item.quantity) {
+        stockErrors.push(
+          `Produto ${product?.name || item.productId}: estoque insuficiente`
+        )
+      }
+    }
+
+    if (stockErrors.length > 0) {
       return NextResponse.json(
-        { error: 'Carrinho vazio' },
+        { error: stockErrors.join('; ') },
         { status: 400 }
-      );
+      )
     }
 
-    const userId = session.user.id;
-
-    // Criar pedido
+    // 2. Criar pedido
     const order = await prisma.order.create({
       data: {
-        userId,
-        status: 'PROCESSING',
-        items: {
-          create: items.map((item: { productId: string; quantity: number; price: number }) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            price: item.price
-          }))
-        }
-      },
-      include: {
-        items: {
-          include: {
-            product: {
-              include: {
-                category: true
-              }
-            }
-          }
-        }
+        userId: session.user.id,
+        status: 'PENDING'
       }
-    });
+    })
 
-    // Log analytics
-    console.log('[Order Created]', {
-      orderId: order.id,
-      userId,
-      total,
-      itemCount: items.length,
-      timestamp: new Date().toISOString()
-    });
+    // 3. Criar orderItems + debitar estoque + status
+    let calculatedTotal = 0
+    for (const item of items) {
+      calculatedTotal += item.price * item.quantity
 
-    // Track analytics event
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/analytics/track`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          event: 'ORDER_PLACED',
-          data: {
-            userId,
-            orderId: order.id,
-            value: total,
-            timestamp: Date.now(),
-            metadata: {
-              itemCount: items.length,
-              paymentMethod
-            }
-          }
+      await prisma.orderItem.create({
+        data: {
+          orderId: order.id,
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price
+        }
+      })
+
+      const updatedProduct = await prisma.product.update({
+        where: { id: item.productId },
+        data: { stock: { decrement: item.quantity } }
+      })
+
+      if (updatedProduct.stock === 0) {
+        await prisma.product.update({
+          where: { id: item.productId },
+          data: { status: 'INACTIVE' }
         })
-      });
-    } catch (error) {
-      console.error('Error tracking analytics:', error);
-      // Não falha o pedido se analytics falhar
+      }
     }
 
-    return NextResponse.json({
-      success: true,
-      orderId: order.id,
-      message: 'Pedido criado com sucesso!',
-      order: {
-        id: order.id,
-        status: order.status,
-        createdAt: order.createdAt,
-        items: order.items.map(item => ({
-          id: item.id,
-          productName: item.product.name,
-          quantity: item.quantity,
-          price: item.price,
-          category: item.product.category.name
-        }))
-      }
-    });
+    const orderItems = await prisma.orderItem.findMany({
+      where: { orderId: order.id },
+      include: { product: true }
+    })
 
-  } catch (error) {
-    console.error('Erro ao criar pedido:', error);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      {
+        order: { ...order, orderItems },
+        calculatedTotal,
+        paymentMethod
+      },
+      { status: 201 }
+    )
+  } catch (err) {
+    console.error('Erro no /api/orders:', err)
+    return NextResponse.json(
+      { error: 'Erro ao criar pedido' },
       { status: 500 }
-    );
+    )
   }
 }
 
-// GET - Listar pedidos do usuário
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSession()
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
     const orders = await prisma.order.findMany({
       where: { userId: session.user.id },
-      include: {
-        items: {
-          include: {
-            product: {
-              select: {
-                name: true,
-                images: true
-              }
-            }
-          }
-        }
-      },
       orderBy: { createdAt: 'desc' }
-    });
+    })
 
-    // Calcular totais para cada pedido
-    const ordersWithTotals = orders.map(order => ({
-      ...order,
-      total: order.items.reduce((sum, item) => {
-        return sum + (Number(item.price) * item.quantity);
-      }, 0),
-      itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0)
-    }));
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order) => {
+        const orderItems = await prisma.orderItem.findMany({
+          where: { orderId: order.id },
+          include: { product: true }
+        })
+        return { ...order, orderItems }
+      })
+    )
 
-    return NextResponse.json({ orders: ordersWithTotals });
-
-  } catch (error) {
-    console.error('Erro ao buscar pedidos:', error);
+    return NextResponse.json({ orders: ordersWithItems })
+  } catch (err) {
+    console.error('Erro listar pedidos:', err)
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Erro ao listar pedidos' },
       { status: 500 }
-    );
+    )
   }
 }

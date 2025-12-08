@@ -1,261 +1,215 @@
-// src/prisma/seed.ts
-import { PrismaClient, Prisma, ProductStatus } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient();
-
-const CATEGORIES = [
-  {
-    id: '1',
-    name: 'Equipamentos de Iluminação',
-    slug: 'iluminacao',
-    description: 'LEDs, HPS, fluorescentes e acessórios de iluminação',
-    icon: '💡',
-  },
-  {
-    id: '2',
-    name: 'Ventilação e Climatização',
-    slug: 'ventilacao',
-    description: 'Exaustores, ventiladores, filtros de carvão',
-    icon: '🌀',
-  },
-  {
-    id: '3',
-    name: 'Sistemas Hidropônicos',
-    slug: 'hidroponia',
-    description: 'NFT, DWC, aeroponia e sistemas completos',
-    icon: '💧',
-  },
-  {
-    id: '4',
-    name: 'Fertilizantes e Nutrição',
-    slug: 'fertilizantes',
-    description: 'Fertilizantes orgânicos, minerais e suplementos',
-    icon: '🧪',
-  },
-  {
-    id: '5',
-    name: 'Substratos e Vasos',
-    slug: 'substratos',
-    description: 'Fibra de coco, perlita, vermiculita e vasos inteligentes',
-    icon: '🏺',
-  },
-];
-
-const TAGS = [
-  { name: 'LED', slug: 'led', color: '#10B981' },
-  { name: 'Orgânico', slug: 'organico', color: '#059669' },
-  { name: 'Automático', slug: 'automatico', color: '#3B82F6' },
-  { name: 'Profissional', slug: 'profissional', color: '#8B5CF6' },
-  { name: 'Iniciante', slug: 'iniciante', color: '#F59E0B' },
-  { name: 'Indoor', slug: 'indoor', color: '#EF4444' },
-];
-
-const PRODUCTS = [
-  {
-    name: 'LED Grow Light 150W Full Spectrum',
-    description:
-      'LED de alta qualidade com espectro completo para todas as fases do cultivo. Consumo eficiente de energia e vida útil de mais de 50.000 horas. Ideal para cultivo indoor profissional.',
-    shortDesc: 'Iluminação profissional para cultivo indoor',
-    slug: 'led-grow-light-150w-full-spectrum',
-    price: 189.90,
-    comparePrice: 249.90,
-    stock: 15,
-    categoryId: '1',
-    status: 'ACTIVE',
-    images: [{ url: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600', alt: 'LED Grow Light' }],
-    sellerBusinessName: 'Cultivo Pro',
-    totalReviews: 23,
-    avgRating: 4.8,
-  },
-  {
-    name: 'Sistema Hidropônico NFT Completo',
-    description:
-      "Sistema completo de hidroponia NFT para até 20 plantas. Inclui bomba d'água, tubulações, reservatório de 40L e manual completo de instalação.",
-    shortDesc: 'Sistema completo para cultivo hidropônico',
-    slug: 'sistema-hidroponico-nft-completo',
-    price: 299.90,
-    stock: 8,
-    categoryId: '3',
-    status: 'ACTIVE',
-    images: [{ url: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=600', alt: 'Sistema Hidropônico' }],
-    sellerBusinessName: 'HidroTech',
-    totalReviews: 15,
-    avgRating: 4.6,
-  },
-  {
-    name: 'Fertilizante Orgânico Premium 1kg',
-    description: 'Fertilizante 100% orgânico rico em nutrientes essenciais. Formulado especialmente para plantas de crescimento rápido.',
-    shortDesc: 'Nutrição orgânica premium para plantas',
-    slug: 'fertilizante-organico-premium-1kg',
-    price: 45.90,
-    comparePrice: 59.90,
-    stock: 25,
-    categoryId: '4',
-    status: 'ACTIVE',
-    images: [{ url: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600', alt: 'Fertilizante Orgânico' }],
-    sellerBusinessName: 'BioCultivo',
-    totalReviews: 31,
-    avgRating: 4.9,
-  },
-];
+const prisma = new PrismaClient()
 
 async function main() {
-  console.log('🌱 Iniciando seed do banco de dados...');
-  try {
-    // ...
-console.log('🗑️  Dados anteriores limpos');
-  await prisma.reviewHelpful.deleteMany();
-  await prisma.reviewReply.deleteMany();
-  await prisma.reviewMedia.deleteMany();
-  await prisma.review.deleteMany();
-  await prisma.pointTransaction.deleteMany();
-  await prisma.orderItem.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.userExpertiseBadge.deleteMany();
-  await prisma.reputationAchievement.deleteMany();
-  await prisma.userReputation.deleteMany();
-  await prisma.reviewQuestion.deleteMany();
-  await prisma.questionAnswer.deleteMany();
-  await prisma.virtualPlant.deleteMany();
-  await prisma.virtualItem.deleteMany();
-  await prisma.dailyRewardLog.deleteMany();
-  await prisma.virtualGrow.deleteMany();
-  await prisma.gameProfile.deleteMany();
-  await prisma.sellerProfile.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.productTagRelation.deleteMany();
-  await prisma.productTag.deleteMany();
-  await prisma.productImage.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
+  console.log('🌱 Iniciando seed do banco de dados...')
 
-    console.log('📂 Criando categorias...');
-    for (const category of CATEGORIES) {
-      await prisma.category.create({
-        data: category,
-      });
-      console.log(`✅ Categoria criada: ${category.name}`);
-    }
-
-    console.log('🏷️  Criando tags...');
-    for (const tag of TAGS) {
-      await prisma.productTag.create({
-        data: tag,
-      });
-      console.log(`✅ Tag criada: ${tag.name}`);
-    }
-
-    console.log('🧑‍🌾 Criando usuários e perfis de vendedores mockados...');
-    const joao = await prisma.user.create({
-      data: {
-        email: 'joao.silva@example.com',
-        name: 'João Silva',
-        password: 'hashed_password_for_joao',
-        role: 'SELLER',
-        sellerProfile: {
-          create: {
-            businessName: 'Cultivo Pro',
-            cnpj: '12.345.678/0001-90',
-          },
-        },
-      },
-      include: {
-        sellerProfile: true,
-      },
-    });
-
-    const maria = await prisma.user.create({
-      data: {
-        email: 'maria.santos@example.com',
-        name: 'Maria Santos',
-        password: 'hashed_password_for_maria',
-        role: 'SELLER',
-        sellerProfile: {
-          create: {
-            businessName: 'HidroTech',
-            cnpj: '98.765.432/0001-21',
-          },
-        },
-      },
-      include: {
-        sellerProfile: true,
-      },
-    });
-
-    const pedro = await prisma.user.create({
-      data: {
-        email: 'pedro.costa@example.com',
-        name: 'Pedro Costa',
-        password: 'hashed_password_for_pedro',
-        role: 'SELLER',
-        sellerProfile: {
-          create: {
-            businessName: 'BioCultivo',
-            cnpj: '11.222.333/0001-44',
-          },
-        },
-      },
-      include: {
-        sellerProfile: true,
-      },
-    });
-
-    console.log('📦 Criando produtos mockados...');
-    for (const product of PRODUCTS) {
-      let sellerId = '';
-      switch (product.sellerBusinessName) {
-        case 'Cultivo Pro':
-          sellerId = joao.sellerProfile?.id || '';
-          break;
-        case 'HidroTech':
-          sellerId = maria.sellerProfile?.id || '';
-          break;
-        case 'BioCultivo':
-          sellerId = pedro.sellerProfile?.id || '';
-          break;
+  // Criar categorias
+  const categories = await Promise.all([
+    prisma.category.upsert({
+      where: { slug: 'iluminacao' },
+      update: {},
+      create: {
+        name: 'Iluminação',
+        slug: 'iluminacao',
+        description: 'LEDs, lâmpadas e sistemas de iluminação',
+        icon: '💡'
       }
-
-      if (sellerId) {
-        await prisma.product.create({
-          data: {
-            name: product.name,
-            description: product.description,
-            shortDesc: product.shortDesc,
-            slug: product.slug,
-            price: new Prisma.Decimal(product.price),
-            comparePrice: product.comparePrice ? new Prisma.Decimal(product.comparePrice) : undefined,
-            stock: product.stock,
-            categoryId: product.categoryId,
-            status: product.status as ProductStatus,
-            totalReviews: product.totalReviews,
-            avgRating: product.avgRating,
-            sellerId: sellerId,
-            images: {
-              create: product.images,
-            },
-          },
-        });
-        console.log(`✅ Produto criado: ${product.name}`);
+    }),
+    prisma.category.upsert({
+      where: { slug: 'ventilacao' },
+      update: {},
+      create: {
+        name: 'Ventilação',
+        slug: 'ventilacao',
+        description: 'Exaustores, ventiladores e filtros',
+        icon: '🌀'
       }
-    }
+    }),
+    prisma.category.upsert({
+      where: { slug: 'nutrientes' },
+      update: {},
+      create: {
+        name: 'Nutrientes',
+        slug: 'nutrientes',
+        description: 'Fertilizantes e suplementos',
+        icon: '🧪'
+      }
+    }),
+    prisma.category.upsert({
+      where: { slug: 'tendas' },
+      update: {},
+      create: {
+        name: 'Tendas',
+        slug: 'tendas',
+        description: 'Estufas e grow boxes',
+        icon: '🏠'
+      }
+    }),
+    prisma.category.upsert({
+      where: { slug: 'ferramentas' },
+      update: {},
+      create: {
+        name: 'Ferramentas',
+        slug: 'ferramentas',
+        description: 'Tesouras, medidores e acessórios',
+        icon: '🔧'
+      }
+    })
+  ])
 
-    console.log('🎉 Seed concluído com sucesso!');
-    const usersCount = await prisma.user.count();
-    const categoriesCount = await prisma.category.count();
-    const productsCount = await prisma.product.count();
-    console.log(`📊 Criadas ${usersCount} usuários, ${categoriesCount} categorias e ${productsCount} produtos.`);
-  } catch (error) {
-    console.error('❌ Erro durante o seed:', error);
-    throw error;
+  console.log('✅ Categorias criadas:', categories.length)
+
+  // Criar usuário vendedor de teste
+  const seller = await prisma.user.upsert({
+    where: { email: 'vendedor@desapegrow.com' },
+    update: {},
+    create: {
+      email: 'vendedor@desapegrow.com',
+      name: 'Vendedor Teste',
+      password: '$2a$10$X8qZ9Z8Z8Z8Z8Z8Z8Z8Z8u', // senha: "123456"
+      role: 'SELLER',
+      gameProfile: {
+        create: {
+          totalPoints: 0,
+          availablePoints: 0,
+          currentLevel: 'INICIANTE'
+        }
+      },
+      sellerProfile: {
+        create: {
+          businessName: 'Grow Shop Teste',
+          totalSales: 0,
+          totalOrders: 0
+        }
+      }
+    },
+    include: {
+      sellerProfile: true
+    }
+  })
+
+  console.log('✅ Vendedor criado:', seller.email)
+
+  // Criar produtos
+  const products = [
+    {
+      name: 'LED Grow Light 300W Full Spectrum',
+      slug: 'led-grow-light-300w',
+      description: 'Painel LED de alta eficiência com espectro completo para todas as fases de crescimento. Economia de energia e melhor produtividade.',
+      shortDesc: 'LED 300W com espectro completo',
+      categoryId: categories[0].id, // Iluminação
+      price: 450.00,
+      comparePrice: 650.00,
+      stock: 15,
+      images: ['https://images.unsplash.com/photo-1621112904887-419379ce6824?w=500']
+    },
+    {
+      name: 'Tenda de Cultivo 80x80x160cm',
+      slug: 'tenda-cultivo-80x80',
+      description: 'Grow box de alta qualidade com revestimento refletivo 95%. Estrutura robusta em metal e tecido 600D resistente.',
+      shortDesc: 'Grow Box 80x80x160cm',
+      categoryId: categories[3].id, // Tendas
+      price: 380.00,
+      comparePrice: 520.00,
+      stock: 8,
+      images: ['https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?w=500']
+    },
+    {
+      name: 'Exaustor Inline 150mm 420m³/h',
+      slug: 'exaustor-inline-150mm',
+      description: 'Exaustor inline silencioso de alta vazão. Motor duplo rolamento para maior durabilidade. Ideal para tendas médias.',
+      shortDesc: 'Exaustor 150mm silencioso',
+      categoryId: categories[1].id, // Ventilação
+      price: 280.00,
+      comparePrice: 380.00,
+      stock: 12,
+      images: ['https://images.unsplash.com/photo-1545259741-2ea3ebf61fa3?w=500']
+    },
+    {
+      name: 'Kit Nutrientes Orgânicos 3 Partes',
+      slug: 'kit-nutrientes-organicos',
+      description: 'Kit completo de nutrientes orgânicos para todas as fases. Inclui Grow, Bloom e Micro. Rende até 200L de solução.',
+      shortDesc: 'Kit nutrição completa orgânica',
+      categoryId: categories[2].id, // Nutrientes
+      price: 165.00,
+      comparePrice: 220.00,
+      stock: 25,
+      images: ['https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=500']
+    },
+    {
+      name: 'Medidor pH e EC Digital',
+      slug: 'medidor-ph-ec-digital',
+      description: 'Medidor digital de pH e condutividade elétrica com tela LCD. Calibração automática e compensação de temperatura.',
+      shortDesc: 'Medidor pH/EC preciso',
+      categoryId: categories[4].id, // Ferramentas
+      price: 95.00,
+      comparePrice: 140.00,
+      stock: 30,
+      images: ['https://images.unsplash.com/photo-1581093458791-9d42e55b8a3c?w=500']
+    },
+    {
+      name: 'Ventilador Oscilante 40cm 110W',
+      slug: 'ventilador-oscilante-40cm',
+      description: 'Ventilador de parede com oscilação automática. 3 velocidades e silencioso. Essencial para circulação de ar.',
+      shortDesc: 'Ventilador oscilante 40cm',
+      categoryId: categories[1].id, // Ventilação
+      price: 120.00,
+      comparePrice: 160.00,
+      stock: 18,
+      images: ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500']
+    },
+    {
+      name: 'Tesoura de Poda Premium Curva',
+      slug: 'tesoura-poda-premium',
+      description: 'Tesoura profissional em aço inox com lâminas curvas. Cabo ergonômico com revestimento antiderrapante.',
+      shortDesc: 'Tesoura profissional curva',
+      categoryId: categories[4].id, // Ferramentas
+      price: 58.00,
+      comparePrice: 85.00,
+      stock: 45,
+      images: ['https://images.unsplash.com/photo-1416339442236-8ceb164046f8?w=500']
+    },
+    {
+      name: 'Timer Digital Programável 220V',
+      slug: 'timer-digital-programavel',
+      description: 'Timer digital com 8 programações diárias. Display LCD e backup de bateria. Controle preciso de iluminação.',
+      shortDesc: 'Timer 8 programações/dia',
+      categoryId: categories[4].id, // Ferramentas
+      price: 42.00,
+      comparePrice: 65.00,
+      stock: 35,
+      images: ['https://images.unsplash.com/photo-1495364141860-b0d03eccd065?w=500']
+    }
+  ]
+
+  for (const product of products) {
+    await prisma.product.create({
+      data: {
+        ...product,
+        sellerId: seller.sellerProfile!.id,
+        status: 'ACTIVE',
+        images: {
+          create: product.images.map((url, index) => ({
+            url,
+            alt: product.name,
+            order: index
+          }))
+        }
+      }
+    })
   }
+
+  console.log('✅ Produtos criados:', products.length)
+  console.log('🎉 Seed concluído com sucesso!')
 }
 
 main()
   .catch((e) => {
-    console.error('💥 Erro fatal no seed:', e);
-    process.exit(1);
+    console.error('❌ Erro no seed:', e)
+    process.exit(1)
   })
   .finally(async () => {
-    await prisma.$disconnect();
-    console.log('🔌 Conexão com banco fechada');
-  });
+    await prisma.$disconnect()
+  })
