@@ -1,14 +1,14 @@
-import './globals.css'
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { Providers } from '../components/providers'
+import { Providers } from '@/components/providers'
 import Header from '@/components/layout/Header'
+import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Desapegrow - Marketplace de Cultivo Gamificado',
-  description: 'O primeiro marketplace de cultivo gamificado do Brasil',
+  title: 'Desapegrow - Marketplace de Equipamentos Grow',
+  description: 'Compre e venda equipamentos para cultivo indoor',
 }
 
 export default function RootLayout({
@@ -21,9 +21,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <Header />
-          <main className="min-h-screen pt-16">
-            {children}
-          </main>
+          {children}
         </Providers>
       </body>
     </html>

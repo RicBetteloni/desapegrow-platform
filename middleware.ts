@@ -28,12 +28,12 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => true // Middleware controla manualmente
+      authorized: ({ token }) => true
     },
   }
 )
 
-// Rotas que precisam de autenticação
+// Apenas rotas protegidas (não inclui /, /marketplace, etc)
 export const config = {
   matcher: [
     '/dashboard/:path*',
@@ -41,6 +41,7 @@ export const config = {
     '/checkout/:path*',
     '/grow-virtual/:path*',
     '/meus-pedidos/:path*',
+    '/perfil/:path*',
     '/auth/signin',
     '/auth/signup'
   ]

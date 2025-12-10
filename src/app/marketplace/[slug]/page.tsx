@@ -98,35 +98,157 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      <nav className="bg-white/80 backdrop-blur-sm border-b p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2 text-xl font-bold text-green-700">
-            <span>🌱</span><span>Desapegrow</span>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Breadcrumb */}
+        <div className="mb-6">
+          <Link href="/marketplace" className="text-green-600 hover:text-green-700 font-medium flex items-center gap-2">
+            ← Voltar ao Marketplace
           </Link>
-          <Link href="/marketplace"><Button variant="ghost">Marketplace</Button></Link>
         </div>
-      </nav>
 
-      <div className="container mx-auto p-6 max-w-7xl">
         <div className="grid lg:grid-cols-2 gap-8">
-          <div className="aspect-square rounded-2xl overflow-hidden bg-white shadow-lg">
-            <img src={product.images[0]?.url} alt={product.name} className="w-full h-full object-cover" />
+          {/* Galeria de Imagens */}
+          <div className="space-y-4">
+            <div className="aspect-square rounded-2xl overflow-hidden bg-white shadow-2xl border-4 border-white">
+              <img 
+                src={product.images[0]?.url} 
+                alt={product.name} 
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
+              />
+            </div>
           </div>
 
+          {/* Informações do Produto */}
           <div className="space-y-6">
-            <div>
-              <Badge variant="outline">{product.category.name}</Badge>
-              <h1 className="text-3xl font-bold my-4">{product.name}</h1>
-              <div className="flex items-baseline space-x-3 mb-6">
-                <span className="text-4xl font-bold text-green-600">R$ {product.price.toFixed(2)}</span>
+            {/* Badge Categoria */}
+            <Badge variant="outline" className="text-sm px-4 py-1">
+              {product.category.name}
+            </Badge>
+
+            {/* Nome */}
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              {product.name}
+            </h1>
+
+            {/* Avaliações */}
+            {product.totalReviews > 0 && (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star 
+                      key={i} 
+                      className={`w-5 h-5 ${i < Math.round(product.avgRating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                    />
+                  ))}
+                </div>
+                <span className="text-gray-600">
+                  {product.avgRating?.toFixed(1)} ({product.totalReviews} avaliações)
+                </span>
               </div>
-              <p className="text-gray-700">{product.description}</p>
+            )}
+
+            {/* Preço */}
+            <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6">
+              {product.comparePrice && product.comparePrice > product.price && (
+                <p className="text-lg text-gray-500 line-through mb-1">
+                  De R$ {product.comparePrice.toFixed(2)}
+                </p>
+              )}
+              <div className="flex items-baseline gap-3">
+                <span className="text-5xl font-bold text-green-600">
+                  R$ {product.price.toFixed(2)}
+                </span>
+                {product.comparePrice && product.comparePrice > product.price && (
+                  <Badge className="bg-red-500 text-white text-sm px-3 py-1">
+                    -{Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF
+                  </Badge>
+                )}
+              </div>
             </div>
 
-            <Button onClick={addToCart} disabled={addingToCart || product.stock === 0} className="w-full" size="lg">
-              {addingToCart ? '⏳ Adicionando...' : <><ShoppingCart className="w-5 h-5 mr-2" />Adicionar ao Carrinho</>}
-            </Button>
+            {/* Descrição */}
+            <div className="bg-white rounded-xl p-6 shadow-md border-2 border-gray-100">
+              <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
+                📝 Descrição
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                {product.description}
+              </p>
+            </div>
+
+            {/* Estoque */}
+            <div className="bg-white rounded-xl p-6 shadow-md border-2 border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Package className="w-5 h-5 text-green-600" />
+                  <span className="font-semibold">Disponibilidade:</span>
+                </div>
+                {product.stock > 0 ? (
+                  <Badge className="bg-green-100 text-green-800 px-4 py-1">
+                    ✓ {product.stock} em estoque
+                  </Badge>
+                ) : (
+                  <Badge className="bg-red-100 text-red-800 px-4 py-1">
+                    ✗ Indisponível
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {/* Vendedor */}
+            <div className="bg-white rounded-xl p-6 shadow-md border-2 border-gray-100">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-semibold">Vendido por:</span>
+                <span className="text-green-600 font-bold">{product.seller.businessName}</span>
+              </div>
+            </div>
+
+            {/* Botões de Ação */}
+            <div className="space-y-3">
+              <Button 
+                onClick={addToCart} 
+                disabled={addingToCart || product.stock === 0} 
+                className="w-full h-16 text-lg font-bold shadow-xl hover:shadow-2xl transition-all hover:scale-105" 
+                size="lg"
+              >
+                {addingToCart ? (
+                  <>⏳ Adicionando...</>
+                ) : product.stock === 0 ? (
+                  <>❌ Produto Indisponível</>
+                ) : (
+                  <>
+                    <ShoppingCart className="w-6 h-6 mr-2" />
+                    Adicionar ao Carrinho
+                  </>
+                )}
+              </Button>
+
+              <Button 
+                variant="outline" 
+                className="w-full h-14 text-lg border-2 hover:bg-green-50" 
+                size="lg"
+              >
+                <Heart className="w-5 h-5 mr-2" />
+                Adicionar aos Favoritos
+              </Button>
+            </div>
+
+            {/* Badges Informativos */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-blue-50 rounded-lg p-4 text-center border border-blue-200">
+                <Sparkles className="w-6 h-6 mx-auto mb-2 text-blue-600" />
+                <p className="text-xs font-semibold text-blue-800">Qualidade Garantida</p>
+              </div>
+              <div className="bg-purple-50 rounded-lg p-4 text-center border border-purple-200">
+                <Gift className="w-6 h-6 mx-auto mb-2 text-purple-600" />
+                <p className="text-xs font-semibold text-purple-800">Ganhe Pontos</p>
+              </div>
+              <div className="bg-green-50 rounded-lg p-4 text-center border border-green-200">
+                <Package className="w-6 h-6 mx-auto mb-2 text-green-600" />
+                <p className="text-xs font-semibold text-green-800">Envio Rápido</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

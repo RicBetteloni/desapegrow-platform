@@ -94,69 +94,75 @@ export default function CheckoutPage() {
     return true
   }
 
-  const handleCheckout = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+  // Substitui a função handleCheckout COMPLETA:
+const handleCheckout = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setError('')
 
-    if (!validateForm()) {
-      return
-    }
+  if (!validateForm() || cartItems.length === 0) return
 
-    if (cartItems.length === 0) {
-      setError('Carrinho está vazio')
-      return
-    }
+  setLoading(true)
 
-    setLoading(true)
-
-    try {
-      const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cartItems.map(item => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            price: item.price
-          })),
-          total,
-          paymentMethod: 'simulated',
-          // Dados cliente (opcional, pode salvar em Order depois)
-          customer: {
-            name: formData.fullName,
-            email: formData.email,
-            phone: formData.phone,
-            cpf: formData.cpf,
-            address: formData.address,
-            city: formData.city,
-            state: formData.state,
-            zipCode: formData.zipCode
-          }
-        })
+  try {
+    // 1. Cria pedido no banco
+    const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    
+    const orderResponse = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: cartItems.map(item => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price
+        })),
+        total,
+        paymentMethod: 'sandbox' // ← NOVIDADE
       })
+    })
 
-      const data = await response.json()
+    const orderData = await orderResponse.json()
 
-      if (!response.ok) {
-        setError(data.error || 'Erro ao processar pedido')
-        return
-      }
-
-      // Limpar carrinho
-      localStorage.removeItem('cart')
-      window.dispatchEvent(new Event('cartUpdated'))
-
-      // Redirecionar para sucesso
-      router.push(`/checkout/sucesso?orderId=${data.order.id}`)
-    } catch (err) {
-      console.error('Erro checkout:', err)
-      setError('Erro ao processar compra. Tente novamente.')
-    } finally {
-      setLoading(false)
+    if (!orderResponse.ok) {
+      setError(orderData.error || 'Erro ao criar pedido')
+      return
     }
+
+    const orderId = orderData.order.id
+
+    // 2. Chama MP Sandbox
+    const mpResponse = await fetch('/api/mp/sandbox', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: cartItems,
+        orderId,
+        customer: formData
+      })
+    })
+
+    const mpData = await mpResponse.json()
+
+    if (!mpResponse.ok) {
+      setError(mpData.error || 'Erro ao processar pagamento')
+      return
+    }
+
+    // 3. Limpa carrinho + redireciona
+    localStorage.removeItem('cart')
+    window.dispatchEvent(new Event('cartUpdated'))
+    
+    // Simula redirecionamento MP (em prod seria mpData.init_point)
+    router.push(mpData.sandboxUrls.success)
+
+  } catch (err) {
+    console.error('Erro checkout:', err)
+    setError('Erro ao processar compra')
+  } finally {
+    setLoading(false)
   }
+}
+
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
 

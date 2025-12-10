@@ -108,7 +108,7 @@ export default function MarketplacePage() {
         name: product.name,
         price: product.price,
         quantity: 1,
-        image: product.images[0]?.url || '/placeholder.png'
+        image: product.images?.[0]?.url || '/placeholder.png'
       })
     }
 
@@ -126,26 +126,56 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      <div className="container mx-auto p-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-4">🏪 Marketplace</h1>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Hero Section */}
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+            🏪 Marketplace Desapegrow
+          </h1>
+          <p className="text-gray-600 text-lg">Encontre os melhores equipamentos para seu cultivo</p>
+        </div>
 
-          {/* Categorias */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
+        {/* Busca */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <form onSubmit={handleSearch} className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Buscar produtos..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 h-12 text-lg border-2 focus:border-green-500"
+              />
+            </div>
+            <Button type="submit" size="lg" className="px-8">
+              Buscar
+            </Button>
+          </form>
+        </div>
+
+        {/* Categorias */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span>📂</span> Categorias
+          </h2>
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <Button
               variant={selectedCategory === '' ? 'default' : 'outline'}
               onClick={() => setSelectedCategory('')}
-              className="whitespace-nowrap"
+              className="whitespace-nowrap shadow-sm hover:shadow-md transition-shadow"
+              size="lg"
             >
-              Todas
+              ✨ Todas
             </Button>
             {categories.map((cat: Category) => (
               <Button
                 key={cat.id}
                 variant={selectedCategory === cat.slug ? 'default' : 'outline'}
                 onClick={() => setSelectedCategory(cat.slug)}
-                className="whitespace-nowrap"
+                className="whitespace-nowrap shadow-sm hover:shadow-md transition-shadow"
+                size="lg"
               >
                 {cat.icon} {cat.name}
               </Button>
@@ -165,19 +195,25 @@ export default function MarketplacePage() {
             <p className="text-gray-600">Nenhum produto encontrado</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {products.map((product: Product) => (
-              <Card 
-                key={product.id} 
-                className="hover:shadow-lg transition-shadow group overflow-hidden relative"
-              >
-                {/* Imagem */}
-                <div className="relative aspect-square bg-gray-100 overflow-hidden">
-                  <img
-                    src={product.images[0]?.url || '/placeholder.png'}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                  />
+          <>
+            <div className="mb-6">
+              <p className="text-gray-600">
+                <span className="font-semibold text-green-600">{products.length}</span> produtos encontrados
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {products.map((product: Product) => (
+                <Card 
+                  key={product.id} 
+                  className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group overflow-hidden relative border-2 hover:border-green-300"
+                >
+                  {/* Imagem */}
+                  <div className="relative aspect-square bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+                    <img
+                      src={product.images?.[0]?.url || '/placeholder.png'}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
 
                   {/* Badges */}
                   <div className="absolute top-2 right-2 space-y-1">
@@ -217,15 +253,15 @@ export default function MarketplacePage() {
                   />
                 </div>
 
-                <CardContent className="p-3 space-y-2">
+                <CardContent className="p-4 space-y-3 bg-white">
                   {/* Categoria */}
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-xs font-medium">
                     {product.category.icon} {product.category.name}
                   </Badge>
 
                   {/* Nome */}
                   <Link href={`/produtos/${product.slug}`}>
-                    <h3 className="font-semibold text-sm line-clamp-2 hover:text-green-700">
+                    <h3 className="font-bold text-base line-clamp-2 hover:text-green-600 transition-colors">
                       {product.name}
                     </h3>
                   </Link>
@@ -240,14 +276,14 @@ export default function MarketplacePage() {
                   )}
 
                   {/* Preço */}
-                  <div>
+                  <div className="pt-2 border-t">
                     {product.comparePrice && product.comparePrice > product.price && (
-                      <p className="text-xs text-gray-500 line-through">
-                        R$ {product.comparePrice.toFixed(2)}
+                      <p className="text-sm text-gray-500 line-through">
+                        De R$ {Number(product.comparePrice).toFixed(2)}
                       </p>
                     )}
-                    <p className="text-lg font-bold text-green-600">
-                      R$ {product.price.toFixed(2)}
+                    <p className="text-2xl font-bold text-green-600">
+                      R$ {Number(product.price).toFixed(2)}
                     </p>
                   </div>
 
@@ -255,31 +291,42 @@ export default function MarketplacePage() {
                   <Button
                     onClick={() => addToCart(product)}
                     disabled={product.stock === 0}
-                    className="w-full text-sm"
+                    className="w-full font-semibold shadow-md hover:shadow-lg transition-shadow"
+                    size="lg"
                   >
                     {product.stock === 0 ? (
-                      'Sem Estoque'
+                      '❌ Sem Estoque'
                     ) : (
                       <>
-                        <ShoppingCart className="w-3 h-3 mr-1" />
-                        Adicionar
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        Adicionar ao Carrinho
                       </>
                     )}
                   </Button>
                 </CardContent>
               </Card>
             ))}
-          </div>
+            </div>
+          </>
         )}
 
-        {/* BOTÕES DE NAVEGAÇÃO - NOVO */}
-        <div className="mt-12 flex flex-col sm:flex-row gap-4">
-          <Link href="/vendedor/meus-anuncios">
-            <Button className="w-full sm:w-auto">📦 Meus Anúncios</Button>
-          </Link>
-          <Link href="/carrinho">
-            <Button variant="outline" className="w-full sm:w-auto">🛒 Meu Carrinho</Button>
-          </Link>
+        {/* BOTÕES DE NAVEGAÇÃO */}
+        <div className="mt-16 bg-white/80 backdrop-blur rounded-2xl p-8 shadow-lg border-2 border-green-100">
+          <h3 className="text-xl font-bold mb-4 text-center">🎯 Acesso Rápido</h3>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link href="/vendedor/meus-anuncios" className="block">
+              <Button className="w-full h-16 text-lg" size="lg">📦 Meus Anúncios</Button>
+            </Link>
+            <Link href="/carrinho" className="block">
+              <Button variant="outline" className="w-full h-16 text-lg" size="lg">🛒 Carrinho</Button>
+            </Link>
+            <Link href="/grow-virtual" className="block">
+              <Button variant="outline" className="w-full h-16 text-lg" size="lg">🌱 Grow Virtual</Button>
+            </Link>
+            <Link href="/gamification" className="block">
+              <Button variant="outline" className="w-full h-16 text-lg" size="lg">🏆 Gamificação</Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

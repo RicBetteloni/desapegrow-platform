@@ -1,86 +1,34 @@
 'use client'
-
-import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle, Package, Sparkles } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 
-export default function PaymentSuccessPage() {
+export default function PaymentSuccess() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get('orderId')
-  const [loading, setLoading] = useState(false)
+  const preferenceId = searchParams.get('preference_id')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-      <Card className="max-w-2xl w-full">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="bg-green-100 rounded-full p-4">
-              <CheckCircle className="w-16 h-16 text-green-600" />
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+      <div className="max-w-md w-full mx-auto p-8 bg-white rounded-2xl shadow-xl">
+        <div className="text-center space-y-6">
+          <CheckCircle2 className="w-20 h-20 text-green-600 mx-auto" />
+          <h1 className="text-3xl font-bold text-gray-900">✅ Pagamento Aprovado!</h1>
+          <div className="space-y-2 text-sm text-gray-600">
+            <p>Preference ID: <span className="font-mono">{preferenceId}</span></p>
+            {orderId && <p>Pedido: <span className="font-mono">{orderId}</span></p>}
           </div>
-          <CardTitle className="text-3xl mb-2">🎉 Pagamento Aprovado!</CardTitle>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-start space-x-3">
-              <Package className="w-6 h-6 text-blue-600 mt-1" />
-              <div>
-                <h3 className="font-semibold text-blue-900 mb-1">
-                  Pedido Confirmado!
-                </h3>
-                <p className="text-sm text-blue-800">
-                  Seu pedido <strong>#{orderId?.slice(0, 8)}</strong> foi confirmado e está sendo processado.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-4">
-            <div className="flex items-start space-x-3">
-              <Sparkles className="w-6 h-6 text-purple-600 mt-1" />
-              <div>
-                <h3 className="font-semibold text-purple-900 mb-2">
-                  🎁 Itens Virtuais Desbloqueados!
-                </h3>
-                <p className="text-sm text-purple-800 mb-2">
-                  Você ganhou recompensas exclusivas:
-                </p>
-                <ul className="text-sm text-purple-700 space-y-1">
-                  <li>✨ Itens raros para seu Grow Virtual</li>
-                  <li>🪙 +100 CultivoCoins</li>
-                  <li>💎 +50 GrowthGems</li>
-                  <li>⚡ Boost de crescimento 2x</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Link href="/meus-pedidos" className="block">
-              <Button variant="outline" className="w-full">
-                Ver Meus Pedidos
-              </Button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link href="/meus-pedidos">
+              <Button className="w-full">📋 Meus Pedidos</Button>
             </Link>
-            <Link href="/grow-virtual" className="block">
-              <Button className="w-full">
-                Acessar Grow Virtual
-              </Button>
-            </Link>
-          </div>
-
-          <div className="text-center">
             <Link href="/marketplace">
-              <Button variant="ghost">
-                Continuar Comprando
-              </Button>
+              <Button variant="outline" className="w-full">🛒 Comprar Mais</Button>
             </Link>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

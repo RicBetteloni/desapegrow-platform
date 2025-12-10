@@ -46,7 +46,7 @@ export default function Header() {
   }, [])
 
   return (
-    <header className="border-b bg-background/95 backdrop-blur">
+    <header className="border-b bg-white/95 backdrop-blur">
       <div className="container flex h-16 items-center px-4">
         <Link href="/marketplace" className="font-bold text-xl">
           Desapegrow
