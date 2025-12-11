@@ -46,9 +46,9 @@ export default function Header() {
   }, [])
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-lg shadow-sm">
+    <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-sm shadow-sm">
       <div className="container flex h-16 items-center px-4">
-        <Link href="/marketplace" className="flex items-center gap-2 font-bold text-xl text-gradient-green hover:scale-105 transition-transform">
+        <Link href="/marketplace" className="flex items-center gap-2 font-bold text-xl text-gray-900 hover:text-green-600 transition-colors">
           <span className="text-2xl">🌱</span>
           Desapegrow
         </Link>
@@ -57,30 +57,30 @@ export default function Header() {
           {session ? (
             <>
               <Link href="/marketplace">
-                <Button variant="ghost" size="sm" className="hover:bg-green-50 hover:text-green-700 transition-colors">
+                <Button variant="ghost" size="sm">
                   🛒 Marketplace
                 </Button>
               </Link>
               
               {isSeller ? (
                 <Link href="/vendedor">
-                  <Button variant="ghost" size="sm" className="hover:bg-green-50 hover:text-green-700 transition-colors">
+                  <Button variant="ghost" size="sm">
                     📦 Vendedor
                   </Button>
                 </Link>
               ) : (
                 <Link href="/vendedor/meus-anuncios">
-                  <Button variant="outline" size="sm" className="border-green-600 text-green-700 hover:bg-green-50 transition-colors">
+                  <Button variant="outline" size="sm">
                     Vender Agora
                   </Button>
                 </Link>
               )}
               
               <Link href="/carrinho">
-                <Button variant="ghost" size="sm" className="relative hover:bg-green-50 hover:text-green-700 transition-colors">
+                <Button variant="ghost" size="sm" className="relative">
                   <ShoppingCart className="h-5 w-5" />
                   {cartCount > 0 && (
-                    <div className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-gradient-to-br from-red-500 to-red-600 text-white text-xs flex items-center justify-center font-bold shadow-lg animate-pulse">
+                    <div className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">
                       {cartCount > 9 ? '9+' : cartCount}
                     </div>
                   )}
@@ -88,14 +88,14 @@ export default function Header() {
               </Link>
               
               <Link href="/perfil">
-                <Button variant="ghost" size="sm" className="hover:bg-green-50 hover:text-green-700 transition-colors">
+                <Button variant="ghost" size="sm">
                   <User className="h-5 w-5" />
                 </Button>
               </Link>
             </>
           ) : (
             <Link href="/auth/signin">
-              <Button className="bg-gradient-green hover:opacity-90 transition-opacity">Entrar</Button>
+              <Button>Entrar</Button>
             </Link>
           )}
         </div>

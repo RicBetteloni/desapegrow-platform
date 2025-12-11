@@ -130,14 +130,16 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
+        {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-            🏪 Marketplace Desapegrow
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 text-gray-900">
+            🌱 Marketplace Desapegrow
           </h1>
-          <p className="text-gray-600 text-lg">Encontre os melhores equipamentos para seu cultivo</p>
+          <p className="text-gray-600 text-lg">
+            Encontre os melhores equipamentos e <strong>ganhe pontos a cada compra!</strong>
+          </p>
         </div>
 
         {/* Busca */}
@@ -150,7 +152,7 @@ export default function MarketplacePage() {
                 placeholder="Buscar produtos..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 h-12 text-lg border-2 focus:border-green-500"
+                className="pl-10 h-12 text-lg"
               />
             </div>
             <Button type="submit" size="lg" className="px-8">
@@ -168,7 +170,7 @@ export default function MarketplacePage() {
             <Button
               variant={selectedCategory === '' ? 'default' : 'outline'}
               onClick={() => setSelectedCategory('')}
-              className="whitespace-nowrap shadow-sm hover:shadow-md transition-shadow"
+              className="whitespace-nowrap"
               size="lg"
             >
               ✨ Todas
@@ -178,7 +180,7 @@ export default function MarketplacePage() {
                 key={cat.id}
                 variant={selectedCategory === cat.slug ? 'default' : 'outline'}
                 onClick={() => setSelectedCategory(cat.slug)}
-                className="whitespace-nowrap shadow-sm hover:shadow-md transition-shadow"
+                className="whitespace-nowrap"
                 size="lg"
               >
                 {cat.icon} {cat.name}
