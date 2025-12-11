@@ -131,14 +131,12 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 text-gray-900">
-            🌱 Marketplace Desapegrow
-          </h1>
+      <div className="container mx-auto p-6">
+        {/* Page Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4">🛒 Marketplace</h1>
           <p className="text-gray-600 text-lg">
-            Encontre os melhores equipamentos e <strong>ganhe pontos a cada compra!</strong>
+            Descubra equipamentos incríveis e ganhe pontos a cada compra!
           </p>
         </div>
 
@@ -162,52 +160,43 @@ export default function MarketplacePage() {
         </div>
 
         {/* Categorias */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span>📂</span> Categorias
-          </h2>
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            <Button
-              variant={selectedCategory === '' ? 'default' : 'outline'}
-              onClick={() => setSelectedCategory('')}
-              className="whitespace-nowrap"
-              size="lg"
-            >
-              ✨ Todas
-            </Button>
-            {categories.map((cat: Category) => (
-              <Button
-                key={cat.id}
-                variant={selectedCategory === cat.slug ? 'default' : 'outline'}
-                onClick={() => setSelectedCategory(cat.slug)}
-                className="whitespace-nowrap"
-                size="lg"
-              >
-                {cat.icon} {cat.name}
-              </Button>
-            ))}
+        {categories.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-6">📂 Categorias</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {categories.map((cat: Category) => (
+                <Card 
+                  key={cat.id} 
+                  className="hover:shadow-lg transition-all cursor-pointer"
+                  onClick={() => setSelectedCategory(cat.slug)}
+                >
+                  <CardContent className="p-4 text-center">
+                    <div className="text-3xl mb-2">{cat.icon}</div>
+                    <h3 className="font-semibold text-sm">{cat.name}</h3>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Produtos */}
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-            <p className="text-gray-600 mt-4">Carregando produtos...</p>
-          </div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-12">
-            <AlertCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <p className="text-gray-600">Nenhum produto encontrado</p>
-          </div>
-        ) : (
-          <>
-            <div className="mb-6">
-              <p className="text-gray-600">
-                <span className="font-semibold text-green-600">{products.length}</span> produtos encontrados
-              </p>
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-6">🌿 Produtos Disponíveis</h2>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+              <p className="text-gray-600 mt-4">Carregando produtos...</p>
             </div>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          ) : products.length === 0 ? (
+            <Card className="max-w-2xl mx-auto">
+              <CardContent className="p-8 text-center">
+                <AlertCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                <p className="text-gray-600 mb-4">Nenhum produto encontrado</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {products.map((product: Product) => (
                 <Card 
                   key={product.id} 
@@ -313,26 +302,7 @@ export default function MarketplacePage() {
               </Card>
             ))}
             </div>
-          </>
-        )}
-
-        {/* BOTÕES DE NAVEGAÇÃO */}
-        <div className="mt-16 bg-white/80 backdrop-blur rounded-2xl p-8 shadow-lg border-2 border-green-100">
-          <h3 className="text-xl font-bold mb-4 text-center">🎯 Acesso Rápido</h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link href="/vendedor/meus-anuncios" className="block">
-              <Button className="w-full h-16 text-lg" size="lg">📦 Meus Anúncios</Button>
-            </Link>
-            <Link href="/carrinho" className="block">
-              <Button variant="outline" className="w-full h-16 text-lg" size="lg">🛒 Carrinho</Button>
-            </Link>
-            <Link href="/grow-virtual" className="block">
-              <Button variant="outline" className="w-full h-16 text-lg" size="lg">🌱 Grow Virtual</Button>
-            </Link>
-            <Link href="/gamification" className="block">
-              <Button variant="outline" className="w-full h-16 text-lg" size="lg">🏆 Gamificação</Button>
-            </Link>
-          </div>
+          )}
         </div>
       </div>
     </div>
