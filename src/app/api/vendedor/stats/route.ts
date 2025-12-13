@@ -10,7 +10,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    const sellerProfile = await prisma.sellerProfile.findUnique({
+    let sellerProfile = await prisma.sellerProfile.findUnique({
       where: { userId: session.user.id },
       include: {
         products: {
@@ -22,8 +22,21 @@ export async function GET() {
       }
     })
 
+    // Se não existe, cria automaticamente
     if (!sellerProfile) {
-      return NextResponse.json({ error: 'Perfil de vendedor não encontrado' }, { status: 404 })
+      sellerProfile = await prisma.sellerProfile.create({
+        data: {
+          userId: session.user.id
+        },
+        include: {
+          products: {
+            select: {
+              id: true,
+              status: true
+            }
+          }
+        }
+      })
     }
 
     const stats = {

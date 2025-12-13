@@ -3,6 +3,12 @@ import { NextResponse } from "next/server"
 
 export default withAuth(
   function middleware(req) {
+    // Bloqueia requisições de tracking/malware
+    if (req.nextUrl.pathname.includes('hybridaction') || 
+        req.nextUrl.pathname.includes('zyb')) {
+      return new NextResponse(null, { status: 404 })
+    }
+
     const token = req.nextauth.token
     const isAuth = !!token
     const isAuthPage = req.nextUrl.pathname.startsWith('/auth')

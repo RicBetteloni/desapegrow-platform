@@ -62,28 +62,35 @@ export default function NovoProdutoPage() {
         return
       }
 
+      const payload = {
+        ...formData,
+        price: parseFloat(formData.price),
+        comparePrice: formData.comparePrice ? parseFloat(formData.comparePrice) : null,
+        stock: parseInt(formData.stock),
+        weight: formData.weight ? parseFloat(formData.weight) : null,
+        images: validImageUrls
+      }
+
+      console.log('📦 Enviando produto:', payload)
+
       const response = await fetch('/api/vendedor/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          price: parseFloat(formData.price),
-          comparePrice: formData.comparePrice ? parseFloat(formData.comparePrice) : null,
-          stock: parseInt(formData.stock),
-          weight: formData.weight ? parseFloat(formData.weight) : null,
-          images: validImageUrls
-        })
+        body: JSON.stringify(payload)
       })
 
+      const data = await response.json()
+      console.log('📡 Resposta da API:', data)
+
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Erro ao criar produto')
+        throw new Error(data.details || data.error || 'Erro ao criar produto')
       }
 
       alert('✅ Produto criado com sucesso!')
       router.push('/vendedor')
 
     } catch (error) {
+      console.error('❌ Erro completo:', error)
       const message = error instanceof Error ? error.message : 'Erro desconhecido'
       alert('❌ Erro: ' + message)
     } finally {

@@ -12,8 +12,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    // Buscar perfil de vendedor
-    const sellerProfile = await prisma.sellerProfile.findUnique({
+    // Buscar ou criar perfil de vendedor
+    let sellerProfile = await prisma.sellerProfile.findUnique({
       where: { userId: session.user.id },
       include: {
         products: {
@@ -31,11 +31,30 @@ export async function GET() {
     console.log('👤 Seller Profile:', {
       found: !!sellerProfile,
       sellerId: sellerProfile?.id,
-      productsCount: sellerProfile?.products.length
+      productsCount: sellerProfile?.products.length,
+      userId: session.user.id
     })
 
+    // Se não existe, cria automaticamente
     if (!sellerProfile) {
-      return NextResponse.json({ error: 'Perfil de vendedor não encontrado' }, { status: 404 })
+      console.log('🔧 Criando perfil de vendedor automaticamente...')
+      sellerProfile = await prisma.sellerProfile.create({
+        data: {
+          userId: session.user.id
+        },
+        include: {
+          products: {
+            include: {
+              images: {
+                take: 1,
+                orderBy: { order: 'asc' }
+              }
+            },
+            orderBy: { createdAt: 'desc' }
+          }
+        }
+      })
+      console.log('✅ Perfil criado:', sellerProfile.id)
     }
 
     // Converter produtos para JSON
@@ -66,7 +85,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    const sellerProfile = await prisma.sellerProfile.findUnique({
+    // Verificar se o usuário existe
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    })
+
+    console.log('👤 User encontrado:', {
+      found: !!user,
+      userId: session.user.id,
+      userName: user?.name,
+      userEmail: user?.email
+    })
+
+    if (!user) {
+      return NextResponse.json({ 
+        error: 'Usuário não encontrado no banco de dados',
+        details: `O ID da sessão ${session.user.id} não corresponde a nenhum usuário`
+      }, { status: 404 })
+    }
+
+    let sellerProfile = await prisma.sellerProfile.findUnique({
       where: { userId: session.user.id }
     })
 
@@ -76,8 +114,23 @@ export async function POST(request: Request) {
       userId: session.user.id
     })
 
+    // Se não existe, cria automaticamente
     if (!sellerProfile) {
-      return NextResponse.json({ error: 'Perfil de vendedor não encontrado' }, { status: 404 })
+      console.log('🔧 Criando perfil de vendedor para criação de produto...')
+      try {
+        sellerProfile = await prisma.sellerProfile.create({
+          data: {
+            userId: session.user.id
+          }
+        })
+        console.log('✅ Perfil criado:', sellerProfile.id)
+      } catch (createError) {
+        console.error('❌ Erro ao criar perfil:', createError)
+        return NextResponse.json({ 
+          error: 'Erro ao criar perfil de vendedor',
+          details: createError instanceof Error ? createError.message : String(createError)
+        }, { status: 500 })
+      }
     }
 
     const body = await request.json()
@@ -94,6 +147,30 @@ export async function POST(request: Request) {
       status
     } = body
 
+    console.log('📋 Dados recebidos:', {
+      name,
+      categorySlug,
+      price,
+      stock,
+      imagesCount: images?.length,
+      description: description?.substring(0, 50)
+    })
+
+    // Validar campos obrigatórios
+    if (!name || !description || !categorySlug || !price || !stock || !images || images.length === 0) {
+      return NextResponse.json({ 
+        error: 'Campos obrigatórios faltando',
+        details: {
+          name: !name,
+          description: !description,
+          categorySlug: !categorySlug,
+          price: !price,
+          stock: !stock,
+          images: !images || images.length === 0
+        }
+      }, { status: 400 })
+    }
+
     // Gerar slug
     const slug = name
       .toLowerCase()
@@ -109,8 +186,17 @@ export async function POST(request: Request) {
       where: { slug: categorySlug }
     })
 
+    console.log('📁 Categoria encontrada:', {
+      found: !!category,
+      categoryId: category?.id,
+      categorySlug
+    })
+
     if (!category) {
-      return NextResponse.json({ error: 'Categoria não encontrada' }, { status: 400 })
+      return NextResponse.json({ 
+        error: 'Categoria não encontrada',
+        details: `Slug '${categorySlug}' não existe no banco de dados`
+      }, { status: 400 })
     }
 
     console.log('📦 Criando produto com sellerId:', sellerProfile.id)
@@ -124,10 +210,10 @@ export async function POST(request: Request) {
         slug,
         shortDesc: shortDesc || null,
         description,
-        price,
-        comparePrice: comparePrice || null,
-        stock,
-        weight: weight || null,
+        price: Number(price),
+        comparePrice: comparePrice ? Number(comparePrice) : null,
+        stock: Number(stock),
+        weight: weight ? Number(weight) : null,
         status: status || 'ACTIVE',
         images: {
           create: images.map((url: string, index: number) => ({
@@ -149,6 +235,11 @@ export async function POST(request: Request) {
 
   } catch (error) {
     console.error('❌ Erro ao criar produto:', error)
-    return NextResponse.json({ error: 'Erro ao criar produto' }, { status: 500 })
+    console.error('❌ Stack trace:', error instanceof Error ? error.stack : 'N/A')
+    console.error('❌ Message:', error instanceof Error ? error.message : String(error))
+    return NextResponse.json({ 
+      error: 'Erro ao criar produto',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 })
   }
 }

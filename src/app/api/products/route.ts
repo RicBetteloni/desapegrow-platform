@@ -44,13 +44,20 @@ export async function GET(request: Request) {
     })
 
     // Calcular média de avaliações
-    const productsWithRatings = products.map(product => ({
-      ...product,
-      avgRating: product.reviews.length > 0 
+    const productsWithRatings = products.map(product => {
+      const avgRating = product.reviews.length > 0 
         ? product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length
-        : null,
-      totalReviews: product.reviews.length
-    }))
+        : null;
+      
+      // Não incluir reviews no retorno para reduzir payload
+      const { reviews, ...productData } = product;
+      
+      return {
+        ...productData,
+        avgRating,
+        totalReviews: product.reviews.length
+      };
+    })
 
     return NextResponse.json({ products: productsWithRatings })
   } catch (error) {

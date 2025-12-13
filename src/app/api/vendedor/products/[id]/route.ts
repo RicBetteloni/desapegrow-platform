@@ -13,12 +13,17 @@ export async function GET(
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    const sellerProfile = await prisma.sellerProfile.findUnique({
+    let sellerProfile = await prisma.sellerProfile.findUnique({
       where: { userId: session.user.id }
     })
 
+    // Se não existe, cria automaticamente
     if (!sellerProfile) {
-      return NextResponse.json({ error: 'Perfil de vendedor não encontrado' }, { status: 404 })
+      sellerProfile = await prisma.sellerProfile.create({
+        data: {
+          userId: session.user.id
+        }
+      })
     }
 
     const product = await prisma.product.findFirst({
@@ -68,12 +73,17 @@ export async function PUT(
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    const sellerProfile = await prisma.sellerProfile.findUnique({
+    let sellerProfile = await prisma.sellerProfile.findUnique({
       where: { userId: session.user.id }
     })
 
+    // Se não existe, cria automaticamente
     if (!sellerProfile) {
-      return NextResponse.json({ error: 'Perfil de vendedor não encontrado' }, { status: 404 })
+      sellerProfile = await prisma.sellerProfile.create({
+        data: {
+          userId: session.user.id
+        }
+      })
     }
 
     const body = await request.json()
@@ -158,12 +168,17 @@ export async function DELETE(
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    const sellerProfile = await prisma.sellerProfile.findUnique({
+    let sellerProfile = await prisma.sellerProfile.findUnique({
       where: { userId: session.user.id }
     })
 
+    // Se não existe, cria automaticamente
     if (!sellerProfile) {
-      return NextResponse.json({ error: 'Perfil de vendedor não encontrado' }, { status: 404 })
+      sellerProfile = await prisma.sellerProfile.create({
+        data: {
+          userId: session.user.id
+        }
+      })
     }
 
     // Deletar produto (cascade vai deletar imagens)

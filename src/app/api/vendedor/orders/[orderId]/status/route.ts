@@ -13,12 +13,17 @@ export async function PATCH(
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    const seller = await prisma.sellerProfile.findUnique({
+    let seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user.id }
     })
 
+    // Se não existe, cria automaticamente
     if (!seller) {
-      return NextResponse.json({ error: 'Perfil de vendedor não encontrado' }, { status: 404 })
+      seller = await prisma.sellerProfile.create({
+        data: {
+          userId: session.user.id
+        }
+      })
     }
 
     const { status } = await request.json()
