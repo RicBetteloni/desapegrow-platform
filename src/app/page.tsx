@@ -6,22 +6,6 @@ import { Badge } from '../components/ui/badge'
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
-      {/* Header */}
-      <nav className="flex items-center justify-between p-6 border-b bg-white/80 backdrop-blur-sm">
-        <div className="flex items-center space-x-2">
-          <span className="text-2xl">🌱</span>
-          <h1 className="text-2xl font-bold text-green-700">Desapegrow</h1>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" asChild>
-            <Link href="/auth/signin">Entrar</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/auth/signup">Cadastrar</Link>
-          </Button>
-        </div>
-      </nav>
-
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center space-y-8">

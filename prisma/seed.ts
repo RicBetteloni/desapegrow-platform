@@ -147,7 +147,7 @@ async function main() {
       price: 95.00,
       comparePrice: 140.00,
       stock: 30,
-      images: ['https://images.unsplash.com/photo-1581093458791-9d42e55b8a3c?w=500']
+      images: ['https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=500']
     },
     {
       name: 'Ventilador Oscilante 40cm 110W',

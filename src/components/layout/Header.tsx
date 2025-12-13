@@ -61,17 +61,35 @@ export default function Header() {
                   🛒 Marketplace
                 </Button>
               </Link>
+
+              <Link href="/grow-virtual">
+                <Button variant="ghost" size="sm">
+                  🌱 Grow Virtual
+                </Button>
+              </Link>
+
+              <Link href="/dashboard">
+                <Button variant="ghost" size="sm">
+                  📊 Dashboard
+                </Button>
+              </Link>
+
+              <Link href="/gamification">
+                <Button variant="ghost" size="sm">
+                  🎮 Gamificação
+                </Button>
+              </Link>
+
+              <Link href="/meus-pedidos">
+                <Button variant="ghost" size="sm">
+                  📦 Meus Pedidos
+                </Button>
+              </Link>
               
-              {isSeller ? (
+              {(session.user as { isSeller?: boolean })?.isSeller && (
                 <Link href="/vendedor">
-                  <Button variant="ghost" size="sm">
-                    📦 Vendedor
-                  </Button>
-                </Link>
-              ) : (
-                <Link href="/vendedor/meus-anuncios">
-                  <Button variant="outline" size="sm">
-                    Vender Agora
+                  <Button variant="ghost" size="sm" className="bg-green-50 text-green-700 hover:bg-green-100">
+                    🏪 Painel Vendedor
                   </Button>
                 </Link>
               )}
