@@ -38,6 +38,8 @@ export default function ProductDetailPage() {
     if (slug) {
       fetchProduct()
     }
+    // Scroll para o topo quando a página carregar
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [slug])
 
   const fetchProduct = async () => {

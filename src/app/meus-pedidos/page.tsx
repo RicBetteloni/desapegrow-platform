@@ -132,25 +132,6 @@ export default function MeusPedidosPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      {/* Header */}
-      <nav className="bg-white/80 backdrop-blur-sm border-b p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2 text-xl font-bold text-green-700">
-            <span>🌱</span>
-            <span>Desapegrow</span>
-          </Link>
-          
-          <div className="flex items-center space-x-4">
-            <Link href="/marketplace">
-              <Button variant="ghost">Marketplace</Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button variant="ghost">Dashboard</Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
-
       <div className="container mx-auto p-6">
         {/* Page Header */}
         <div className="text-center mb-8">

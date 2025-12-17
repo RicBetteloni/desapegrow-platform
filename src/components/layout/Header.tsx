@@ -56,46 +56,52 @@ export default function Header() {
         <div className="ml-auto flex items-center gap-3">
           {session ? (
             <>
-              <Link href="/marketplace">
-                <Button variant="ghost" size="sm">
+              <Link href="/marketplace" className="cursor-pointer">
+                <Button variant="ghost" size="sm" className="cursor-pointer">
                   🛒 Marketplace
                 </Button>
               </Link>
 
-              <Link href="/grow-virtual">
-                <Button variant="ghost" size="sm">
+              <Link href="/grow-virtual" className="cursor-pointer">
+                <Button variant="ghost" size="sm" className="cursor-pointer">
                   🌱 Grow Virtual
                 </Button>
               </Link>
 
-              <Link href="/dashboard">
-                <Button variant="ghost" size="sm">
+              <Link href="/dashboard" className="cursor-pointer">
+                <Button variant="ghost" size="sm" className="cursor-pointer">
                   📊 Dashboard
                 </Button>
               </Link>
 
-              <Link href="/gamification">
-                <Button variant="ghost" size="sm">
+              <Link href="/analytics" className="cursor-pointer">
+                <Button variant="ghost" size="sm" className="cursor-pointer">
+                  📈 Analytics
+                </Button>
+              </Link>
+
+              <Link href="/gamification" className="cursor-pointer">
+                <Button variant="ghost" size="sm" className="cursor-pointer">
                   🎮 Gamificação
                 </Button>
               </Link>
 
-              <Link href="/meus-pedidos">
-                <Button variant="ghost" size="sm">
+              <Link href="/meus-pedidos" className="cursor-pointer">
+                <Button variant="ghost" size="sm" className="cursor-pointer">
                   📦 Meus Pedidos
                 </Button>
               </Link>
               
               {(session.user as { isSeller?: boolean })?.isSeller && (
-                <Link href="/vendedor">
-                  <Button variant="ghost" size="sm" className="bg-green-50 text-green-700 hover:bg-green-100">
+                <Link href="/vendedor" className="cursor-pointer">
+                  <Button variant="ghost" size="sm" className="bg-green-50 text-green-700 hover:bg-green-100 cursor-pointer">
                     🏪 Painel Vendedor
                   </Button>
                 </Link>
               )}
               
-              <Link href="/carrinho">
-                <Button variant="ghost" size="sm" className="relative">
+              <Link href="/carrinho" className="cursor-pointer">
+                <Button variant="ghost" size="sm" className="relative cursor-pointer">
                   <ShoppingCart className="h-5 w-5" />
                   {cartCount > 0 && (
                     <div className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">
@@ -105,8 +111,8 @@ export default function Header() {
                 </Button>
               </Link>
               
-              <Link href="/perfil">
-                <Button variant="ghost" size="sm">
+              <Link href="/perfil" className="cursor-pointer">
+                <Button variant="ghost" size="sm" className="cursor-pointer">
                   <User className="h-5 w-5" />
                 </Button>
               </Link>

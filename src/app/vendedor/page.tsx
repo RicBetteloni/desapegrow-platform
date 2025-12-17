@@ -256,16 +256,6 @@ export default function VendedorDashboard() {
             </Card>
           </>
         )}
-
-        {/* BOTÕES DE NAVEGAÇÃO - NOVO */}
-        <div className="mt-12 flex flex-col sm:flex-row gap-4">
-          <Link href="/marketplace">
-            <Button className="w-full sm:w-auto">🛒 Ver Marketplace</Button>
-          </Link>
-          <Link href="/vendedor/pedidos">
-            <Button variant="outline" className="w-full sm:w-auto">📋 Meus Pedidos</Button>
-          </Link>
-        </div>
       </div>
     </div>
   )
