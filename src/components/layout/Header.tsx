@@ -141,7 +141,9 @@ export default function Header() {
               </>
             ) : (
               <Link href="/auth/signin">
-                <Button size="sm">Entrar</Button>
+                <Button className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6">
+                  Entrar
+                </Button>
               </Link>
             )}
           </nav>
