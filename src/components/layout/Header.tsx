@@ -57,15 +57,16 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
-        <div className="container flex h-16 items-center px-4">
-          <Link href="/marketplace" className="flex items-center gap-2 font-bold text-xl text-gray-900 hover:text-green-600 transition-colors">
+      <header className="sticky top-0 z-50 border-b bg-white shadow-md">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+          {/* Logo */}
+          <Link href="/marketplace" className="flex items-center gap-2 font-bold text-lg md:text-xl text-gray-900 hover:text-green-600 transition-colors">
             <span className="text-2xl">🌱</span>
-            <span className="hidden sm:inline">Desapegrow</span>
+            <span>Desapegrow</span>
           </Link>
           
           {/* Desktop Navigation */}
-          <div className="ml-auto hidden lg:flex items-center gap-2">
+          <nav className="hidden lg:flex items-center gap-2">
             {session ? (
               <>
                 {menuItems.map((item) => (
@@ -106,40 +107,44 @@ export default function Header() {
                 <Button>Entrar</Button>
               </Link>
             )}
-          </div>
+          </nav>
 
           {/* Mobile Navigation */}
-          <div className="ml-auto flex lg:hidden items-center gap-3">
-            {session && (
+          <nav className="flex lg:hidden items-center gap-2">
+            {session ? (
               <>
-                <Link href="/carrinho" className="cursor-pointer">
-                  <Button variant="ghost" size="sm" className="relative cursor-pointer">
-                    <ShoppingCart className="h-6 w-6" />
+                {/* Carrinho Mobile */}
+                <Link href="/carrinho">
+                  <Button variant="ghost" size="icon" className="relative">
+                    <ShoppingCart className="h-6 w-6 text-gray-700" />
                     {cartCount > 0 && (
-                      <div className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">
+                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">
                         {cartCount > 9 ? '9+' : cartCount}
-                      </div>
+                      </span>
                     )}
                   </Button>
                 </Link>
 
+                {/* Menu Hamburguer */}
                 <Button 
                   variant="ghost" 
-                  size="sm" 
-                  className="cursor-pointer p-2"
+                  size="icon"
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  aria-label="Menu"
                 >
-                  {mobileMenuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
+                  {mobileMenuOpen ? (
+                    <X className="h-7 w-7 text-gray-700" />
+                  ) : (
+                    <Menu className="h-7 w-7 text-gray-700" />
+                  )}
                 </Button>
               </>
-            )}
-
-            {!session && (
+            ) : (
               <Link href="/auth/signin">
                 <Button size="sm">Entrar</Button>
               </Link>
             )}
-          </div>
+          </nav>
         </div>
       </header>
 
