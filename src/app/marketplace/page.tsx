@@ -14,7 +14,9 @@ import {
   ShoppingCart, 
   Search, 
   Star,
-  AlertCircle
+  AlertCircle,
+  Heart,
+  TrendingUp
 } from 'lucide-react'
 
 interface Product {
@@ -127,6 +129,27 @@ export default function MarketplacePage() {
     alert('✅ Produto adicionado ao carrinho!')
   }
 
+  const toggleFavorite = (productId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+    const index = favorites.indexOf(productId)
+    
+    if (index >= 0) {
+      favorites.splice(index, 1)
+      alert('❌ Removido dos favoritos')
+    } else {
+      favorites.push(productId)
+      alert('❤️ Adicionado aos favoritos!')
+    }
+    
+    localStorage.setItem('favorites', JSON.stringify(favorites))
+  }
+
+  const isFavorite = (productId: string) => {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+    return favorites.includes(productId)
+  }
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     const newParams = new URLSearchParams()
@@ -212,53 +235,83 @@ export default function MarketplacePage() {
                 return (
                   <Card 
                     key={product.id} 
-                    className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                    className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden flex flex-col border-2 border-transparent hover:border-green-200"
                   >
-                    {/* Imagem */}
-                    <div className="relative aspect-square bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-                      <Link href={`/produtos/${product.slug}`}>
+                    {/* Imagem - altura fixa com object-contain para manter proporção */}
+                    <div className="relative h-64 bg-white overflow-hidden border-b">
+                      <Link href={`/produtos/${product.slug}`} className="block h-full">
                         <img
                           src={product.images?.[0]?.url || '/placeholder.png'}
                           alt={product.name}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                          className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-300"
                         />
                       </Link>
 
+                      {/* Botão Favoritar */}
+                      <button
+                        onClick={(e) => toggleFavorite(product.id, e)}
+                        className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-lg hover:scale-110 transition-transform z-10"
+                      >
+                        <Heart 
+                          className={`h-5 w-5 ${
+                            isFavorite(product.id) 
+                              ? 'fill-red-500 text-red-500' 
+                              : 'text-gray-400'
+                          }`}
+                        />
+                      </button>
+
                       {/* Badges */}
-                      <div className="absolute top-2 left-2 space-y-1">
+                      <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                        {/* Badge Mais Vendido (exemplo - pode ser baseado em vendas reais) */}
+                        {product.totalReviews > 10 && (
+                          <Badge className="bg-purple-500 hover:bg-purple-600 text-white text-xs font-semibold shadow-md flex items-center gap-1">
+                            <TrendingUp className="h-3 w-3" />
+                            Popular
+                          </Badge>
+                        )}
                         {discountPercent > 0 && (
-                          <Badge className="bg-red-500 text-white text-xs">
+                          <Badge className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold shadow-md">
                             -{discountPercent}%
                           </Badge>
                         )}
                         {product.stock === 0 && (
-                          <Badge className="bg-gray-500 text-white text-xs">
+                          <Badge className="bg-gray-500 text-white text-xs font-semibold shadow-md">
                             Esgotado
                           </Badge>
                         )}
                         {product.stock > 0 && product.stock <= 5 && (
-                          <Badge className="bg-orange-500 text-white text-xs">
-                            Últimas {product.stock}
+                          <Badge className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold shadow-md animate-pulse">
+                            Só {product.stock}!
                           </Badge>
                         )}
                       </div>
+
+                      {/* Badge Frete Grátis (exemplo - pode ser baseado em regra de negócio) */}
+                      {product.price >= 100 && (
+                        <div className="absolute bottom-3 left-3 right-3">
+                          <Badge className="bg-green-600 text-white text-xs font-semibold shadow-md w-full justify-center">
+                            🚚 Frete Grátis
+                          </Badge>
+                        </div>
+                      )}
                     </div>
 
-                    <CardContent className="p-4 space-y-3">
+                    <CardContent className="p-4 flex-1 flex flex-col">
                       {/* Nome do Produto */}
-                      <Link href={`/produtos/${product.slug}`}>
-                        <h3 className="font-semibold text-sm line-clamp-2 hover:text-primary transition-colors min-h-[40px]">
+                      <Link href={`/produtos/${product.slug}`} className="block mb-2">
+                        <h3 className="font-semibold text-base line-clamp-2 hover:text-green-600 transition-colors min-h-[48px] leading-tight">
                           {product.name}
                         </h3>
                       </Link>
 
                       {/* Avaliação com Estrelas */}
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center gap-1 mb-3">
                         <div className="flex">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
-                              className={`h-3 w-3 ${
+                              className={`h-4 w-4 ${
                                 product.avgRating && star <= Math.round(product.avgRating)
                                   ? 'text-yellow-400 fill-yellow-400'
                                   : 'text-gray-300'
@@ -266,47 +319,52 @@ export default function MarketplacePage() {
                             />
                           ))}
                         </div>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-600">
                           ({product.totalReviews})
                         </span>
                       </div>
 
                       {/* Preços */}
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-bold text-lg text-gray-900">
-                            R$ {Number(product.price).toFixed(2).replace('.', ',')}
-                          </span>
-                          {product.comparePrice && (
-                            <span className="text-sm text-gray-500 line-through">
-                              R$ {Number(product.comparePrice).toFixed(2).replace('.', ',')}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* CultivoCoins */}
-                        {pointsEarned > 0 && (
-                          <div className="flex items-center space-x-1 text-xs text-green-600">
-                            <span>⚡</span>
-                            <span>Ganhe {pointsEarned} CultivoCoins</span>
+                      <div className="mb-3">
+                        {product.comparePrice && (
+                          <div className="text-xs text-gray-500 line-through mb-1">
+                            R$ {Number(product.comparePrice).toFixed(2).replace('.', ',')}
                           </div>
                         )}
+                        <div className="text-2xl font-bold text-gray-900">
+                          R$ {Number(product.price).toFixed(2).replace('.', ',')}
+                        </div>
+                        {/* Parcelamento */}
+                        <div className="text-xs text-gray-600 mt-1">
+                          ou 3x de R$ {(Number(product.price) / 3).toFixed(2).replace('.', ',')} sem juros
+                        </div>
                       </div>
+
+                      {/* CultivoCoins */}
+                      {pointsEarned > 0 && (
+                        <div className="flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 rounded-full px-3 py-1.5 mb-4 w-fit">
+                          <span className="text-sm">⚡</span>
+                          <span>+{pointsEarned} CultivoCoins</span>
+                        </div>
+                      )}
+
+                      {/* Espaçador flex */}
+                      <div className="flex-1"></div>
 
                       {/* Botão Adicionar ao Carrinho */}
                       <Button
                         variant="default"
-                        className="w-full mt-3 bg-gray-900 hover:bg-gray-800 text-white"
+                        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold shadow-sm"
                         disabled={product.stock === 0}
                         onClick={() => addToCart(product)}
                       >
                         <ShoppingCart className="h-4 w-4 mr-2" />
-                        {product.stock === 0 ? 'Esgotado' : 'Adicionar ao Carrinho'}
+                        {product.stock === 0 ? 'Indisponível' : 'Adicionar'}
                       </Button>
 
                       {/* Vendedor */}
-                      <p className="text-xs text-gray-500 mt-2">
-                        por {product.seller?.user?.name || 'Vendedor'}
+                      <p className="text-xs text-gray-500 text-center mt-3">
+                        Vendido por <span className="font-medium">{product.seller?.user?.name || 'Vendedor'}</span>
                       </p>
                     </CardContent>
                   </Card>

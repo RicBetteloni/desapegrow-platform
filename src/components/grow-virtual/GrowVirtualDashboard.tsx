@@ -197,7 +197,17 @@ export function GrowVirtualDashboard() {
     )
   }
 
-  if (!growData) return null
+  // Verificar se growData está carregado antes de renderizar
+  if (!growData || !growData.stats) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando seu Grow Virtual...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
