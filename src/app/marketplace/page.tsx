@@ -63,7 +63,9 @@ export default function MarketplacePage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState(searchParams.get('q') || '')
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '')
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    searchParams.get('category') ? [searchParams.get('category')!] : []
+  )
   const [categories, setCategories] = useState<Category[]>([])
 
   useEffect(() => {
@@ -72,7 +74,7 @@ export default function MarketplacePage() {
 
   useEffect(() => {
     fetchProducts()
-  }, [search, selectedCategory])
+  }, [search, selectedCategories])
 
   const fetchCategories = async () => {
     try {
@@ -89,16 +91,60 @@ export default function MarketplacePage() {
     try {
       const params = new URLSearchParams()
       if (search) params.append('search', search)
-      if (selectedCategory) params.append('category', selectedCategory)
 
-      const response = await fetch(`/api/products?${params}`)
-      const data = await response.json()
-      setProducts(data.products || [])
+      // Se nenhuma categoria selecionada, buscar tudo
+      // Se uma categoria, buscar só ela
+      // Se múltiplas, buscar todas e juntar resultados
+      if (selectedCategories.length === 0) {
+        const response = await fetch(`/api/products?${params}`)
+        const data = await response.json()
+        setProducts(data.products || [])
+      } else if (selectedCategories.length === 1) {
+        params.append('category', selectedCategories[0])
+        const response = await fetch(`/api/products?${params}`)
+        const data = await response.json()
+        setProducts(data.products || [])
+      } else {
+        // Múltiplas categorias - buscar cada uma e combinar
+        const allProducts: Product[] = []
+        const productIds = new Set<string>()
+        
+        for (const category of selectedCategories) {
+          const categoryParams = new URLSearchParams(params)
+          categoryParams.append('category', category)
+          const response = await fetch(`/api/products?${categoryParams}`)
+          const data = await response.json()
+          
+          // Adicionar produtos únicos (evitar duplicatas)
+          data.products?.forEach((product: Product) => {
+            if (!productIds.has(product.id)) {
+              productIds.add(product.id)
+              allProducts.push(product)
+            }
+          })
+        }
+        
+        setProducts(allProducts)
+      }
     } catch (error) {
       console.error('Erro ao buscar produtos:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const toggleCategory = (categorySlug: string) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(categorySlug)) {
+        return prev.filter(c => c !== categorySlug)
+      } else {
+        return [...prev, categorySlug]
+      }
+    })
+  }
+
+  const clearCategories = () => {
+    setSelectedCategories([])
   }
 
   const addToCart = (product: Product) => {
@@ -154,7 +200,9 @@ export default function MarketplacePage() {
     e.preventDefault()
     const newParams = new URLSearchParams()
     if (search) newParams.append('q', search)
-    if (selectedCategory) newParams.append('category', selectedCategory)
+    if (selectedCategories.length > 0) {
+      newParams.append('category', selectedCategories[0])
+    }
     router.push(`/marketplace?${newParams.toString()}`)
   }
 
@@ -191,20 +239,61 @@ export default function MarketplacePage() {
         {/* Categorias */}
         {categories.length > 0 && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">📂 Categorias</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {categories.map((cat: Category) => (
-                <Card 
-                  key={cat.id} 
-                  className="hover:shadow-lg transition-all cursor-pointer"
-                  onClick={() => setSelectedCategory(cat.slug)}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">📂 Filtrar por Categoria</h2>
+              {selectedCategories.length > 0 && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={clearCategories}
+                  className="text-red-600 hover:text-red-700"
                 >
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl mb-2">{cat.icon}</div>
-                    <h3 className="font-semibold text-sm">{cat.name}</h3>
-                  </CardContent>
-                </Card>
-              ))}
+                  Limpar filtros ({selectedCategories.length})
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {/* Botão TODOS */}
+              <Card 
+                className={`hover:shadow-lg transition-all cursor-pointer ${
+                  selectedCategories.length === 0 
+                    ? 'ring-2 ring-green-500 bg-green-50' 
+                    : 'hover:border-green-200'
+                }`}
+                onClick={clearCategories}
+              >
+                <CardContent className="p-4 text-center">
+                  <div className="text-3xl mb-2">📦</div>
+                  <h3 className="font-semibold text-sm">Todos</h3>
+                  {selectedCategories.length === 0 && (
+                    <Badge className="mt-2 bg-green-600 text-white text-xs">Ativo</Badge>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Categorias */}
+              {categories.map((cat: Category) => {
+                const isSelected = selectedCategories.includes(cat.slug)
+                return (
+                  <Card 
+                    key={cat.id} 
+                    className={`hover:shadow-lg transition-all cursor-pointer ${
+                      isSelected 
+                        ? 'ring-2 ring-green-500 bg-green-50' 
+                        : 'hover:border-green-200'
+                    }`}
+                    onClick={() => toggleCategory(cat.slug)}
+                  >
+                    <CardContent className="p-4 text-center">
+                      <div className="text-3xl mb-2">{cat.icon}</div>
+                      <h3 className="font-semibold text-sm">{cat.name}</h3>
+                      {isSelected && (
+                        <Badge className="mt-2 bg-green-600 text-white text-xs">✓ Selecionado</Badge>
+                      )}
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
           </div>
         )}
@@ -298,6 +387,20 @@ export default function MarketplacePage() {
                     </div>
 
                     <CardContent className="p-4 flex-1 flex flex-col">
+                      {/* Breadcrumb - Categoria */}
+                      <div className="mb-2">
+                        <Badge 
+                          variant="outline" 
+                          className="text-xs text-gray-600 border-gray-300 hover:bg-gray-50 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleCategory(product.category.slug)
+                          }}
+                        >
+                          {product.category.icon} {product.category.name}
+                        </Badge>
+                      </div>
+
                       {/* Nome do Produto */}
                       <Link href={`/produtos/${product.slug}`} className="block mb-2">
                         <h3 className="font-semibold text-base line-clamp-2 hover:text-green-600 transition-colors min-h-[48px] leading-tight">
