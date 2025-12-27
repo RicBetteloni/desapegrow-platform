@@ -20,6 +20,8 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { DailyRewards } from './DailyRewards'
+import { WelcomePackModal } from './WelcomePackModal'
+import { PlantCarePanel } from './PlantCarePanel'
 
 interface VirtualGrow {
   id: string
@@ -212,6 +214,9 @@ export function GrowVirtualDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Welcome Pack Modal */}
+      <WelcomePackModal />
+      
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -336,7 +341,7 @@ export function GrowVirtualDashboard() {
                 Minhas Plantas ({growData.stats.totalPlants})
               </CardTitle>
               <CardDescription>
-                Acompanhe o crescimento das suas plantas virtuais
+                Acompanhe o crescimento e cuide das suas plantas virtuais
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -351,52 +356,13 @@ export function GrowVirtualDashboard() {
                   </Button>
                 </div>
               ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
                   {growData.plants.map((plant) => (
-                    <Card key={plant.id} className="border-green-200 hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
-                        <div className="text-center">
-                          <div className="text-4xl mb-2">{getStageEmoji(plant.stage)}</div>
-                          <h4 className="font-medium text-lg text-green-800">{plant.name}</h4>
-                          <p className="text-sm text-gray-600 mb-3">
-                            {plant.stage.replace('_', ' ')} • {plant.daysGrowing} dias
-                          </p>
-                          
-                          {/* Health Bar */}
-                          <div className="mb-3">
-                            <div className="flex justify-between text-xs mb-1">
-                              <span>Saúde</span>
-                              <span>{plant.health}%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
-                                className={`h-2 rounded-full ${
-                                  plant.health > 70 ? 'bg-green-500' :
-                                  plant.health > 40 ? 'bg-yellow-500' : 'bg-red-500'
-                                }`}
-                                style={{width: `${plant.health}%`}}
-                              ></div>
-                            </div>
-                          </div>
-
-                          {/* Tamanho */}
-                          <div className="text-xs text-gray-500 mb-3">
-                            Tamanho: {(plant.size * 100).toFixed(0)}cm
-                          </div>
-
-                          <div className="flex gap-2 justify-center">
-                            <Button variant="outline" size="sm">
-                              <Heart className="h-3 w-3 mr-1" />
-                              Cuidar
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              <Settings className="h-3 w-3 mr-1" />
-                              Config
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <PlantCarePanel 
+                      key={plant.id} 
+                      plant={plant as any}
+                      onUpdate={fetchGrowData}
+                    />
                   ))}
                 </div>
               )}

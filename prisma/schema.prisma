@@ -58,18 +58,36 @@ model VirtualGrow {
 }
 
 model VirtualPlant {
-  id          String      @id @default(cuid())
-  growId      String
-  name        String
-  strain      PlantStrain
-  genetics    Json
-  stage       GrowthStage @default(SEED)
-  daysGrowing Int         @default(0)
-  health      Int         @default(100)
-  size        Float       @default(0.1)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  grow        VirtualGrow @relation(fields: [growId], references: [id])
+  id            String      @id @default(cuid())
+  growId        String
+  name          String
+  strain        PlantStrain
+  genetics      Json
+  stage         GrowthStage @default(SEED)
+  daysGrowing   Int         @default(0)
+  health        Int         @default(100)
+  size          Float       @default(0.1)
+  waterLevel    Int         @default(100)
+  vpdLevel      Float       @default(1.0)
+  lightHours    Int         @default(18)
+  lastCareAt    DateTime    @default(now())
+  harvestedAt   DateTime?
+  cardGenerated Boolean     @default(false)
+  cardData      Json?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  grow          VirtualGrow @relation(fields: [growId], references: [id])
+  careLog       PlantCareLog[]
+}
+
+model PlantCareLog {
+  id        String       @id @default(cuid())
+  plantId   String
+  careType  PlantCareType
+  value     Float
+  notes     String?
+  createdAt DateTime     @default(now())
+  plant     VirtualPlant @relation(fields: [plantId], references: [id], onDelete: Cascade)
 }
 
 model VirtualItem {
@@ -572,4 +590,15 @@ enum SourceType {
   ACHIEVEMENT
   SOCIAL_REWARD
   EVENT_REWARD
+  WELCOME_PACK
+  HARVEST
+}
+
+enum PlantCareType {
+  WATER
+  VPD_ADJUST
+  LIGHT_ADJUST
+  NUTRIENT
+  DEFOLIATION
+  TRAINING
 }
