@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Droplets, Sun, Thermometer, Heart, Sparkles, Award } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '../ui/badge'
+import { PlantStageBadges } from './PlantStageBadges'
 
 interface Plant {
   id: string
@@ -120,139 +121,15 @@ export function PlantCarePanel({ plant, onUpdate }: { plant: Plant; onUpdate: ()
   }
 
   return (
-    <Card className="border-2 hover:shadow-lg transition-shadow">
-      <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <span className="text-4xl">{STAGE_EMOJIS[plant.stage]}</span>
-              <div>
-                <div>{plant.name}</div>
-                <Badge variant="outline" className="mt-1">{plant.strain}</Badge>
-              </div>
-            </CardTitle>
-          </div>
-          <Badge className="text-lg px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600">
-            {STAGE_NAMES[plant.stage]}
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-6 space-y-6">
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="flex flex-col items-center p-3 bg-green-50 rounded-lg">
-            <Heart className={`w-6 h-6 mb-1 ${getHealthColor(plant.health)}`} />
-            <span className="text-sm text-gray-600">Saúde</span>
-            <span className={`text-lg font-bold ${getHealthColor(plant.health)}`}>
-              {plant.health}%
-            </span>
-          </div>
-
-          <div className="flex flex-col items-center p-3 bg-blue-50 rounded-lg">
-            <Droplets className="w-6 h-6 mb-1 text-blue-600" />
-            <span className="text-sm text-gray-600">Água</span>
-            <span className="text-lg font-bold text-blue-600">
-              {plant.waterLevel}%
-            </span>
-          </div>
-
-          <div className="flex flex-col items-center p-3 bg-yellow-50 rounded-lg">
-            <Sun className="w-6 h-6 mb-1 text-yellow-600" />
-            <span className="text-sm text-gray-600">Luz</span>
-            <span className="text-lg font-bold text-yellow-600">
-              {plant.lightHours}h
-            </span>
-          </div>
-
-          <div className="flex flex-col items-center p-3 bg-purple-50 rounded-lg">
-            <Thermometer className="w-6 h-6 mb-1 text-purple-600" />
-            <span className="text-sm text-gray-600">VPD</span>
-            <span className="text-lg font-bold text-purple-600">
-              {plant.vpdLevel.toFixed(1)}
-            </span>
-          </div>
-        </div>
-
-        {/* Progress */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Dias de Cultivo</span>
-            <span className="font-bold">{plant.daysGrowing.toFixed(0)} dias</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Tamanho</span>
-            <span className="font-bold">{plant.size.toFixed(1)}g</span>
-          </div>
-        </div>
-
-        {/* Care Actions */}
-        {plant.stage !== 'HARVEST_READY' ? (
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              onClick={() => handleCare('WATER')}
-              disabled={caring || plant.waterLevel >= 100}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Droplets className="w-4 h-4" />
-              Regar
-            </Button>
-
-            <Button
-              onClick={() => handleCare('VPD_ADJUST', 1.2)}
-              disabled={caring}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Thermometer className="w-4 h-4" />
-              Ajustar VPD (-10 coins)
-            </Button>
-
-            <Button
-              onClick={() => handleCare('LIGHT_ADJUST', 18)}
-              disabled={caring}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Sun className="w-4 h-4" />
-              Ajustar Luz
-            </Button>
-
-            <Button
-              onClick={() => handleCare('NUTRIENT', 15)}
-              disabled={caring}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Sparkles className="w-4 h-4" />
-              Nutrientes (-15 coins)
-            </Button>
-          </div>
-        ) : (
-          <Button
-            onClick={handleHarvest}
-            disabled={caring}
-            className="w-full h-12 text-lg font-bold bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700"
-          >
-            <Award className="w-5 h-5 mr-2" />
-            🌿 Colher e Gerar Card NFT
-          </Button>
-        )}
-
-        {/* Genetics Info */}
-        {plant.genetics && (
-          <div className="pt-4 border-t">
-            <p className="text-sm font-semibold text-gray-700 mb-2">📊 Genética:</p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div><span className="text-gray-600">THC:</span> <span className="font-bold">{plant.genetics.thc}</span></div>
-              <div><span className="text-gray-600">CBD:</span> <span className="font-bold">{plant.genetics.cbd}</span></div>
-              <div><span className="text-gray-600">Floração:</span> <span className="font-bold">{plant.genetics.flowering}</span></div>
-              <div><span className="text-gray-600">Dificuldade:</span> <span className="font-bold">{plant.genetics.difficulty}</span></div>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <PlantStageBadges 
+      key={`badges-${plant.id}`}
+      currentStage={plant.stage}
+      genetics={plant.name}
+      strain={plant.strain}
+      rarity={(plant.genetics as Record<string, unknown>)?.rarity as string || 'COMMON'}
+      plant={plant}
+      onCare={handleCare}
+      onHarvest={handleHarvest}
+    />
   )
 }

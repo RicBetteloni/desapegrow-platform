@@ -46,6 +46,11 @@ export async function GET(req: NextRequest) {
       reward => reward.rewardDate.toISOString().slice(0, 10) === today
     );
 
+    console.log(`🌱 Plantas encontradas para usuário ${userId}:`, virtualGrow.plants.length);
+    virtualGrow.plants.forEach(plant => {
+      console.log(`  - ${plant.name} (${plant.stage})`);
+    });
+
     return NextResponse.json({
       ...virtualGrow,
       canClaimDaily,

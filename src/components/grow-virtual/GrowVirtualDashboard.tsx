@@ -22,6 +22,7 @@ import { toast } from 'sonner'
 import { DailyRewards } from './DailyRewards'
 import { WelcomePackModal } from './WelcomePackModal'
 import { PlantCarePanel } from './PlantCarePanel'
+import { SeedInventory } from './SeedInventory'
 
 interface VirtualGrow {
   id: string
@@ -378,34 +379,53 @@ export function GrowVirtualDashboard() {
                 Inventário ({growData.stats.totalItems} items)
               </CardTitle>
               <CardDescription>
-                Items virtuais desbloqueados através de compras e recompensas
+                Sementes e items virtuais desbloqueados
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              {growData.inventory.length === 0 ? (
+            <CardContent className="space-y-8">
+              {/* Seção de Seeds */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Sprout className="w-5 h-5 text-green-600" />
+                  Sementes Disponíveis
+                </h3>
+                <SeedInventory 
+                  seeds={growData.inventory.filter(item => item.itemType === 'GENETICS')}
+                  onPlant={fetchGrowData}
+                />
+              </div>
+
+              {/* Seção de Outros Items */}
+              {growData.inventory.filter(item => item.itemType !== 'GENETICS').length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Package className="w-5 h-5 text-blue-600" />
+                    Outros Items
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {growData.inventory
+                      .filter(item => item.itemType !== 'GENETICS')
+                      .map((item) => (
+                        <div key={item.id} className="border rounded-lg p-4 text-center hover:shadow-md transition-shadow bg-white">
+                          <div className="text-3xl mb-3">📦</div>
+                          <h4 className="font-medium text-sm mb-2 line-clamp-2">{item.name}</h4>
+                          <Badge className={`${getRarityColor(item.rarity)} text-xs mb-2`}>
+                            {item.rarity}
+                          </Badge>
+                          <p className="text-xs text-gray-500">
+                            {item.itemType.replace('_', ' ')}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+              
+              {growData.inventory.length === 0 && (
                 <div className="text-center py-12">
                   <Package className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Inventário vazio</h3>
-                  <p className="text-gray-500 mb-4">Faça compras no marketplace para desbloquear items virtuais!</p>
-                  <Button variant="outline">
-                    <TrendingUp className="h-4 w-4 mr-2" />
-                    Ir para Marketplace
-                  </Button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                  {growData.inventory.map((item) => (
-                    <div key={item.id} className="border rounded-lg p-4 text-center hover:shadow-md transition-shadow bg-white">
-                      <div className="text-3xl mb-3">📦</div>
-                      <h4 className="font-medium text-sm mb-2 line-clamp-2">{item.name}</h4>
-                      <Badge className={`${getRarityColor(item.rarity)} text-xs mb-2`}>
-                        {item.rarity}
-                      </Badge>
-                      <p className="text-xs text-gray-500">
-                        {item.itemType.replace('_', ' ')}
-                      </p>
-                    </div>
-                  ))}
+                  <p className="text-gray-500 mb-4">Reivindique seu pacote de boas-vindas para começar!</p>
                 </div>
               )}
             </CardContent>
