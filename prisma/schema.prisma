@@ -555,10 +555,12 @@ enum ItemType {
   AUTOMATION
   DECORATION
   BOOSTER
+  SPECIAL
 }
 
 enum ItemRarity {
   COMMON
+  UNCOMMON
   RARE
   EPIC
   LEGENDARY

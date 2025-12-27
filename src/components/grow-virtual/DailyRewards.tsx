@@ -19,6 +19,7 @@ interface RewardStatus {
 export function DailyRewards() {
   const { data: session, status } = useSession()
   const [loading, setLoading] = useState(false)
+  const [resetting, setResetting] = useState(false)
   const [rewardStatus, setRewardStatus] = useState<RewardStatus | null>(null)
   const [countdown, setCountdown] = useState<string>('')
 
@@ -83,14 +84,34 @@ export function DailyRewards() {
       })
       
       const data = await response.json()
+      console.log('🎁 Resposta recebida:', data)
       
       if (response.ok) {
+        const hasItems = data.reward.items && data.reward.items.length > 0
+        const isMilestone = [7, 14, 30, 60, 100].includes(data.reward.streakDay)
+        
+        console.log('✨ Mostrando toast com:', { hasItems, isMilestone, coins: data.reward.coins })
+        
         toast.success(
-          <div className="flex flex-col space-y-1">
-            <p className="font-semibold">🎉 Recompensa Resgatada!</p>
-            <p className="text-sm">💰 +{data.reward.coins} CultivoCoins</p>
-            <p className="text-xs text-gray-600">🔥 Sequência: {data.reward.streakDay} dias</p>
-          </div>
+          <div className="flex flex-col space-y-2">
+            <p className="font-bold text-lg">🎉 Recompensa Resgatada!</p>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold">💰 +{data.reward.coins} CultivoCoins</p>
+              <p className="text-xs text-gray-700">🔥 Sequência: {data.reward.streakDay} dias</p>
+              {hasItems && (
+                <div className="mt-2 pt-2 border-t border-gray-200">
+                  {isMilestone && <p className="text-sm font-bold text-purple-600">⭐ Bônus de Marco!</p>}
+                  <p className="text-sm font-semibold text-green-600">
+                    🎁 +{data.reward.items.length} Vaso{data.reward.items.length > 1 ? 's' : ''} Surpresa!
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    Raridade: {data.reward.rarityRolled}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>,
+          { duration: 5000 }
         )
         // Aguardar um pouco antes de atualizar o status
         setTimeout(async () => {
@@ -107,6 +128,30 @@ export function DailyRewards() {
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // FUNÇÃO TEMPORÁRIA PARA TESTES - REMOVER EM PRODUÇÃO
+  const resetReward = async () => {
+    setResetting(true)
+    try {
+      const response = await fetch('/api/grow/daily-reward/reset', {
+        method: 'POST'
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        toast.success('🔄 Recompensa resetada! Você pode resgatar novamente.')
+        await checkRewardStatus()
+      } else {
+        toast.error(data.error || 'Erro ao resetar')
+      }
+    } catch (err) {
+      toast.error('❌ Erro ao resetar recompensa')
+      console.error(err)
+    } finally {
+      setResetting(false)
     }
   }
 
@@ -161,29 +206,42 @@ export function DailyRewards() {
             </div>
           </div>
           
-          <Button 
-            onClick={claimReward} 
-            disabled={loading || !canClaim || status !== 'authenticated'}
-            className={canClaim 
-              ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white shadow-md font-bold' 
-              : 'bg-gray-400 cursor-not-allowed'
-            }
-            size="lg"
-          >
-            {loading ? (
-              <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                Resgatando...
-              </div>
-            ) : canClaim ? (
-              <div className="flex items-center gap-2">
-                <Award className="w-5 h-5" />
-                Resgatar
-              </div>
-            ) : (
-              'Indisponível'
-            )}
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={claimReward} 
+              disabled={loading || !canClaim || status !== 'authenticated'}
+              className={canClaim 
+                ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white shadow-md font-bold' 
+                : 'bg-gray-400 cursor-not-allowed'
+              }
+              size="lg"
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Resgatando...
+                </div>
+              ) : canClaim ? (
+                <div className="flex items-center gap-2">
+                  <Award className="w-5 h-5" />
+                  Resgatar
+                </div>
+              ) : (
+                'Indisponível'
+              )}
+            </Button>
+            
+            {/* BOTÃO TEMPORÁRIO DE TESTE - REMOVER EM PRODUÇÃO */}
+            <Button 
+              onClick={resetReward}
+              disabled={resetting}
+              variant="outline"
+              size="lg"
+              className="border-orange-300 text-orange-600 hover:bg-orange-50"
+            >
+              {resetting ? '🔄' : '🔄 Reset (Teste)'}
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
