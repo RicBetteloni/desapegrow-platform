@@ -42,11 +42,19 @@ export default function MeusPedidosPage() {
 
   const fetchOrders = async () => {
     try {
+      console.log('🛒 Buscando pedidos do COMPRADOR:', session?.user?.id)
       const response = await fetch('/api/orders/my-orders')
+      
+      if (!response.ok) {
+        throw new Error(`Erro ${response.status}: ${response.statusText}`)
+      }
+      
       const data = await response.json()
+      console.log('✅ Pedidos de compra encontrados:', data.orders?.length || 0)
       setOrders(data.orders || [])
     } catch (error) {
-      console.error('Erro ao carregar pedidos:', error)
+      console.error('❌ Erro ao carregar pedidos de compra:', error)
+      alert('Erro ao carregar seus pedidos. Tente novamente.')
     } finally {
       setLoadingOrders(false)
     }

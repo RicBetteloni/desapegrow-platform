@@ -19,6 +19,7 @@ import {
   Settings
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { DailyRewards } from './DailyRewards'
 
 interface VirtualGrow {
   id: string
@@ -238,19 +239,10 @@ export function GrowVirtualDashboard() {
             </div>
           </div>
         </div>
-        
-        {growData.canClaimDaily && (
-          <Button 
-            onClick={claimDailyReward}
-            disabled={claimingReward}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg"
-            size="lg"
-          >
-            <Gift className="h-5 w-5 mr-2" />
-            {claimingReward ? 'Resgatando...' : 'Resgatar Diária'}
-          </Button>
-        )}
       </div>
+
+      {/* Daily Rewards Component */}
+      <DailyRewards />
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

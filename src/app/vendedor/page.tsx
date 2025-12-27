@@ -37,8 +37,20 @@ interface Stats {
 export default function VendedorDashboard() {
   const { session, loading } = useRequireAuth()
   const [products, setProducts] = useState<Product[]>([])
+  const [allProducts, setAllProducts] = useState<Product[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
   const [loadingData, setLoadingData] = useState(true)
+  const [areaFilter, setAreaFilter] = useState<string>('todos')
+  
+  const areas = [
+    { value: 'todos', label: '📦 Todos os Produtos' },
+    { value: 'indoor', label: '🏠 Indoor' },
+    { value: 'outdoor', label: '☀️ Outdoor' },
+    { value: 'iluminacao', label: '💡 Iluminação' },
+    { value: 'nutrientes', label: '🧪 Nutrientes' },
+    { value: 'ferramentas', label: '🔧 Ferramentas' },
+    { value: 'seguranca', label: '🔒 Segurança' }
+  ]
 
   useEffect(() => {
     if (session) {
@@ -56,7 +68,9 @@ export default function VendedorDashboard() {
       const productsData = await productsRes.json()
       const statsData = await statsRes.json()
 
-      setProducts(productsData.products || [])
+      const productsList = productsData.products || []
+      setProducts(productsList)
+      setAllProducts(productsList)
       setStats(statsData.stats || {
         totalProducts: 0,
         activeProducts: 0,
@@ -69,6 +83,20 @@ export default function VendedorDashboard() {
       setLoadingData(false)
     }
   }
+
+  useEffect(() => {
+    if (areaFilter === 'todos') {
+      setProducts(allProducts)
+    } else {
+      const filtered = allProducts.filter(product => {
+        const name = product.name.toLowerCase()
+        const slug = product.slug.toLowerCase()
+        const filter = areaFilter.toLowerCase()
+        return name.includes(filter) || slug.includes(filter)
+      })
+      setProducts(filtered)
+    }
+  }, [areaFilter, allProducts])
 
   const deleteProduct = async (id: string) => {
     if (!confirm('Deseja realmente excluir este produto?')) return
@@ -181,11 +209,45 @@ export default function VendedorDashboard() {
 
             {/* Lista de Produtos */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Meus Produtos</CardTitle>
+                
+                {/* Filtro de Área */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">Filtrar por:</span>
+                  <select
+                    value={areaFilter}
+                    onChange={(e) => setAreaFilter(e.target.value)}
+                    className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    {areas.map(area => (
+                      <option key={area.value} value={area.value}>
+                        {area.label}
+                      </option>
+                    ))}
+                  </select>
+                  {areaFilter !== 'todos' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setAreaFilter('todos')}
+                      className="text-xs"
+                    >
+                      Limpar
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
-                {products.length === 0 ? (
+                {products.length === 0 && areaFilter !== 'todos' ? (
+                  <div className="text-center py-12">
+                    <Package className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                    <p className="text-gray-500 mb-2">Nenhum produto encontrado para "{areas.find(a => a.value === areaFilter)?.label}"</p>
+                    <Button variant="outline" onClick={() => setAreaFilter('todos')}>
+                      Ver todos os produtos
+                    </Button>
+                  </div>
+                ) : products.length === 0 ? (
                   <div className="text-center py-12">
                     <Package className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                     <p className="text-gray-500 mb-4">Você ainda não tem produtos cadastrados</p>

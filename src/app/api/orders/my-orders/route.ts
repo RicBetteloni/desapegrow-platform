@@ -13,10 +13,12 @@ export async function GET() {
       )
     }
 
-    console.log('📦 Buscando pedidos do usuário:', session.user.id)
+    console.log('🛒 Buscando pedidos onde usuário é COMPRADOR (userId):', session.user.id)
 
     const orders = await prisma.order.findMany({
-      where: { userId: session.user.id },
+      where: { 
+        userId: session.user.id  // userId = COMPRADOR
+      },
       include: {
         items: {
           include: {
@@ -44,7 +46,8 @@ export async function GET() {
       }
     })
 
-    console.log('✅ Pedidos encontrados:', orders.length)
+    console.log('✅ Pedidos de COMPRA encontrados:', orders.length)
+    console.log('📊 Status dos pedidos:', orders.map(o => ({ id: o.id.slice(0, 8), status: o.status })))
 
     return NextResponse.json({ orders })
 

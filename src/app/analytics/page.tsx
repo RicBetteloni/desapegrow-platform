@@ -12,11 +12,15 @@ export default function AnalyticsPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
 
-  // Redirect se não estiver logado
+  // Redirect se não estiver logado ou não for ADMIN
   useEffect(() => {
     if (status === 'loading') return
     if (!session) {
       router.push('/auth/signin')
+      return
+    }
+    if (session.user.role !== 'ADMIN') {
+      router.push('/marketplace')
       return
     }
   }, [session, status, router])
@@ -34,6 +38,17 @@ export default function AnalyticsPage() {
 
   if (!session) {
     return null
+  }
+
+  if (session.user.role !== 'ADMIN') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-4">🔒 Acesso Restrito</h1>
+          <p className="text-gray-600 mb-4">Esta página é exclusiva para administradores.</p>
+        </div>
+      </div>
+    )
   }
 
   return (

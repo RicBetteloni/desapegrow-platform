@@ -12,6 +12,7 @@ type CartItem = {
 export default function Header() {
   const { data: session } = useSession()
   const isSeller = session?.user?.role === 'SELLER'
+  const isAdmin = session?.user?.role === 'ADMIN'
   const [cartCount, setCartCount] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -46,14 +47,15 @@ export default function Header() {
     }
   }, [])
 
+  // Menu items dinâmicos baseados no role
   const menuItems = [
-    { href: '/marketplace', label: 'Marketplace', icon: '🛒' },
-    { href: '/grow-virtual', label: 'Grow Virtual', icon: '🌱' },
-    { href: '/dashboard', label: 'Dashboard', icon: '📊' },
-    { href: '/analytics', label: 'Analytics', icon: '📈' },
-    { href: '/gamification', label: 'Gamificação', icon: '🎮' },
-    { href: '/meus-pedidos', label: 'Meus Pedidos', icon: '📦' },
-  ]
+    { href: '/marketplace', label: 'Marketplace', icon: '🛒', roles: ['BUYER', 'SELLER', 'ADMIN'] },
+    { href: '/grow-virtual', label: 'Grow Virtual', icon: '🌱', roles: ['BUYER', 'SELLER', 'ADMIN'] },
+    { href: '/gamification', label: 'Gamificação', icon: '🎮', roles: ['BUYER', 'SELLER', 'ADMIN'] },
+    { href: '/meus-pedidos', label: 'Meus Pedidos', icon: '📦', roles: ['BUYER', 'SELLER', 'ADMIN'] },
+    { href: '/dashboard', label: 'Dashboard', icon: '📊', roles: ['ADMIN'] },
+    { href: '/analytics', label: 'Analytics', icon: '📈', roles: ['ADMIN'] },
+  ].filter(item => !session?.user?.role || item.roles.includes(session.user.role))
 
   return (
     <>
@@ -80,7 +82,7 @@ export default function Header() {
                 {isSeller && (
                   <Link href="/vendedor" className="cursor-pointer">
                     <Button variant="ghost" size="sm" className="bg-green-50 text-green-700 hover:bg-green-100 cursor-pointer text-xs xl:text-sm">
-                      <span className="hidden xl:inline">🏪 </span>Vendedor
+                      <span className="hidden xl:inline">🏪 </span>Área do Vendedor
                     </Button>
                   </Link>
                 )}

@@ -10,18 +10,24 @@ export async function GET() {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
+    console.log('🏪 Buscando pedidos do VENDEDOR (sellerId):', session.user.id)
+
     let seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user.id }
     })
 
     // Se não existe, cria automaticamente
     if (!seller) {
+      console.log('📝 Criando perfil de vendedor automaticamente...')
       seller = await prisma.sellerProfile.create({
         data: {
           userId: session.user.id
         }
       })
+      console.log('✅ Perfil de vendedor criado:', seller.id)
     }
+
+    console.log('🔍 SellerProfile ID:', seller.id)
 
     // Buscar pedidos que tenham ao menos 1 item de produtos deste seller
     const orders = await prisma.order.findMany({
@@ -29,7 +35,7 @@ export async function GET() {
         items: {
           some: {
             product: {
-              sellerId: seller.id
+              sellerId: seller.id  // sellerId = VENDEDOR
             }
           }
         }
@@ -59,6 +65,14 @@ export async function GET() {
       },
       orderBy: { createdAt: 'desc' }
     })
+
+    console.log('✅ Pedidos de VENDA encontrados:', orders.length)
+    console.log('📊 Detalhes:', orders.map(o => ({ 
+      orderId: o.id.slice(0, 8), 
+      status: o.status,
+      items: o.items.length,
+      buyer: o.user.name 
+    })))
 
     const ordersJSON = orders.map(order => {
       const total = order.items.reduce((sum, item) => {
