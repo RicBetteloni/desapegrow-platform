@@ -11,9 +11,30 @@ type IncomingItem = {
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession()
+    console.log('🔐 Session completa:', JSON.stringify(session, null, 2))
+    
     if (!session?.user?.id) {
+      console.error('❌ Sessão inválida ou usuário sem ID')
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
+
+    console.log('🔐 Usuário autenticado:', session.user.id)
+
+    // Verificar se o usuário existe no banco
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    })
+
+    if (!user) {
+      console.error('❌ Usuário não encontrado no banco:', session.user.id)
+      console.error('💡 Solução: Faça logout e login novamente')
+      return NextResponse.json({ 
+        error: 'Usuário não encontrado. Por favor, faça logout e login novamente.',
+        code: 'USER_NOT_FOUND'
+      }, { status: 404 })
+    }
+
+    console.log('✅ Usuário encontrado:', user.name)
 
     const body = await request.json()
     const { items, total, paymentMethod } = body as {
@@ -25,6 +46,8 @@ export async function POST(request: NextRequest) {
     if (!items?.length || typeof total !== 'number' || !paymentMethod) {
       return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 })
     }
+
+    console.log('📦 Criando pedido para:', user.name, 'com', items.length, 'itens')
 
     // 1. Validar estoque
     const stockErrors: string[] = []

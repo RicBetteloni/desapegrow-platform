@@ -4,9 +4,16 @@ import { Prisma } from '@prisma/client'
 
 export async function GET(request: Request) {
   try {
+    console.log('🛍️ Buscando produtos...')
+    
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
     const category = searchParams.get('category')
+
+    console.log('📊 Parâmetros:', { search, category })
+
+    // Verificar conexão com o banco
+    await prisma.$connect()
 
     const where: Prisma.ProductWhereInput = {
       status: 'ACTIVE'
@@ -27,7 +34,7 @@ export async function GET(request: Request) {
       where,
       include: {
         category: true,
-        images: true, // ← ADICIONE ESTA LINHA
+        images: true,
         seller: {
           select: {
             id: true,
@@ -42,6 +49,8 @@ export async function GET(request: Request) {
       },
       orderBy: { createdAt: 'desc' },
     })
+
+    console.log('✅ Produtos encontrados:', products.length)
 
     // Calcular média de avaliações
     const productsWithRatings = products.map(product => {
@@ -61,9 +70,13 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ products: productsWithRatings })
   } catch (error) {
-    console.error('Erro ao listar produtos:', error)
+    console.error('❌ Erro ao listar produtos:', error)
+    console.error('❌ Detalhes do erro:', {
+      message: error instanceof Error ? error.message : 'Erro desconhecido',
+      stack: error instanceof Error ? error.stack : undefined
+    })
     return NextResponse.json(
-      { error: 'Erro ao listar produtos' },
+      { error: 'Erro ao listar produtos', details: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }

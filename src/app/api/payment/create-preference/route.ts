@@ -3,9 +3,17 @@ import { getServerSession } from 'next-auth'
 import { MercadoPagoConfig, Preference } from 'mercadopago'
 import { prisma } from '@/lib/prisma'
 
-// Configurar Mercado Pago
+type Item = {
+  productId: string
+  name: string
+  image?: string
+  price: number
+  quantity: number
+}
+
+// Config Mercado Pago
 const client = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN!,
+  accessToken: process.env.MP_ACCESS_TOKEN || '',
   options: { timeout: 5000 }
 })
 
@@ -13,26 +21,31 @@ const preference = new Preference(client)
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession()
-
-    if (!session?.user?.email) {
+    if (!process.env.MP_ACCESS_TOKEN) {
       return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
+        { error: 'MP_ACCESS_TOKEN não configurado' },
+        { status: 500 }
       )
     }
 
-    type Item = {
-      productId: string
-      name: string
-      image?: string
-      price: number
-      quantity: number
+    const session = await getServerSession()
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    const { items, orderId } = await request.json() as { items: Item[]; orderId: string }
+    const { items, orderId } = (await request.json()) as {
+      items: Item[]
+      orderId: string
+    }
 
-    // Buscar usuário
+    if (!items?.length || !orderId) {
+      return NextResponse.json(
+        { error: 'items e orderId são obrigatórios' },
+        { status: 400 }
+      )
+    }
+
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
     })
@@ -44,38 +57,52 @@ export async function POST(request: Request) {
       )
     }
 
-    // Calcular total
-    const total = items.reduce((sum: number, item: Item) => {
-      return sum + (item.price * item.quantity)
-    }, 0)
+    const baseUrl =
+      process.env.NEXTAUTH_URL ||
+      process.env.NEXT_PUBLIC_URL ||
+      'http://localhost:3000'
 
-    // Criar preferência de pagamento
+    // Preparar dados do payer
+    const payerData: {
+      name: string
+      email: string
+      phone?: { area_code: string; number: string }
+    } = {
+      name: user.name,
+      email: user.email
+    }
+
+    // Adiciona telefone se disponível e válido
+    if (user.phone && user.phone.length >= 10) {
+      const cleanPhone = user.phone.replace(/\D/g, '')
+      payerData.phone = {
+        area_code: cleanPhone.substring(0, 2),
+        number: cleanPhone.substring(2)
+      }
+    }
+
     const preferenceData = {
       body: {
-        items: items.map((item: Item) => ({
+        items: items.map(item => ({
           id: item.productId,
           title: item.name,
           description: item.name,
           picture_url: item.image,
           quantity: item.quantity,
-          unit_price: item.price,
+          unit_price: Number(item.price),
           currency_id: 'BRL'
         })),
-        payer: {
-          name: user.name,
-          email: user.email,
-          phone: user.phone ? {
-            area_code: user.phone.substring(0, 2),
-            number: user.phone.substring(2)
-          } : undefined
-        },
+        payer: payerData,
         back_urls: {
-          success: `${process.env.NEXTAUTH_URL}/payment/success?orderId=${orderId}`,
-          failure: `${process.env.NEXTAUTH_URL}/payment/failure?orderId=${orderId}`,
-          pending: `${process.env.NEXTAUTH_URL}/payment/pending?orderId=${orderId}`
+          success: `${baseUrl}/payment/success?orderId=${orderId}`,
+          failure: `${baseUrl}/payment/failure?orderId=${orderId}`,
+          pending: `${baseUrl}/payment/pending?orderId=${orderId}`
         },
-        auto_return: 'approved' as const,
-        notification_url: `${process.env.NEXTAUTH_URL}/api/payment/webhook`,
+        // auto_return apenas em produção
+        ...(process.env.NODE_ENV === 'production'
+          ? { auto_return: 'approved' as const }
+          : {}),
+        notification_url: `${baseUrl}/api/payment/webhook`,
         external_reference: orderId,
         statement_descriptor: 'DESAPEGROW',
         metadata: {
@@ -85,14 +112,29 @@ export async function POST(request: Request) {
       }
     }
 
-    const response = await preference.create(preferenceData)
-
-    return NextResponse.json({
-      preferenceId: response.id,
-      initPoint: response.init_point,
-      sandboxInitPoint: response.sandbox_init_point
+    console.log('🔵 Criando preferência MP com:', {
+      items: items.length,
+      orderId,
+      userId: user.id,
+      hasPhone: !!payerData.phone
     })
 
+    const response = await preference.create(preferenceData)
+
+    console.log('✅ Preferência criada:', {
+      id: response.id,
+      hasInitPoint: !!response.init_point,
+      hasSandboxInitPoint: !!response.sandbox_init_point
+    })
+
+    return NextResponse.json(
+      {
+        preferenceId: response.id,
+        initPoint: response.init_point,
+        sandboxInitPoint: response.sandbox_init_point
+      },
+      { status: 201 }
+    )
   } catch (error: unknown) {
     console.error('Erro ao criar preferência MP:', error)
     const message = error instanceof Error ? error.message : String(error)

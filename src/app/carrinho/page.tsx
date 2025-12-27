@@ -29,8 +29,26 @@ export default function CarrinhoPage() {
       : null
     if (savedCart) {
       try {
-        setCartItems(JSON.parse(savedCart))
+        const parsed = JSON.parse(savedCart)
+        // Validar e limpar itens inválidos
+        const validItems = parsed.filter((item: CartItem) => {
+          return item.productId && 
+                 item.name && 
+                 typeof item.price === 'number' && 
+                 typeof item.quantity === 'number' &&
+                 item.image
+        })
+        
+        // Se removeu itens inválidos, atualizar localStorage
+        if (validItems.length !== parsed.length) {
+          console.warn('⚠️ Removidos itens inválidos do carrinho')
+          localStorage.setItem('cart', JSON.stringify(validItems))
+        }
+        
+        setCartItems(validItems)
       } catch {
+        console.error('❌ Erro ao carregar carrinho, limpando...')
+        localStorage.removeItem('cart')
         setCartItems([])
       }
     } else {
@@ -66,7 +84,7 @@ export default function CarrinhoPage() {
   }
 
   const total = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
     0
   )
 
@@ -110,7 +128,7 @@ export default function CarrinhoPage() {
                         {item.name}
                       </p>
                       <p className="text-green-700 font-bold mt-1">
-                        R$ {item.price.toFixed(2)}
+                        R$ {(item.price || 0).toFixed(2)}
                       </p>
 
                       <div className="flex items-center gap-2 mt-2">

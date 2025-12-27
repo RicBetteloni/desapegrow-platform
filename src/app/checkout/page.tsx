@@ -1,4 +1,5 @@
 'use client'
+
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -20,8 +21,7 @@ export default function CheckoutPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  
-  // Formulário
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -40,6 +40,7 @@ export default function CheckoutPage() {
   }, [])
 
   const loadCart = () => {
+    if (typeof window === 'undefined') return
     const savedCart = localStorage.getItem('cart')
     if (savedCart) {
       try {
@@ -94,77 +95,106 @@ export default function CheckoutPage() {
     return true
   }
 
-  // Substitui a função handleCheckout COMPLETA:
-const handleCheckout = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setError('')
+  const handleCheckout = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
 
-  if (!validateForm() || cartItems.length === 0) return
-
-  setLoading(true)
-
-  try {
-    // 1. Cria pedido no banco
-    const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    
-    const orderResponse = await fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        items: cartItems.map(item => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          price: item.price
-        })),
-        total,
-        paymentMethod: 'sandbox' // ← NOVIDADE
-      })
-    })
-
-    const orderData = await orderResponse.json()
-
-    if (!orderResponse.ok) {
-      setError(orderData.error || 'Erro ao criar pedido')
+    if (!validateForm()) return
+    if (cartItems.length === 0) {
+      setError('Seu carrinho está vazio')
       return
     }
 
-    const orderId = orderData.order.id
+    setLoading(true)
 
-    // 2. Chama MP Sandbox
-    const mpResponse = await fetch('/api/mp/sandbox', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        items: cartItems,
-        orderId,
-        customer: formData
+    try {
+      // 1. Cria pedido no banco
+      const total = cartItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      )
+
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cartItems.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price
+          })),
+          total,
+          paymentMethod: 'mercadopago'
+        })
       })
-    })
 
-    const mpData = await mpResponse.json()
+      const orderData = await orderResponse.json()
 
-    if (!mpResponse.ok) {
-      setError(mpData.error || 'Erro ao processar pagamento')
-      return
+      if (!orderResponse.ok) {
+        if (orderData.code === 'USER_NOT_FOUND') {
+          setError('Sua sessão expirou. Por favor, faça logout e login novamente.')
+        } else {
+          setError(orderData.error || 'Erro ao criar pedido')
+        }
+        return
+      }
+
+      const orderId = orderData.order.id
+
+      // 2. Cria preferência no Mercado Pago
+      const mpResponse = await fetch('/api/payment/create-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cartItems.map(item => ({
+            productId: item.productId,
+            name: item.name,
+            image: item.image,
+            price: item.price,
+            quantity: item.quantity
+          })),
+          orderId
+        })
+      })
+
+      const mpData = await mpResponse.json()
+
+      if (!mpResponse.ok) {
+        setError(mpData.error || 'Erro ao processar pagamento')
+        return
+      }
+
+      // Modo TESTE - usar sandboxInitPoint para credenciais de teste
+      // Use cartões de teste do Mercado Pago
+      const redirectUrl = mpData.sandboxInitPoint || mpData.initPoint || mpData.init_point
+
+      if (!redirectUrl) {
+        setError('URL de pagamento não retornada pelo Mercado Pago')
+        console.error('❌ MP Response:', mpData)
+        return
+      }
+
+      console.log('✅ URL de redirecionamento:', redirectUrl)
+      console.log('🧪 Modo TESTE - Use cartões de teste do Mercado Pago')
+
+      // NÃO limpar carrinho aqui - só limpar após confirmação de pagamento
+      // O carrinho será limpo na página de sucesso do pagamento
+
+      // 3. Redireciona para o checkout do Mercado Pago
+      console.log('🔀 Redirecionando para Mercado Pago...')
+      window.location.href = redirectUrl
+    } catch (err) {
+      console.error('Erro checkout:', err)
+      setError('Erro ao processar compra')
+    } finally {
+      setLoading(false)
     }
-
-    // 3. Limpa carrinho + redireciona
-    localStorage.removeItem('cart')
-    window.dispatchEvent(new Event('cartUpdated'))
-    
-    // Simula redirecionamento MP (em prod seria mpData.init_point)
-    router.push(mpData.sandboxUrls.success)
-
-  } catch (err) {
-    console.error('Erro checkout:', err)
-    setError('Erro ao processar compra')
-  } finally {
-    setLoading(false)
   }
-}
 
-
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const total = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  )
 
   if (cartItems.length === 0) {
     return (
@@ -190,7 +220,6 @@ const handleCheckout = async (e: React.FormEvent) => {
         <h1 className="text-3xl font-bold mb-8">💳 Finalizar Compra</h1>
 
         <div className="grid md:grid-cols-[2fr,1fr] gap-6">
-          {/* Formulário */}
           <Card>
             <CardHeader>
               <CardTitle>Dados de Entrega</CardTitle>
@@ -204,9 +233,10 @@ const handleCheckout = async (e: React.FormEvent) => {
                   </div>
                 )}
 
-                {/* Nome Completo */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Nome Completo *</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Nome Completo *
+                  </label>
                   <Input
                     type="text"
                     name="fullName"
@@ -217,48 +247,52 @@ const handleCheckout = async (e: React.FormEvent) => {
                   />
                 </div>
 
-                {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Email *</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Email *
+                  </label>
                   <Input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    placeholder="joao@email.com"
+                    placeholder="seu@email.com"
                     required
                   />
                 </div>
 
-                {/* Telefone */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Telefone *</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Telefone *
+                  </label>
                   <Input
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    placeholder="(11) 99999-9999"
+                    placeholder="11999999999"
                     required
                   />
                 </div>
 
-                {/* CPF */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">CPF *</label>
+                  <label className="block text-sm font-medium mb-2">
+                    CPF *
+                  </label>
                   <Input
                     type="text"
                     name="cpf"
                     value={formData.cpf}
                     onChange={handleInputChange}
-                    placeholder="000.000.000-00"
+                    placeholder="00000000000"
                     required
                   />
                 </div>
 
-                {/* Endereço */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Endereço *</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Endereço *
+                  </label>
                   <Input
                     type="text"
                     name="address"
@@ -269,9 +303,10 @@ const handleCheckout = async (e: React.FormEvent) => {
                   />
                 </div>
 
-                {/* Número */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Número *</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Número *
+                  </label>
                   <Input
                     type="text"
                     name="addressNumber"
@@ -282,9 +317,10 @@ const handleCheckout = async (e: React.FormEvent) => {
                   />
                 </div>
 
-                {/* Complemento */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Complemento</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Complemento
+                  </label>
                   <Input
                     type="text"
                     name="addressComplement"
@@ -294,9 +330,10 @@ const handleCheckout = async (e: React.FormEvent) => {
                   />
                 </div>
 
-                {/* Cidade */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Cidade *</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Cidade *
+                  </label>
                   <Input
                     type="text"
                     name="city"
@@ -307,9 +344,10 @@ const handleCheckout = async (e: React.FormEvent) => {
                   />
                 </div>
 
-                {/* Estado */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Estado *</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Estado *
+                  </label>
                   <Input
                     type="text"
                     name="state"
@@ -321,15 +359,16 @@ const handleCheckout = async (e: React.FormEvent) => {
                   />
                 </div>
 
-                {/* CEP */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">CEP *</label>
+                  <label className="block text-sm font-medium mb-2">
+                    CEP *
+                  </label>
                   <Input
                     type="text"
                     name="zipCode"
                     value={formData.zipCode}
                     onChange={handleInputChange}
-                    placeholder="01234-567"
+                    placeholder="01234567"
                     required
                   />
                 </div>
@@ -340,13 +379,12 @@ const handleCheckout = async (e: React.FormEvent) => {
                   className="w-full"
                   size="lg"
                 >
-                  {loading ? 'Processando...' : 'Confirmar Compra'}
+                  {loading ? 'Processando...' : 'Ir para pagamento'}
                 </Button>
               </form>
             </CardContent>
           </Card>
 
-          {/* Resumo */}
           <Card className="h-fit sticky top-6">
             <CardHeader>
               <CardTitle>Resumo do Pedido</CardTitle>
@@ -354,9 +392,16 @@ const handleCheckout = async (e: React.FormEvent) => {
             <CardContent className="space-y-4">
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {cartItems.map(item => (
-                  <div key={item.productId} className="flex justify-between text-sm">
-                    <span className="line-clamp-1">{item.name} x{item.quantity}</span>
-                    <span className="font-semibold">R$ {(item.price * item.quantity).toFixed(2)}</span>
+                  <div
+                    key={item.productId}
+                    className="flex justify-between text-sm"
+                  >
+                    <span className="line-clamp-1">
+                      {item.name} x{item.quantity}
+                    </span>
+                    <span className="font-semibold">
+                      R$ {(item.price * item.quantity).toFixed(2)}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -378,7 +423,7 @@ const handleCheckout = async (e: React.FormEvent) => {
 
               <Link href="/carrinho">
                 <Button variant="outline" className="w-full">
-                  ← Voltar ao Carrinho
+                  ← Voltar ao carrinho
                 </Button>
               </Link>
             </CardContent>
