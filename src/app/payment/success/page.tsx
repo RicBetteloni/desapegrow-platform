@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { CheckCircle2, Loader2 } from 'lucide-react'
@@ -22,7 +22,7 @@ interface Order {
   items: OrderItem[]
 }
 
-export default function PaymentSuccess() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get('orderId')
   const preferenceId = searchParams.get('preference_id')
@@ -122,5 +122,17 @@ export default function PaymentSuccess() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function PaymentSuccess() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }
