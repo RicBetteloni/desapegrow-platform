@@ -10,24 +10,28 @@ function calculateHarvestReward(
   _genetics: unknown,
   _daysGrowing: number
 ): { coins: number; gems: number; rarity: ItemRarity; quality: string } {
+  // Garantir valores válidos
+  const safeHealth = typeof health === 'number' ? health : 0;
+  const safeSize = typeof size === 'number' ? size : 0;
+  
   // Calcular qualidade baseado em saúde e tempo
   let quality = 'Poor';
   let rarity: ItemRarity = ItemRarity.COMMON;
   let multiplier = 1.0;
 
-  if (health >= 90 && size >= 5.0) {
+  if (safeHealth >= 90 && safeSize >= 5.0) {
     quality = 'Perfect';
     rarity = ItemRarity.LEGENDARY;
     multiplier = 3.0;
-  } else if (health >= 75 && size >= 4.0) {
+  } else if (safeHealth >= 75 && safeSize >= 4.0) {
     quality = 'Excellent';
     rarity = ItemRarity.EPIC;
     multiplier = 2.5;
-  } else if (health >= 60 && size >= 3.0) {
+  } else if (safeHealth >= 60 && safeSize >= 3.0) {
     quality = 'Good';
     rarity = ItemRarity.RARE;
     multiplier = 2.0;
-  } else if (health >= 45 && size >= 2.0) {
+  } else if (safeHealth >= 45 && safeSize >= 2.0) {
     quality = 'Fair';
     rarity = ItemRarity.UNCOMMON;
     multiplier = 1.5;
@@ -46,6 +50,9 @@ function calculateHarvestReward(
 
 function generateCardData(plant: Record<string, unknown>, quality: string, rarity: ItemRarity) {
   const genetics = plant.genetics as Record<string, unknown>;
+  const size = typeof plant.size === 'number' ? plant.size : 0;
+  const daysGrowing = typeof plant.daysGrowing === 'number' ? plant.daysGrowing : 0;
+  const health = typeof plant.health === 'number' ? plant.health : 0;
   
   return {
     id: plant.id,
@@ -54,11 +61,11 @@ function generateCardData(plant: Record<string, unknown>, quality: string, rarit
     quality,
     rarity,
     stats: {
-      thc: genetics.thc || 'Unknown',
-      cbd: genetics.cbd || 'Unknown',
-      totalYield: `${plant.size.toFixed(1)}g`,
-      growTime: `${plant.daysGrowing.toFixed(0)} days`,
-      finalHealth: `${plant.health}%`
+      thc: genetics?.thc || 'Unknown',
+      cbd: genetics?.cbd || 'Unknown',
+      totalYield: `${size.toFixed(1)}g`,
+      growTime: `${daysGrowing.toFixed(0)} days`,
+      finalHealth: `${health}%`
     },
     genetics,
     harvestedAt: new Date().toISOString(),
