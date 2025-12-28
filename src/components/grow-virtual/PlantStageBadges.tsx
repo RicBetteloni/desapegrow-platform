@@ -46,15 +46,6 @@ const STAGE_NAMES: Record<string, string> = {
   HARVEST_READY: '✨ Pronta para Colher'
 }
 
-const STAGE_EMOJIS: Record<string, string> = {
-  SEED: '🌰',
-  SEEDLING: '🌱',
-  VEGETATIVE: '🌿',
-  PRE_FLOWER: '🌾',
-  FLOWERING: '🌸',
-  HARVEST_READY: '✨'
-}
-
 export function PlantStageBadges({ 
   currentStage, 
   genetics, 
