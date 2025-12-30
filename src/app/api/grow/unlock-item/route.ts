@@ -4,12 +4,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { 
-
-export const dynamic = 'force-dynamic';
   mapProductToVirtualItem, 
   getCoinsReward, 
   getGemsReward 
 } from '@/lib/productItemMapping';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
