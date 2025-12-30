@@ -63,8 +63,10 @@ export function GrowVirtualDashboard() {
   const [growData, setGrowData] = useState<VirtualGrow | null>(null)
   const [loading, setLoading] = useState(true)
   const [claimingReward, setClaimingReward] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     fetchGrowData()
   }, [])
 
@@ -204,7 +206,7 @@ export function GrowVirtualDashboard() {
   }
 
   // Verificar se growData está carregado antes de renderizar
-  if (!growData || !growData.stats) {
+  if (!mounted || !growData || !growData.stats) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
