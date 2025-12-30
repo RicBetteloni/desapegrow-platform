@@ -60,7 +60,9 @@ export async function GET() {
 
     if (lastReward) {
       // Próxima recompensa é 24h após o último resgate
-      const nextClaim = new Date(lastReward.rewardDate.getTime() + (24 * 60 * 60 * 1000))
+      // Converter Date do PostgreSQL para JavaScript Date
+      const lastDate = new Date(lastReward.rewardDate)
+      const nextClaim = new Date(lastDate.getTime() + (24 * 60 * 60 * 1000))
       
       nextClaimTime = nextClaim.toISOString()
       timeUntilNext = Math.max(0, Math.floor((nextClaim.getTime() - Date.now()) / 1000))
@@ -68,7 +70,7 @@ export async function GET() {
 
     const response = {
       canClaim,
-      lastClaimDate: lastReward?.rewardDate.toISOString() || null,
+      lastClaimDate: lastReward ? new Date(lastReward.rewardDate).toISOString() : null,
       nextClaimTime,
       currentStreak: gameProfile.loginStreak || 0,
       timeUntilNext

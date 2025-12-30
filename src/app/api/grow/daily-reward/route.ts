@@ -158,7 +158,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (lastReward) {
-      const nextClaimTime = new Date(lastReward.rewardDate.getTime() + (24 * 60 * 60 * 1000))
+      // Converter Date do PostgreSQL para JavaScript Date
+      const lastDate = new Date(lastReward.rewardDate)
+      const nextClaimTime = new Date(lastDate.getTime() + (24 * 60 * 60 * 1000))
       const hoursRemaining = Math.ceil((nextClaimTime.getTime() - Date.now()) / (1000 * 60 * 60))
       return NextResponse.json({ 
         error: `Você já resgatou hoje! Volte em ${hoursRemaining}h` 
@@ -180,7 +182,8 @@ export async function POST(req: NextRequest) {
     let currentStreak = 0
     
     if (allRewards.length > 0) {
-      const lastRewardDate = allRewards[0].rewardDate
+      // Converter Date do PostgreSQL para JavaScript Date
+      const lastRewardDate = new Date(allRewards[0].rewardDate)
       const daysSinceLastReward = Math.floor((now.getTime() - lastRewardDate.getTime()) / (24 * 60 * 60 * 1000))
       
       // Se passou exatamente 1 dia, continua o streak
@@ -225,11 +228,13 @@ export async function POST(req: NextRequest) {
 
     // Registrar recompensa
     const itemNames = items.map(i => i.name)
+    const rewardDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()) // Apenas a data, sem hora
+    
     await prisma.dailyRewardLog.create({
       data: {
         userId,
         growId: virtualGrow.id,
-        rewardDate: now,
+        rewardDate: rewardDate,
         coinsEarned: coins,
         streakDay,
         totalStreak,

@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
     // Verificar se pode resgatar recompensa diária
     const today = new Date().toISOString().slice(0, 10);
     const canClaimDaily = !virtualGrow.dailyRewards.some(
-      reward => reward.rewardDate.toISOString().slice(0, 10) === today
+      reward => new Date(reward.rewardDate).toISOString().slice(0, 10) === today
     );
 
     console.log(`🌱 Plantas encontradas para usuário ${userId}:`, virtualGrow.plants.length);
