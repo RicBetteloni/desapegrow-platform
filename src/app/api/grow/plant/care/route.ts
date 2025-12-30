@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { GrowthStage, PlantCareType } from '@prisma/client';
 
+export const dynamic = 'force-dynamic';
+
 // Mapeamento de estágios e tempo necessário (em horas)
 const STAGE_DURATIONS = {
   SEED: 48, // 2 dias para germinar

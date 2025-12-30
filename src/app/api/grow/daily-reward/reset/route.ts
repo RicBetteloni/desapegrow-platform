@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic';
+
 // API TEMPORÁRIA PARA TESTES - REMOVER EM PRODUÇÃO
 export async function POST() {
   try {

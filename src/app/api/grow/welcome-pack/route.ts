@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { ItemRarity, ItemType, SourceType, PlantStrain } from '@prisma/client';
 
+export const dynamic = 'force-dynamic';
+
 // ========== SISTEMA RNG - TAXAS DIFFICULT ==========
 // 70% COMMON | 20% UNCOMMON | 8% RARE | 1.8% EPIC | 0.2% LEGENDARY
 

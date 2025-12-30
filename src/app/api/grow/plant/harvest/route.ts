@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { GrowthStage, ItemType, ItemRarity, SourceType } from '@prisma/client';
 
+export const dynamic = 'force-dynamic';
+
 function calculateHarvestReward(
   health: number,
   size: number,

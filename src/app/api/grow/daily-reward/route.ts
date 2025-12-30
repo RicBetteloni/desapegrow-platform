@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { ItemRarity, ItemType, SourceType } from '@prisma/client';
 
+export const dynamic = 'force-dynamic';
+
 // Interface para o item virtual (baseado no seu schema.prisma)
 interface VirtualItemData {
   itemType: ItemType;
