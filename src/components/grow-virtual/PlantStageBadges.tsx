@@ -257,7 +257,7 @@ export function PlantStageBadges({
                 <Thermometer className="w-4 h-4 mb-1 text-purple-600" />
                 <span className="text-[10px] text-gray-600">VPD</span>
                 <span className="text-sm font-bold text-purple-600">
-                  {plant.vpdLevel.toFixed(1)}
+                  {(plant.vpdLevel ?? 1.0).toFixed(1)}
                 </span>
               </div>
             </div>
@@ -266,11 +266,11 @@ export function PlantStageBadges({
             <div className="bg-white p-2 rounded-lg border mb-3">
               <div className="flex justify-between text-xs mb-1">
                 <span className="text-gray-600">Dias de Cultivo</span>
-                <span className="font-bold">{plant.daysGrowing.toFixed(0)} dias</span>
+                <span className="font-bold">{(plant.daysGrowing ?? 0).toFixed(0)} dias</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-gray-600">Tamanho</span>
-                <span className="font-bold">{plant.size.toFixed(1)}g</span>
+                <span className="font-bold">{(plant.size ?? 0).toFixed(1)}g</span>
               </div>
             </div>
 

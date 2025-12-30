@@ -358,14 +358,14 @@ export function GrowVirtualHub() {
                         <div>
                           <p className="text-gray-600">Tamanho</p>
                           <div className="flex items-center space-x-2">
-                            <Progress value={plant.size * 100} className="flex-1 h-2" />
-                            <span className="font-semibold">{(plant.size * 100).toFixed(0)}%</span>
+                            <Progress value={(plant.size ?? 0) * 100} className="flex-1 h-2" />
+                            <span className="font-semibold">{((plant.size ?? 0) * 100).toFixed(0)}%</span>
                           </div>
                         </div>
                       </div>
 
                       <div className="flex justify-between text-sm text-gray-600">
-                        <span>{plant.daysGrowing} dias crescendo</span>
+                        <span>{plant.daysGrowing ?? 0} dias crescendo</span>
                         <span>Strain: {plant.strain}</span>
                       </div>
 
@@ -585,9 +585,9 @@ export function GrowVirtualHub() {
                 <div>
                   <div className="flex justify-between mb-1">
                     <span className="text-sm font-medium">Crescimento</span>
-                    <span className="text-sm">{(selectedPlant.size * 100).toFixed(0)}%</span>
+                    <span className="text-sm">{((selectedPlant.size ?? 0) * 100).toFixed(0)}%</span>
                   </div>
-                  <Progress value={selectedPlant.size * 100} className="h-3" />
+                  <Progress value={(selectedPlant.size ?? 0) * 100} className="h-3" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
