@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 
 interface CartItem {
   id: string
@@ -20,20 +21,52 @@ interface Product {
 }
 
 export function useCart() {
+  const { data: session, status } = useSession()
   const [items, setItems] = useState<CartItem[]>([])
+  const [isInitialized, setIsInitialized] = useState(false)
 
-  // Carregar carrinho do localStorage na inicialização
-  useEffect(() => {
-    const saved = localStorage.getItem('cart-items')
-    if (saved) {
-      setItems(JSON.parse(saved))
+  // Gera a chave do localStorage baseada no usuário
+  const getCartKey = () => {
+    if (session?.user?.id) {
+      return `cart-items-${session.user.id}`
     }
-  }, [])
+    return 'cart-items-guest'
+  }
 
-  // Salvar no localStorage sempre que o carrinho mudar
+  // Carregar carrinho do localStorage quando o usuário estiver autenticado
   useEffect(() => {
-    localStorage.setItem('cart-items', JSON.stringify(items))
-  }, [items])
+    if (status === 'loading') return
+
+    const cartKey = getCartKey()
+    const saved = localStorage.getItem(cartKey)
+    
+    if (saved) {
+      try {
+        setItems(JSON.parse(saved))
+      } catch (error) {
+        console.error('Erro ao carregar carrinho:', error)
+        localStorage.removeItem(cartKey)
+        setItems([])
+      }
+    } else {
+      setItems([])
+    }
+    
+    // Limpar carrinho de convidado se usuário fez login
+    if (session?.user?.id) {
+      localStorage.removeItem('cart-items-guest')
+    }
+    
+    setIsInitialized(true)
+  }, [session?.user?.id, status])
+
+  // Salvar no localStorage sempre que o carrinho mudar (apenas se já inicializou)
+  useEffect(() => {
+    if (!isInitialized) return
+    
+    const cartKey = getCartKey()
+    localStorage.setItem(cartKey, JSON.stringify(items))
+  }, [items, session?.user?.id, isInitialized])
 
   const addToCart = (product: Product, quantity: number = 1) => {
     setItems(current => {
