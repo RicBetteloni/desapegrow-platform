@@ -16,8 +16,12 @@ import {
   Star,
   AlertCircle,
   Heart,
-  TrendingUp
+  TrendingUp,
+  ShieldCheck,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 
 interface Product {
   id: string
@@ -39,6 +43,7 @@ interface Product {
     id: string
     user: {
       name: string
+      isEmailVerified?: boolean
     }
   }
 }
@@ -61,6 +66,7 @@ interface CartItem {
 export default function MarketplacePage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { data: session } = useSession()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState(searchParams.get('q') || '')
@@ -68,6 +74,43 @@ export default function MarketplacePage() {
     searchParams.get('category') ? [searchParams.get('category')!] : []
   )
   const [categories, setCategories] = useState<Category[]>([])
+  const [currentBanner, setCurrentBanner] = useState(0)
+
+  // Banners do carousel
+  const banners = [
+    {
+      id: 1,
+      title: 'Grow Shop Sustentável 🌱',
+      subtitle: 'Equipamentos de cultivo seminovos com até 60% OFF - Qualidade garantida',
+      image: '/banners/grow-shop.jpg',
+      bgColor: 'from-emerald-600 via-green-600 to-teal-600',
+      link: '/marketplace?category=grow'
+    },
+    {
+      id: 2,
+      title: 'Desapegue & Ganhe Grows ♻️',
+      subtitle: 'Venda seu equipamento usado e acumule moedas virtuais para cultivar',
+      image: '/banners/desapegue-grows.jpg',
+      bgColor: 'from-purple-600 via-indigo-600 to-blue-600',
+      link: '/vendedor/produtos/novo'
+    },
+    {
+      id: 3,
+      title: 'LED, Ventilação & Mais 💡',
+      subtitle: 'Monte seu grow room completo com economia e consciência ambiental',
+      image: '/banners/equipamentos.jpg',
+      bgColor: 'from-amber-600 via-orange-600 to-red-600',
+      link: '/marketplace'
+    },
+    {
+      id: 4,
+      title: 'Cultivo Consciente 🌍',
+      subtitle: 'Reutilize, economize e contribua para um planeta mais verde',
+      image: '/banners/sustentavel.jpg',
+      bgColor: 'from-lime-600 via-green-700 to-emerald-700',
+      link: '/marketplace?destaque=sustentavel'
+    }
+  ]
 
   useEffect(() => {
     fetchCategories()
@@ -207,15 +250,111 @@ export default function MarketplacePage() {
     router.push(`/marketplace?${newParams.toString()}`)
   }
 
+  const nextBanner = () => {
+    setCurrentBanner((prev) => (prev + 1) % banners.length)
+  }
+
+  const prevBanner = () => {
+    setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length)
+  }
+
+  // Auto-advance carousel
+  useEffect(() => {
+    const interval = setInterval(nextBanner, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       <div className="container mx-auto p-6">
-        {/* Page Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">🛒 Marketplace</h1>
-          <p className="text-gray-600 text-lg">
-            Descubra equipamentos incríveis e ganhe pontos a cada compra!
-          </p>
+        {/* Badge de Conta Verificada */}
+        {session?.user && (
+          <div className="mb-6 max-w-4xl mx-auto">
+            <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
+              <CardContent className="p-4 flex items-center gap-3">
+                <ShieldCheck className="w-6 h-6 text-green-600 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-semibold text-green-900">
+                    Sua conta está verificada, isso fortalece a confiança.
+                  </p>
+                  <p className="text-sm text-green-700">
+                    A verificação de identidade ajuda a manter o ambiente seguro para todos.
+                  </p>
+                </div>
+                <Badge className="bg-green-600 text-white">✓ Verificado</Badge>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Banner Carousel */}
+        <div className="max-w-6xl mx-auto mb-8">
+          <div className="relative overflow-hidden rounded-2xl shadow-2xl group">
+            {/* Banner atual */}
+            <div className="relative h-64 md:h-80">
+              {banners.map((banner, index) => (
+                <div
+                  key={banner.id}
+                  className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                    index === currentBanner 
+                      ? 'opacity-100 translate-x-0' 
+                      : index < currentBanner 
+                      ? 'opacity-0 -translate-x-full' 
+                      : 'opacity-0 translate-x-full'
+                  }`}
+                >
+                  <Link href={banner.link}>
+                    <div className={`w-full h-full bg-gradient-to-r ${banner.bgColor} flex items-center justify-between px-12 cursor-pointer hover:scale-[1.02] transition-transform`}>
+                      <div className="text-white max-w-xl z-10">
+                        <h2 className="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
+                          {banner.title}
+                        </h2>
+                        <p className="text-xl md:text-2xl drop-shadow-md">
+                          {banner.subtitle}
+                        </p>
+                        <Button size="lg" className="mt-6 bg-white text-gray-900 hover:bg-gray-100 font-semibold">
+                          Ver Ofertas
+                        </Button>
+                      </div>
+                      {/* Placeholder para imagem/ilustração */}
+                      <div className="hidden md:block text-8xl opacity-50">
+                        🌿
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+
+            {/* Botões de navegação */}
+            <button
+              onClick={prevBanner}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            >
+              <ChevronLeft className="w-6 h-6 text-gray-800" />
+            </button>
+            <button
+              onClick={nextBanner}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            >
+              <ChevronRight className="w-6 h-6 text-gray-800" />
+            </button>
+
+            {/* Indicadores */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {banners.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentBanner(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentBanner 
+                      ? 'bg-white w-8' 
+                      : 'bg-white/50 hover:bg-white/75'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Busca */}
@@ -253,22 +392,19 @@ export default function MarketplacePage() {
                 </Button>
               )}
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="flex flex-wrap justify-center gap-4 max-w-6xl mx-auto">
               {/* Botão TODOS */}
               <Card 
-                className={`hover:shadow-lg transition-all cursor-pointer ${
+                className={`hover:shadow-md transition-all cursor-pointer ${
                   selectedCategories.length === 0 
                     ? 'ring-2 ring-green-500 bg-green-50' 
                     : 'hover:border-green-200'
                 }`}
                 onClick={clearCategories}
               >
-                <CardContent className="p-4 text-center">
-                  <div className="text-3xl mb-2">📦</div>
-                  <h3 className="font-semibold text-sm">Todos</h3>
-                  {selectedCategories.length === 0 && (
-                    <Badge className="mt-2 bg-green-600 text-white text-xs">Ativo</Badge>
-                  )}
+                <CardContent className="p-3 text-center min-w-[110px]">
+                  <div className="text-2xl mb-1">📦</div>
+                  <h3 className="font-medium text-xs">Todos</h3>
                 </CardContent>
               </Card>
 
@@ -278,19 +414,16 @@ export default function MarketplacePage() {
                 return (
                   <Card 
                     key={cat.id} 
-                    className={`hover:shadow-lg transition-all cursor-pointer ${
+                    className={`hover:shadow-md transition-all cursor-pointer ${
                       isSelected 
                         ? 'ring-2 ring-green-500 bg-green-50' 
                         : 'hover:border-green-200'
                     }`}
                     onClick={() => toggleCategory(cat.slug)}
                   >
-                    <CardContent className="p-4 text-center">
-                      <div className="text-3xl mb-2">{cat.icon}</div>
-                      <h3 className="font-semibold text-sm">{cat.name}</h3>
-                      {isSelected && (
-                        <Badge className="mt-2 bg-green-600 text-white text-xs">✓ Selecionado</Badge>
-                      )}
+                    <CardContent className="p-3 text-center min-w-[110px]">
+                      <div className="text-2xl mb-1">{cat.icon}</div>
+                      <h3 className="font-medium text-xs line-clamp-2">{cat.name}</h3>
                     </CardContent>
                   </Card>
                 )
@@ -299,9 +432,22 @@ export default function MarketplacePage() {
           </div>
         )}
 
+        {/* Publicidade Horizontal */}
+        <div className="max-w-6xl mx-auto mb-8">
+          <Card className="border-dashed border-2 border-gray-300 bg-gray-50">
+            <CardContent className="p-8 text-center">
+              <p className="text-gray-500 font-medium">📢 Espaço Publicitário 728x90</p>
+              <p className="text-xs text-gray-400 mt-1">Banner horizontal - Anuncie aqui</p>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Produtos */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">🌿 Produtos Disponíveis</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">🌿 Produtos Disponíveis</h2>
+            {/* Espaço para filtros adicionais */}
+          </div>
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
@@ -315,8 +461,11 @@ export default function MarketplacePage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.map((product: Product) => {
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Coluna principal - Produtos */}
+              <div className="lg:col-span-9">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {products.map((product: Product) => {
                 const pointsEarned = Math.floor(Number(product.price) * 0.05);
                 const discountPercent = product.comparePrice
                   ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
@@ -467,17 +616,63 @@ export default function MarketplacePage() {
                       </Button>
 
                       {/* Vendedor */}
-                      <p className="text-xs text-gray-500 text-center mt-3">
-                        Vendido por <span className="font-medium">{product.seller?.user?.name || 'Vendedor'}</span>
-                      </p>
+                      <div className="text-xs text-gray-500 text-center mt-3 flex items-center justify-center gap-1">
+                        <span>Vendido por</span>
+                        <span className="font-medium">{product.seller?.user?.name || 'Vendedor'}</span>
+                        {product.seller?.user?.isEmailVerified && (
+                          <ShieldCheck className="w-3 h-3 text-green-600" />
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 );
               })}
             </div>
-          )}
+          </div>
+
+          {/* Sidebar - Publicidade */}
+          <div className="hidden lg:block lg:col-span-3">
+            <div className="sticky top-6 space-y-6">
+              {/* Publicidade 1 */}
+              <Card className="border-dashed border-2 border-gray-300 bg-gray-50">
+                <CardContent className="p-6 text-center">
+                  <p className="text-gray-500 font-medium">📢 Publicidade</p>
+                  <p className="text-xs text-gray-400 mt-1">300x250</p>
+                  <div className="h-48 flex items-center justify-center text-gray-300 text-4xl mt-2">
+                    🌱
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Publicidade 2 */}
+              <Card className="border-dashed border-2 border-gray-300 bg-gray-50">
+                <CardContent className="p-6 text-center">
+                  <p className="text-gray-500 font-medium">📢 Publicidade</p>
+                  <p className="text-xs text-gray-400 mt-1">300x250</p>
+                  <div className="h-48 flex items-center justify-center text-gray-300 text-4xl mt-2">
+                    🎯
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Dicas / Call to Action */}
+              <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+                <CardContent className="p-6">
+                  <h3 className="font-bold text-green-900 mb-2">💡 Dica do Dia</h3>
+                  <p className="text-sm text-green-800">
+                    Ganhe CultivoCoins a cada compra e troque por descontos exclusivos!
+                  </p>
+                  <Button size="sm" className="w-full mt-4 bg-green-600 hover:bg-green-700">
+                    Saiba Mais
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
+  </div>
+</div>
   )
 }
