@@ -15,6 +15,19 @@ export async function GET() {
 
     const userId = session.user.id
 
+    // Validar se o usuário existe
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true }
+    })
+
+    if (!userExists) {
+      return NextResponse.json({ 
+        error: 'Sua sessão está inválida. Por favor, faça login novamente.',
+        action: 'LOGOUT_REQUIRED'
+      }, { status: 403 })
+    }
+
     // Buscar ou criar GameProfile
     let gameProfile = await prisma.gameProfile.findUnique({
       where: { userId }
@@ -80,10 +93,18 @@ export async function GET() {
 
     return NextResponse.json(response)
 
-  } catch (error) {
-    console.error('❌ Erro ao verificar status da recompensa:', error)
+  } catch (error: any) {
+    console.error('❌ [DAILY REWARD STATUS ERROR]:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      code: error.code
+    });
     return NextResponse.json(
-      { error: 'Erro ao verificar status' },
+      { 
+        error: 'Erro ao verificar status',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      },
       { status: 500 }
     )
   }

@@ -409,6 +409,22 @@ export async function POST(_req: NextRequest) {
 
     console.log('🎁 Verificando pacote de boas-vindas para:', userId);
 
+    // Validar se o usuário existe antes de criar VirtualGrow
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, name: true }
+    });
+
+    if (!userExists) {
+      console.error('❌ Usuário não encontrado:', userId);
+      return NextResponse.json({ 
+        error: 'Sua sessão está inválida. Por favor, faça login novamente.',
+        action: 'LOGOUT_REQUIRED'
+      }, { status: 403 });
+    }
+
+    console.log('✅ Usuário validado:', userExists.name, userExists.email);
+
     // Buscar ou criar VirtualGrow
     let virtualGrow = await prisma.virtualGrow.findUnique({
       where: { userId },

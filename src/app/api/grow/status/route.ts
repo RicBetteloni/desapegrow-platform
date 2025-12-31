@@ -14,6 +14,19 @@ export async function GET(req: NextRequest) {
 
     const userId = session.user.id;
 
+    // Validar se o usuário existe
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true }
+    });
+
+    if (!userExists) {
+      return NextResponse.json({ 
+        error: 'Sua sessão está inválida. Por favor, faça login novamente.',
+        action: 'LOGOUT_REQUIRED'
+      }, { status: 403 });
+    }
+
     // Buscar dados completos do grow virtual
     const virtualGrow = await prisma.virtualGrow.findUnique({
       where: { userId },
@@ -64,10 +77,15 @@ export async function GET(req: NextRequest) {
       }
     });
 
-  } catch (error) {
-    console.error('Erro ao buscar status do grow:', error);
+  } catch (error: any) {
+    console.error('❌ [GROW STATUS ERROR]:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     return NextResponse.json({ 
-      error: 'Erro interno do servidor' 
+      error: 'Erro interno do servidor',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     }, { status: 500 });
   }
 }

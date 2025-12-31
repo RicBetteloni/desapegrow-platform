@@ -21,7 +21,11 @@ interface WelcomePack {
   message: string
 }
 
-export function WelcomePackModal() {
+interface WelcomePackModalProps {
+  onPackClaimed?: () => void
+}
+
+export function WelcomePackModal({ onPackClaimed }: WelcomePackModalProps) {
   const { status } = useSession()
   const [loading, setLoading] = useState(false)
   const [canClaim, setCanClaim] = useState(false)
@@ -63,6 +67,17 @@ export function WelcomePackModal() {
       
       const data = await response.json()
       
+      if (response.status === 403 && data.action === 'LOGOUT_REQUIRED') {
+        toast.error(data.error || 'Sessão inválida', {
+          description: 'Redirecionando para login...',
+          duration: 3000
+        })
+        setTimeout(() => {
+          window.location.href = '/api/auth/signout?callbackUrl=/auth/signin'
+        }, 2000)
+        return
+      }
+      
       if (response.ok) {
         setWelcomePack(data.welcomePack)
         
@@ -75,15 +90,17 @@ export function WelcomePackModal() {
               <p className="text-sm">💰 +{data.welcomePack.bonusCoins} CultivoCoins</p>
             </div>
           </div>,
-          { duration: 8000 }
+          { duration: 5000 }
         )
         
         setCanClaim(false)
         
-        // Forçar reload para atualizar inventário
+        // Chamar callback para atualizar dados do dashboard
         setTimeout(() => {
-          window.location.reload()
-        }, 4000)
+          if (onPackClaimed) {
+            onPackClaimed()
+          }
+        }, 2000)
       } else {
         toast.error(data.error || 'Erro ao resgatar pacote')
         setRevealing(false)

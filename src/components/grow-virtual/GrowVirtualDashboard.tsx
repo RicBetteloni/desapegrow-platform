@@ -64,6 +64,8 @@ export function GrowVirtualDashboard() {
   const [loading, setLoading] = useState(true)
   const [claimingReward, setClaimingReward] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [hasNewItems, setHasNewItems] = useState(false)
+  const [previousItemCount, setPreviousItemCount] = useState(0)
 
   useEffect(() => {
     setMounted(true)
@@ -73,9 +75,34 @@ export function GrowVirtualDashboard() {
   const fetchGrowData = async () => {
     try {
       const response = await fetch('/api/grow/status')
+      
+      if (response.status === 403) {
+        const data = await response.json()
+        if (data.action === 'LOGOUT_REQUIRED') {
+          toast.error(data.error || 'Sessão inválida', {
+            description: 'Redirecionando para login...',
+            duration: 3000
+          })
+          setTimeout(() => {
+            window.location.href = '/api/auth/signout?callbackUrl=/auth/signin'
+          }, 2000)
+          return
+        }
+      }
+      
       if (response.ok) {
         const data = await response.json()
         setGrowData(data)
+        
+        // Detectar novos itens
+        if (previousItemCount > 0 && data.stats.totalItems > previousItemCount) {
+          setHasNewItems(true)
+          toast.success('Novo item adicionado ao inventário!', {
+            icon: '🎁',
+            duration: 4000
+          })
+        }
+        setPreviousItemCount(data.stats.totalItems)
       } else {
         // Se a API não existir ainda, usar dados mock
         setGrowData(getMockData())
@@ -220,7 +247,7 @@ export function GrowVirtualDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome Pack Modal */}
-      <WelcomePackModal />
+      <WelcomePackModal onPackClaimed={() => fetchGrowData()} />
       
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -318,7 +345,11 @@ export function GrowVirtualDashboard() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="plants" className="space-y-4">
+      <Tabs defaultValue="plants" className="space-y-4" onValueChange={(value) => {
+        if (value === 'inventory') {
+          setHasNewItems(false)
+        }
+      }}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="plants" className="flex items-center gap-2">
             <Sprout className="h-4 w-4" />
@@ -327,6 +358,11 @@ export function GrowVirtualDashboard() {
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             Inventário
+            {hasNewItems && (
+              <Badge variant="destructive" className="ml-1 h-5 px-1.5 text-xs animate-pulse">
+                NEW
+              </Badge>
+            )}
           </TabsTrigger>
           <TabsTrigger value="achievements" className="flex items-center gap-2">
             <Trophy className="h-4 w-4" />
