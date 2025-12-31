@@ -64,8 +64,7 @@ export function GrowVirtualDashboard() {
   const [loading, setLoading] = useState(true)
   const [claimingReward, setClaimingReward] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [hasNewItems, setHasNewItems] = useState(false)
-  const [previousItemCount, setPreviousItemCount] = useState(0)
+  const [newItemsCount, setNewItemsCount] = useState(0)
 
   useEffect(() => {
     setMounted(true)
@@ -94,15 +93,22 @@ export function GrowVirtualDashboard() {
         const data = await response.json()
         setGrowData(data)
         
-        // Detectar novos itens
-        if (previousItemCount > 0 && data.stats.totalItems > previousItemCount) {
-          setHasNewItems(true)
-          toast.success('Novo item adicionado ao inventário!', {
-            icon: '🎁',
-            duration: 4000
-          })
+        // Detectar novos itens desde o último acesso ao inventário
+        const lastViewedCount = parseInt(localStorage.getItem('lastViewedInventoryCount') || '0')
+        const currentCount = data.stats.totalItems
+        
+        if (currentCount > lastViewedCount) {
+          const newItems = currentCount - lastViewedCount
+          setNewItemsCount(newItems)
+          
+          // Mostrar toast apenas se não for o primeiro carregamento
+          if (lastViewedCount > 0) {
+            toast.success(`${newItems} ${newItems === 1 ? 'novo item' : 'novos itens'} no inventário!`, {
+              icon: '🎁',
+              duration: 4000
+            })
+          }
         }
-        setPreviousItemCount(data.stats.totalItems)
       } else {
         // Se a API não existir ainda, usar dados mock
         setGrowData(getMockData())
@@ -346,8 +352,10 @@ export function GrowVirtualDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="plants" className="space-y-4" onValueChange={(value) => {
-        if (value === 'inventory') {
-          setHasNewItems(false)
+        if (value === 'inventory' && growData) {
+          // Marcar como visualizado e limpar badge
+          localStorage.setItem('lastViewedInventoryCount', growData.stats.totalItems.toString())
+          setNewItemsCount(0)
         }
       }}>
         <TabsList className="grid w-full grid-cols-4">
@@ -355,13 +363,16 @@ export function GrowVirtualDashboard() {
             <Sprout className="h-4 w-4" />
             Plantas
           </TabsTrigger>
-          <TabsTrigger value="inventory" className="flex items-center gap-2">
+          <TabsTrigger value="inventory" className="flex items-center gap-2 relative">
             <Package className="h-4 w-4" />
             Inventário
-            {hasNewItems && (
-              <Badge variant="destructive" className="ml-1 h-5 px-1.5 text-xs animate-pulse">
-                NEW
-              </Badge>
+            {newItemsCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 items-center justify-center text-[10px] font-bold text-white">
+                  {newItemsCount}
+                </span>
+              </span>
             )}
           </TabsTrigger>
           <TabsTrigger value="achievements" className="flex items-center gap-2">
