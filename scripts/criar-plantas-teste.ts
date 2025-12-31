@@ -179,7 +179,7 @@ async function createTestPlants() {
           growId: virtualGrow.id,
           name: config.name,
           strain: config.strain,
-          stage: config.stage,
+          stage: config.stage as any,
           genetics: config.genetics,
           health: config.health,
           size: config.size,

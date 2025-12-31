@@ -65,11 +65,11 @@ export async function POST(req: Request) {
       }
     });
     
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro:', error);
     return NextResponse.json({ 
-      error: error.message,
-      stack: error.stack 
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined 
     }, { status: 500 });
   }
 }

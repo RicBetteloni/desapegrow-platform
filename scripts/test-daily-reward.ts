@@ -1,5 +1,5 @@
 // Teste de resgate de recompensa diária
-import { PrismaClient, ItemRarity, ItemType, SourceType } from '@prisma/client'
+import { PrismaClient, ItemRarity } from '@prisma/client'
 
 const prisma = new PrismaClient()
 

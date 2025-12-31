@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       data: {
         growId: virtualGrow.id,
         name: plantName || seedItem.name.replace('🌱 ', '').replace('🌿 ', '').replace('✨ ', ''),
-        strain: strain,
+        strain: strain as any,
         genetics: genetics,
         stage: GrowthStage.SEED,
         daysGrowing: 0,

@@ -47,8 +47,8 @@ async function addTestItem() {
     console.log(`   2. Aguarde 2 segundos`);
     console.log(`   3. Observe o badge vermelho aparecer no botão "Inventário"`);
 
-  } catch (error: any) {
-    console.error('❌ Erro:', error.message);
+  } catch (error) {
+    console.error('❌ Erro:', error instanceof Error ? error.message : String(error));
   } finally {
     await prisma.$disconnect();
   }

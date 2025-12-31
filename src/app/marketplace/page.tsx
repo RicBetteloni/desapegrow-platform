@@ -33,6 +33,7 @@ interface Product {
   category: {
     name: string
     icon: string
+    slug: string
   }
   seller: {
     id: string

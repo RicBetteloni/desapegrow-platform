@@ -63,9 +63,11 @@ async function resetAndCreateUser() {
     console.log('   3. Fazer login com: vendedor@desapegrow.com / senha123');
     console.log('   4. Testar o welcome pack em: http://localhost:3000/grow-virtual\n');
     
-  } catch (error: any) {
-    console.error('❌ Erro:', error.message);
-    console.error(error.stack);
+  } catch (error) {
+    console.error('❌ Erro:', error instanceof Error ? error.message : String(error));
+    if (error instanceof Error) {
+      console.error(error.stack);
+    }
   } finally {
     await prisma.$disconnect();
   }

@@ -46,32 +46,24 @@ async function testAPIs() {
       console.log('⚠️ No VirtualGrow records found');
     }
     
-    // Test 3: Check for null values in plants
-    const plants = await prisma.plant.findMany({ take: 5 });
-    console.log(`\n✅ Found ${plants.length} plants`);
+    // Test 3: Check for virtual items
+    const items = await prisma.virtualItem.findMany({ take: 5 });
+    console.log(`\n✅ Found ${items.length} virtual items`);
     
-    plants.forEach((plant, idx) => {
-      console.log(`\nPlant ${idx + 1}:`);
-      console.log(`   - size: ${plant.size} (${typeof plant.size})`);
-      console.log(`   - daysGrowing: ${plant.daysGrowing} (${typeof plant.daysGrowing})`);
-      console.log(`   - vpdLevel: ${plant.vpdLevel} (${typeof plant.vpdLevel})`);
-      
-      // Test toFixed on each value
-      try {
-        const sizeFixed = (plant.size ?? 0).toFixed(1);
-        const daysFixed = (plant.daysGrowing ?? 0).toFixed(0);
-        const vpdFixed = (plant.vpdLevel ?? 1.0).toFixed(1);
-        console.log(`   ✅ toFixed() works: size=${sizeFixed}, days=${daysFixed}, vpd=${vpdFixed}`);
-      } catch (e: any) {
-        console.error(`   ❌ toFixed() failed:`, e.message);
-      }
+    items.forEach((item, idx: number) => {
+      console.log(`\nItem ${idx + 1}:`);
+      console.log(`   - name: ${item.name}`);
+      console.log(`   - rarity: ${item.rarity}`);
+      console.log(`   - type: ${item.itemType}`);
     });
     
     console.log('\n✅ All tests passed!');
     
-  } catch (error: any) {
-    console.error('❌ Test failed:', error.message);
-    console.error('Stack:', error.stack);
+  } catch (error) {
+    console.error('❌ Test failed:', error instanceof Error ? error.message : String(error));
+    if (error instanceof Error) {
+      console.error('Stack:', error.stack);
+    }
   } finally {
     await prisma.$disconnect();
   }

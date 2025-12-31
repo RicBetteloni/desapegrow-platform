@@ -106,7 +106,7 @@ export function SeedInventory({ seeds, onPlant }: SeedInventoryProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {seeds.map((seed) => {
         const style = getRarityStyle(seed.rarity)
-        const genetics = seed.effects.genetics as Record<string, unknown>
+        const genetics = (seed.effects.genetics as Record<string, string> | undefined) || undefined
         const isSelected = selectedSeed === seed.id
         
         return (
@@ -131,37 +131,47 @@ export function SeedInventory({ seeds, onPlant }: SeedInventoryProps) {
               </div>
 
               {/* Informações da genética */}
-              {genetics && (
+              {(() => {
+                const g = genetics as Record<string, string> | undefined;
+                if (!g) return null;
+                
+                const lineage = g.lineage;
+                const thc = g.thc;
+                const flowering = g.flowering;
+                const difficulty = g.difficulty;
+                
+                return (
                 <div className="space-y-2 text-sm bg-white/50 p-3 rounded-lg">
-                  {genetics.lineage && (
+                  {lineage && (
                     <div className="flex items-start gap-2">
                       <Info className="w-4 h-4 mt-0.5 text-gray-500 flex-shrink-0" />
                       <div>
                         <p className="text-gray-600">Genética:</p>
-                        <p className="font-semibold text-gray-800">{String(genetics.lineage || '')}</p>
+                        <p className="font-semibold text-gray-800">{lineage}</p>
                       </div>
                     </div>
                   )}
-                  {genetics.thc && (
+                  {thc && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">THC:</span>
-                      <span className="font-bold text-green-700">{String(genetics.thc || '')}</span>
+                      <span className="font-bold text-green-700">{thc}</span>
                     </div>
                   )}
-                  {genetics.flowering && (
+                  {flowering && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Floração:</span>
-                      <span className="font-semibold">{String(genetics.flowering || '')}</span>
+                      <span className="font-semibold">{flowering}</span>
                     </div>
                   )}
-                  {genetics.difficulty && (
+                  {difficulty && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Dificuldade:</span>
-                      <span className="font-semibold">{String(genetics.difficulty || '')}</span>
+                      <span className="font-semibold">{difficulty}</span>
                     </div>
                   )}
                 </div>
-              )}
+                );
+              })()}
 
               {/* Botão de germinar */}
               <Button

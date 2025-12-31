@@ -57,12 +57,19 @@ async function criarUsuarioVendedor() {
         role: 'SELLER',
         phone: '11999999999',
         isEmailVerified: true
+      },
+      include: {
+        sellerProfile: true
       }
     })
 
     console.log('✅ Usuário criado!')
 
     // Criar perfil de vendedor
+    if (!user?.id) {
+      throw new Error('Falha ao criar usuário');
+    }
+
     await prisma.sellerProfile.create({
       data: {
         userId: user.id,
@@ -75,6 +82,10 @@ async function criarUsuarioVendedor() {
     console.log('✅ Perfil de vendedor criado!')
 
     // Criar VirtualGrow
+    if (!user?.id) {
+      throw new Error('Usuário não encontrado');
+    }
+
     await prisma.virtualGrow.create({
       data: {
         userId: user.id,

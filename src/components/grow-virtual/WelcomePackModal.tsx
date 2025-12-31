@@ -216,28 +216,40 @@ export function WelcomePackModal({ onPackClaimed }: WelcomePackModalProps) {
                         <div className="text-center">
                           <h3 className="text-3xl font-bold mb-2">{welcomePack.seed.name}</h3>
                           
-                          {welcomePack.seed.effects.genetics && (
+                          {(() => {
+                            const genetics = welcomePack.seed.effects.genetics as Record<string, string> | undefined;
+                            if (!genetics) return null;
+                            
+                            const lineage = genetics.lineage;
+                            const era = genetics.era;
+                            const historical = genetics.historical;
+                            const thc = genetics.thc;
+                            
+                            return (
                             <div className="space-y-1 text-sm">
-                              <p className="font-semibold">
-                                📊 {String((welcomePack.seed.effects.genetics as Record<string, unknown>).lineage)}
-                              </p>
-                              {(welcomePack.seed.effects.genetics as Record<string, unknown>).era && (
+                              {lineage && (
+                                <p className="font-semibold">
+                                  📊 {lineage}
+                                </p>
+                              )}
+                              {era && (
                                 <p className="text-gray-700">
-                                  🕰️ Era: {String((welcomePack.seed.effects.genetics as Record<string, unknown>).era)}
+                                  🕰️ Era: {era}
                                 </p>
                               )}
-                              {(welcomePack.seed.effects.genetics as Record<string, unknown>).historical && (
+                              {historical && (
                                 <p className="italic text-gray-600 mt-2">
-                                  {String((welcomePack.seed.effects.genetics as Record<string, unknown>).historical)}
+                                  {historical}
                                 </p>
                               )}
-                              {(welcomePack.seed.effects.genetics as Record<string, unknown>).thc && (
+                              {thc && (
                                 <p className="font-mono text-green-700">
-                                  💚 THC: {String((welcomePack.seed.effects.genetics as Record<string, unknown>).thc)}
+                                  💚 THC: {thc}
                                 </p>
                               )}
                             </div>
-                          )}
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>

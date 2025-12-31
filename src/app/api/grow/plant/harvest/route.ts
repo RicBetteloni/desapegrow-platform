@@ -50,28 +50,25 @@ function calculateHarvestReward(
   };
 }
 
-function generateCardData(plant: Record<string, unknown>, quality: string, rarity: ItemRarity) {
+function generateCardData(plant: Record<string, unknown>, quality: string, rarity: ItemRarity): Record<string, string | number | boolean | null> {
   const genetics = plant.genetics as Record<string, unknown>;
   const size = typeof plant.size === 'number' ? plant.size : 0;
   const daysGrowing = typeof plant.daysGrowing === 'number' ? plant.daysGrowing : 0;
   const health = typeof plant.health === 'number' ? plant.health : 0;
   
   return {
-    id: plant.id,
-    name: plant.name,
-    strain: plant.strain,
+    id: String(plant.id),
+    name: String(plant.name),
+    strain: String(plant.strain),
     quality,
     rarity,
-    stats: {
-      thc: genetics?.thc || 'Unknown',
-      cbd: genetics?.cbd || 'Unknown',
-      totalYield: `${size.toFixed(1)}g`,
-      growTime: `${daysGrowing.toFixed(0)} days`,
-      finalHealth: `${health}%`
-    },
-    genetics,
+    thc: String(genetics?.thc || 'Unknown'),
+    cbd: String(genetics?.cbd || 'Unknown'),
+    totalYield: `${size.toFixed(1)}g`,
+    growTime: `${daysGrowing.toFixed(0)} days`,
+    finalHealth: `${health}%`,
     harvestedAt: new Date().toISOString(),
-    growId: plant.growId
+    growId: String(plant.growId)
   };
 }
 
@@ -128,7 +125,7 @@ export async function POST(req: NextRequest) {
       data: {
         harvestedAt: new Date(),
         cardGenerated: true,
-        cardData
+        cardData: cardData as any
       }
     });
 
@@ -150,7 +147,7 @@ export async function POST(req: NextRequest) {
         rarity,
         name: `Card: ${plant.name} (${quality})`,
         iconUrl: `/cards/${rarity.toLowerCase()}-card.png`,
-        effects: cardData,
+        effects: cardData as any,
         sourceType: SourceType.HARVEST,
         sourceId: plantId
       }
