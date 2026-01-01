@@ -47,6 +47,28 @@ export default function Header() {
     }
   }, [])
 
+  // Limpar carrinho quando usuário deslogar
+  useEffect(() => {
+    if (!session) {
+      // Se não há sessão, limpar carrinho
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('cart')
+        window.localStorage.removeItem('favorites')
+        setCartCount(0)
+      }
+    }
+  }, [session])
+
+  const handleLogout = () => {
+    // Limpar localStorage antes de deslogar
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('cart')
+      window.localStorage.removeItem('favorites')
+      setCartCount(0)
+    }
+    signOut({ callbackUrl: '/auth/signin' })
+  }
+
   // Menu items dinâmicos baseados no role
   const menuItems = [
     { href: '/marketplace', label: 'Marketplace', icon: '🛒', roles: ['BUYER', 'SELLER', 'ADMIN'] },
@@ -202,7 +224,7 @@ export default function Header() {
                   className="w-full h-12 text-base"
                   onClick={() => {
                     setMobileMenuOpen(false)
-                    signOut()
+                    handleLogout()
                   }}
                 >
                   Sair

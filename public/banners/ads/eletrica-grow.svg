@@ -1,0 +1,49 @@
+<svg width="300" height="250" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ea580c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="250" fill="url(#grad3)"/>
+  
+  <!-- Decorative circuit lines -->
+  <path d="M 0,50 L 80,50 L 80,100 L 150,100" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.2"/>
+  <path d="M 300,200 L 220,200 L 220,150 L 150,150" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.2"/>
+  <circle cx="80" cy="50" r="5" fill="#ffffff" opacity="0.3"/>
+  <circle cx="150" cy="100" r="5" fill="#ffffff" opacity="0.3"/>
+  <circle cx="220" cy="200" r="5" fill="#ffffff" opacity="0.3"/>
+  
+  <!-- Icon -->
+  <text x="150" y="75" font-family="Arial, sans-serif" font-size="48" text-anchor="middle">⚡</text>
+  
+  <!-- Main text -->
+  <text x="150" y="115" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">
+    Instalação Elétrica
+  </text>
+  <text x="150" y="140" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#ffffff" text-anchor="middle">
+    para Grow Room
+  </text>
+  
+  <!-- Features -->
+  <text x="150" y="165" font-family="Arial, sans-serif" font-size="11" fill="#fed7aa" text-anchor="middle">
+    ✓ Dimensionamento correto
+  </text>
+  <text x="150" y="182" font-family="Arial, sans-serif" font-size="11" fill="#fed7aa" text-anchor="middle">
+    ✓ Segurança e economia
+  </text>
+  
+  <!-- CTA Button -->
+  <rect x="75" y="200" width="150" height="35" rx="17.5" fill="#ffffff"/>
+  <text x="150" y="224" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ea580c" text-anchor="middle">
+    Solicitar Orçamento
+  </text>
+  
+  <!-- Ad label -->
+  <text x="5" y="12" font-family="Arial, sans-serif" font-size="9" fill="#ffffff" opacity="0.6">
+    PUBLICIDADE
+  </text>
+</svg>

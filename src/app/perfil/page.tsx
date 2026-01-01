@@ -15,6 +15,15 @@ export default function PerfilPage() {
     return <AuthLoading />
   }
 
+  const handleLogout = () => {
+    // Limpar localStorage antes de deslogar
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('cart')
+      window.localStorage.removeItem('favorites')
+    }
+    signOut({ callbackUrl: '/auth/signin' })
+  }
+
   const user = session.user as {
     name?: string | null
     email?: string | null
@@ -129,7 +138,7 @@ export default function PerfilPage() {
               <Button 
                 variant="outline" 
                 className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                onClick={() => signOut({ callbackUrl: '/' })}
+                onClick={handleLogout}
               >
                 Sair da Conta
               </Button>

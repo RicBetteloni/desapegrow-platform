@@ -5,7 +5,7 @@ import { Badge } from '../components/ui/badge'
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <main className="bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 py-12">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center space-y-8">
