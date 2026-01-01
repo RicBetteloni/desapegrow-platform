@@ -75,6 +75,61 @@ export default function MarketplacePage() {
   )
   const [categories, setCategories] = useState<Category[]>([])
   const [currentBanner, setCurrentBanner] = useState(0)
+  const [currentTip, setCurrentTip] = useState(0)
+
+  // Dicas rotativas de cultivo
+  const growTips = [
+    {
+      icon: '💧',
+      title: 'Cuidado com Rega em Excesso',
+      text: 'Excesso de água pode causar fungus gnats e apodrecimento das raízes. Deixe o substrato secar entre as regas!'
+    },
+    {
+      icon: '🌡️',
+      title: 'Controle de VPD',
+      text: 'Ventilação correta garante um VPD ideal. Temperatura e umidade equilibradas = plantas saudáveis e melhor crescimento!'
+    },
+    {
+      icon: '💡',
+      title: 'Distância da Luz',
+      text: 'LEDs muito próximos podem queimar as folhas. Mantenha 30-45cm de distância e ajuste conforme a fase de crescimento.'
+    },
+    {
+      icon: '🌿',
+      title: 'pH Ideal do Substrato',
+      text: 'Mantenha o pH entre 6.0-7.0 para solo e 5.5-6.5 para hidro. pH incorreto bloqueia absorção de nutrientes!'
+    },
+    {
+      icon: '🍃',
+      title: 'Poda e Desfolha',
+      text: 'Remova folhas amarelas e baixeiras para melhorar circulação de ar. Mas cuidado: não estresse demais a planta!'
+    },
+    {
+      icon: '⏰',
+      title: 'Fotoperíodo Correto',
+      text: 'Vegetativo: 18h luz / 6h escuro. Floração: 12h luz / 12h escuro. Use timer para manter ciclo consistente!'
+    },
+    {
+      icon: '🧪',
+      title: 'EC e Nutrientes',
+      text: 'Meça a EC da solução nutritiva! Excesso de nutrientes (EC alta) queima as pontas das folhas. Less is more!'
+    },
+    {
+      icon: '🌬️',
+      title: 'Circulação de Ar',
+      text: 'Ventiladores oscilantes fortalecem os caules e previnem mofo. Ar parado = problemas futuros!'
+    },
+    {
+      icon: '🔍',
+      title: 'Inspeção Diária',
+      text: 'Verifique diariamente por pragas, manchas nas folhas e sinais de estresse. Prevenção é melhor que tratamento!'
+    },
+    {
+      icon: '📊',
+      title: 'Anote Tudo',
+      text: 'Mantenha um diário do cultivo: rega, nutrientes, pH, problemas. Isso ajuda a replicar sucessos e evitar erros!'
+    }
+  ]
 
   // Banners do carousel
   const banners = [
@@ -263,6 +318,24 @@ export default function MarketplacePage() {
     const interval = setInterval(nextBanner, 5000)
     return () => clearInterval(interval)
   }, [])
+
+  // Rotacionar dicas a cada visita (baseado em número aleatório salvo)
+  useEffect(() => {
+    const savedTipIndex = localStorage.getItem('currentTipIndex')
+    if (savedTipIndex) {
+      setCurrentTip(parseInt(savedTipIndex))
+    } else {
+      const randomIndex = Math.floor(Math.random() * growTips.length)
+      setCurrentTip(randomIndex)
+      localStorage.setItem('currentTipIndex', randomIndex.toString())
+    }
+  }, [])
+
+  // Mudar para próxima dica na próxima visita
+  useEffect(() => {
+    const nextTipIndex = (currentTip + 1) % growTips.length
+    localStorage.setItem('currentTipIndex', nextTipIndex.toString())
+  }, [currentTip])
 
   return (
     <div className="bg-gradient-to-br from-green-50 to-blue-50 pb-12">
@@ -581,12 +654,22 @@ export default function MarketplacePage() {
               {/* Dicas / Call to Action */}
               <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
                 <CardContent className="p-6">
-                  <h3 className="font-bold text-green-900 mb-2">💡 Dica do Dia</h3>
-                  <p className="text-sm text-green-800">
-                    Ganhe CultivoCoins a cada compra e troque por descontos exclusivos!
+                  <div className="flex items-start gap-3 mb-3">
+                    <span className="text-3xl flex-shrink-0">{growTips[currentTip].icon}</span>
+                    <div>
+                      <h3 className="font-bold text-green-900 mb-1">{growTips[currentTip].title}</h3>
+                      <p className="text-xs text-gray-500">Dica {currentTip + 1} de {growTips.length}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-green-800 leading-relaxed">
+                    {growTips[currentTip].text}
                   </p>
-                  <Button size="sm" className="w-full mt-4 bg-green-600 hover:bg-green-700">
-                    Saiba Mais
+                  <Button 
+                    size="sm" 
+                    className="w-full mt-4 bg-green-600 hover:bg-green-700"
+                    onClick={() => setCurrentTip((currentTip + 1) % growTips.length)}
+                  >
+                    Próxima Dica →
                   </Button>
                 </CardContent>
               </Card>
