@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -27,12 +26,25 @@ interface Product {
 export default function ProductDetailPage() {
   const params = useParams()
   const slug = params.slug as string
-  const { data: session } = useSession()
   const router = useRouter()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [addingToCart, setAddingToCart] = useState(false)
   const [selectedImage, setSelectedImage] = useState(0)
+
+  const fetchProduct = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/marketplace-products/${slug}`)
+      const data = await response.json()
+      if (!response.ok) throw new Error('Produto não encontrado')
+      setProduct(data.product)
+    } catch (error) {
+      console.error('Erro ao buscar produto:', error)
+      setProduct(null)
+    } finally {
+      setLoading(false)
+    }
+  }, [slug])
 
   useEffect(() => {
     if (slug) {
@@ -40,27 +52,15 @@ export default function ProductDetailPage() {
     }
     // Scroll para o topo quando a página carregar
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [slug])
-
-  const fetchProduct = async () => {
-    try {
-      const response = await fetch(`/api/marketplace-products/${slug}`)
-      const data = await response.json()
-      if (!response.ok) throw new Error('Produto não encontrado')
-      setProduct(data.product)
-    } catch (error) {
-      console.error('Erro ao carregar produto:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [slug, fetchProduct])
 
   const addToCart = () => {
     if (!product) return
     setAddingToCart(true)
     const cartJson = localStorage.getItem('cart')
-    const cart = cartJson ? JSON.parse(cartJson) : []
-    const existing = cart.find((i: any) => i.productId === product.id)
+    type CartItem = { productId: string; name: string; price: number; quantity: number; image: string }
+    const cart: CartItem[] = cartJson ? JSON.parse(cartJson) : []
+    const existing = cart.find((i: CartItem) => i.productId === product.id)
     if (existing) {
       existing.quantity += 1
     } else {

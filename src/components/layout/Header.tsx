@@ -52,6 +52,7 @@ export default function Header() {
     { href: '/marketplace', label: 'Marketplace', icon: '🛒', roles: ['BUYER', 'SELLER', 'ADMIN'] },
     { href: '/grow-virtual', label: 'Grow Virtual', icon: '🌱', roles: ['BUYER', 'SELLER', 'ADMIN'] },
     { href: '/gamification', label: 'Gamificação', icon: '🎮', roles: ['BUYER', 'SELLER', 'ADMIN'] },
+    { href: '/deals/parceiros', label: 'Deals', icon: '🔥', roles: ['BUYER', 'SELLER', 'ADMIN'] },
     { href: '/meus-pedidos', label: 'Meus Pedidos', icon: '📦', roles: ['BUYER', 'SELLER', 'ADMIN'] },
     { href: '/dashboard', label: 'Dashboard', icon: '📊', roles: ['ADMIN'] },
     { href: '/analytics', label: 'Analytics', icon: '📈', roles: ['ADMIN'] },
