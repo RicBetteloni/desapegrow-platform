@@ -176,8 +176,8 @@ export function DailyRewards() {
         : 'bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300'
     }`}>
       <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center space-x-3 flex-1">
             <span className="text-3xl">{canClaim ? '🎁' : '⏰'}</span>
             <div>
               <h3 className={`font-semibold ${
@@ -206,15 +206,15 @@ export function DailyRewards() {
             </div>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
             <Button 
               onClick={claimReward} 
               disabled={loading || !canClaim || status !== 'authenticated'}
-              className={canClaim 
+              className={`w-full md:w-auto ${canClaim 
                 ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white shadow-md font-bold' 
                 : 'bg-gray-400 cursor-not-allowed'
-              }
-              size="lg"
+              }`}
+              size="default"
             >
               {loading ? (
                 <div className="flex items-center gap-2">
@@ -236,8 +236,8 @@ export function DailyRewards() {
               onClick={resetReward}
               disabled={resetting}
               variant="outline"
-              size="lg"
-              className="border-orange-300 text-orange-600 hover:bg-orange-50"
+              size="default"
+              className="w-full md:w-auto border-orange-300 text-orange-600 hover:bg-orange-50"
             >
               {resetting ? '🔄' : '🔄 Reset (Teste)'}
             </Button>

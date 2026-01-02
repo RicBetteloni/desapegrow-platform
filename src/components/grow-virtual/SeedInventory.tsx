@@ -103,7 +103,7 @@ export function SeedInventory({ seeds, onPlant }: SeedInventoryProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {seeds.map((seed) => {
         const style = getRarityStyle(seed.rarity)
         const genetics = (seed.effects.genetics as Record<string, string> | undefined) || undefined
@@ -117,17 +117,17 @@ export function SeedInventory({ seeds, onPlant }: SeedInventoryProps) {
             }`}
             onClick={() => setSelectedSeed(seed.id)}
           >
-            <CardContent className="p-6 space-y-4">
+            <CardContent className="p-4 md:p-6 space-y-3 md:space-y-4">
               {/* Header com raridade */}
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <Badge className={`${style.badge} mb-2`}>
+                  <Badge className={`${style.badge} mb-2 text-xs`}>
                     <Sparkles className="w-3 h-3 mr-1" />
                     {seed.rarity}
                   </Badge>
-                  <h3 className="font-bold text-lg">{seed.name}</h3>
+                  <h3 className="font-bold text-base md:text-lg">{seed.name}</h3>
                 </div>
-                <div className="text-4xl">🌱</div>
+                <div className="text-3xl md:text-4xl">🌱</div>
               </div>
 
               {/* Informações da genética */}
@@ -141,7 +141,7 @@ export function SeedInventory({ seeds, onPlant }: SeedInventoryProps) {
                 const difficulty = g.difficulty;
                 
                 return (
-                <div className="space-y-2 text-sm bg-white/50 p-3 rounded-lg">
+                <div className="space-y-2 text-xs md:text-sm bg-white/50 p-2 md:p-3 rounded-lg">
                   {lineage && (
                     <div className="flex items-start gap-2">
                       <Info className="w-4 h-4 mt-0.5 text-gray-500 flex-shrink-0" />

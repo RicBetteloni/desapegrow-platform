@@ -131,39 +131,86 @@ export default function MarketplacePage() {
     }
   ]
 
-  // Banners do carousel
+  // Banners do carousel - Estilo OLX com imagens reais
   const banners = [
     {
       id: 1,
-      title: 'Grow Shop Sustentável 🌱',
-      subtitle: 'Equipamentos de cultivo seminovos com até 60% OFF - Qualidade garantida',
-      image: '/banners/grow-shop.jpg',
-      bgColor: 'from-emerald-600 via-green-600 to-teal-600',
-      link: '/marketplace?category=grow'
+      title: 'Monte seu Grow',
+      subtitle: 'Completo',
+      description: 'Kit Grow Box com iluminação LED + exaustor',
+      price: 'a partir de R$ 899',
+      image: '/kit-dark-box-eco-120.jpg',
+      bgColor: 'bg-gradient-to-br from-purple-600 to-purple-800',
+      textColor: 'text-white',
+      link: '/marketplace',
+      badge: 'Economia de até 60%',
+      imagePosition: 'right'
     },
     {
       id: 2,
-      title: 'Desapegue & Ganhe Grows ♻️',
-      subtitle: 'Venda seu equipamento usado e acumule moedas virtuais para cultivar',
-      image: '/banners/desapegue-grows.jpg',
-      bgColor: 'from-purple-600 via-indigo-600 to-blue-600',
-      link: '/vendedor/produtos/novo'
+      title: 'Iluminação LED',
+      subtitle: 'Quantum Board',
+      description: 'A melhor tecnologia para seu cultivo indoor',
+      price: 'de R$ 2.499 por R$ 1.299',
+      image: '/Iluminacao5.png',
+      bgColor: 'bg-gradient-to-br from-amber-500 to-orange-600',
+      textColor: 'text-white',
+      link: '/marketplace',
+      badge: 'Frete Grátis',
+      imagePosition: 'left'
     },
     {
       id: 3,
-      title: 'LED, Ventilação & Mais 💡',
-      subtitle: 'Monte seu grow room completo com economia e consciência ambiental',
-      image: '/banners/equipamentos.jpg',
-      bgColor: 'from-amber-600 via-orange-600 to-red-600',
-      link: '/marketplace'
+      title: 'Grow Tents',
+      subtitle: 'Profissionais',
+      description: 'Tendas refletivas de alta qualidade seminovas',
+      price: 'a partir de R$ 349',
+      image: '/tenda5.png',
+      bgColor: 'bg-gradient-to-br from-green-600 to-emerald-700',
+      textColor: 'text-white',
+      link: '/marketplace',
+      badge: 'Condição Impecável',
+      imagePosition: 'right'
     },
     {
       id: 4,
-      title: 'Cultivo Consciente 🌍',
-      subtitle: 'Reutilize, economize e contribua para um planeta mais verde',
-      image: '/banners/sustentavel.jpg',
-      bgColor: 'from-lime-600 via-green-700 to-emerald-700',
-      link: '/marketplace?destaque=sustentavel'
+      title: 'Exaustores',
+      subtitle: 'Silenciosos',
+      description: 'Controle perfeito de temperatura e odor',
+      price: 'de R$ 899 por R$ 549',
+      image: '/Exaustor1.png',
+      bgColor: 'bg-gradient-to-br from-cyan-600 to-blue-700',
+      textColor: 'text-white',
+      link: '/marketplace',
+      badge: '40% OFF',
+      imagePosition: 'left'
+    },
+    {
+      id: 5,
+      title: 'Venda seu',
+      subtitle: 'Equipamento',
+      description: 'Anuncie grátis e venda rápido',
+      price: 'Sem taxas abusivas',
+      image: '/kit-3-vasos-feltro-27l-grow.png',
+      bgColor: 'bg-gradient-to-br from-pink-600 to-rose-700',
+      textColor: 'text-white',
+      link: '/vendedor/produtos/novo',
+      badge: '🎯 Milhares de compradores',
+      imagePosition: 'right'
+    },
+    {
+      id: 6,
+      title: 'Anuncie Aqui',
+      subtitle: 'Sua Marca',
+      description: '100% público grower, alta taxa de conversão',
+      price: 'Público altamente segmentado',
+      image: null,
+      bgColor: 'bg-gradient-to-br from-indigo-600 to-violet-700',
+      textColor: 'text-white',
+      link: '/vendedor/produtos/novo',
+      badge: '🎯 Máxima Conversão',
+      imagePosition: 'center',
+      niches: ['Solo pronto', 'Consultoria', 'Elétrica', 'Impressão 3D', 'Fertilizantes', 'Camisetas', 'Grow Shop']
     }
   ]
 
@@ -315,7 +362,7 @@ export default function MarketplacePage() {
 
   // Auto-advance carousel
   useEffect(() => {
-    const interval = setInterval(nextBanner, 5000)
+    const interval = setInterval(nextBanner, 8000)
     return () => clearInterval(interval)
   }, [])
 
@@ -361,10 +408,10 @@ export default function MarketplacePage() {
         )}
 
         {/* Banner Carousel */}
-        <div className="max-w-6xl mx-auto mb-8">
-          <div className="relative overflow-hidden rounded-2xl shadow-2xl group">
+        <div className="max-w-6xl mx-auto mb-8 px-4">
+          <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-2xl group">
             {/* Banner atual */}
-            <div className="relative h-64 md:h-80">
+            <div className="relative h-auto min-h-[320px] md:h-80">
               {banners.map((banner, index) => (
                 <div
                   key={banner.id}
@@ -377,22 +424,72 @@ export default function MarketplacePage() {
                   }`}
                 >
                   <Link href={banner.link}>
-                    <div className={`w-full h-full bg-gradient-to-r ${banner.bgColor} flex items-center justify-between px-12 cursor-pointer hover:scale-[1.02] transition-transform`}>
-                      <div className="text-white max-w-xl z-10">
-                        <h2 className="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
-                          {banner.title}
-                        </h2>
-                        <p className="text-xl md:text-2xl drop-shadow-md">
-                          {banner.subtitle}
-                        </p>
-                        <Button size="lg" className="mt-6 bg-white text-gray-900 hover:bg-gray-100 font-semibold">
-                          Ver Ofertas
-                        </Button>
+                    <div className={`w-full h-full ${banner.bgColor} cursor-pointer hover:scale-[1.01] transition-all relative overflow-hidden`}>
+                      <div className={`h-full flex flex-col md:flex-row items-center ${
+                        banner.image ? (banner.imagePosition === 'right' ? 'md:flex-row' : 'md:flex-row-reverse') : 'justify-center'
+                      } gap-4 md:gap-8 px-4 md:px-16 py-6 md:py-8`}>
+                        
+                        {/* Conteúdo de Texto */}
+                        <div className={`${banner.image ? 'flex-1' : 'max-w-3xl'} ${banner.textColor} z-10 text-center ${banner.image ? 'md:text-left' : ''}`}>
+                          {/* Badge */}
+                          <div className="inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold mb-2">
+                            {banner.badge}
+                          </div>
+                          
+                          {/* Título */}
+                          <h2 className="text-2xl md:text-4xl font-black mb-1 leading-tight">
+                            {banner.title}
+                          </h2>
+                          
+                          {/* Subtítulo */}
+                          <h3 className="text-2xl md:text-4xl font-black mb-1 md:mb-2 leading-tight opacity-80">
+                            {banner.subtitle}
+                          </h3>
+                          
+                          {/* Descrição */}
+                          <p className="text-sm md:text-lg mb-2 opacity-90">
+                            {banner.description}
+                          </p>
+                          
+                          {/* Nichos (apenas para banner de anúncios) */}
+                          {banner.niches && (
+                            <div className="flex flex-wrap gap-1.5 md:gap-2 mb-2 md:mb-3 justify-center md:justify-start">
+                              {banner.niches.map((niche, idx) => (
+                                <span key={idx} className="bg-white/20 backdrop-blur-sm px-2 py-1 md:px-3 md:py-1.5 rounded-full text-xs md:text-sm font-semibold border border-white/30">
+                                  {niche}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* Preço */}
+                          <p className="text-lg md:text-2xl font-bold mb-3 md:mb-4 text-yellow-300">
+                            {banner.price}
+                          </p>
+                          
+                          {/* CTA */}
+                          <Button size="sm" className="md:h-12 bg-white text-gray-900 hover:bg-yellow-300 hover:text-gray-900 font-bold px-5 md:px-6 py-4 md:py-5 shadow-2xl hover:scale-105 transition-all">
+                            Ver ofertas
+                          </Button>
+                        </div>
+                        
+                        {/* Imagem do Produto (apenas se existir) - esconde em mobile */}
+                        {banner.image && (
+                          <div className="hidden md:flex flex-1 items-center justify-center z-10">
+                            <div className="relative w-full max-w-xs aspect-square">
+                              <img 
+                                src={banner.image} 
+                                alt={banner.title}
+                                className="w-full h-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+                              />
+                            </div>
+                          </div>
+                        )}
+                        
                       </div>
-                      {/* Placeholder para imagem/ilustração */}
-                      <div className="hidden md:block text-8xl opacity-50">
-                        🌿
-                      </div>
+                      
+                      {/* Efeito de luz de fundo */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/20 pointer-events-none"></div>
                     </div>
                   </Link>
                 </div>
@@ -402,15 +499,15 @@ export default function MarketplacePage() {
             {/* Botões de navegação */}
             <button
               onClick={prevBanner}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 md:p-3 rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-all z-50 hover:scale-110"
             >
-              <ChevronLeft className="w-6 h-6 text-gray-800" />
+              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
             </button>
             <button
               onClick={nextBanner}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 md:p-3 rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-all z-50 hover:scale-110"
             >
-              <ChevronRight className="w-6 h-6 text-gray-800" />
+              <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
             </button>
 
             {/* Indicadores */}
