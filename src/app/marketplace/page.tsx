@@ -429,6 +429,19 @@ export default function MarketplacePage() {
                         banner.image ? (banner.imagePosition === 'right' ? 'md:flex-row' : 'md:flex-row-reverse') : 'justify-center'
                       } gap-4 md:gap-8 px-4 md:px-16 py-6 md:py-8`}>
                         
+                        {/* Imagem à esquerda (quando imagePosition = 'left') */}
+                        {banner.image && banner.imagePosition === 'left' && (
+                          <div className="hidden md:flex flex-1 items-center justify-center z-10">
+                            <div className="relative w-full max-w-md aspect-square">
+                              <img 
+                                src={banner.image} 
+                                alt={banner.title}
+                                className="w-full h-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+                              />
+                            </div>
+                          </div>
+                        )}
+                        
                         {/* Conteúdo de Texto */}
                         <div className={`${banner.image ? 'flex-1' : 'max-w-3xl'} ${banner.textColor} z-10 text-center ${banner.image ? 'md:text-left' : ''}`}>
                           {/* Badge */}
@@ -453,9 +466,9 @@ export default function MarketplacePage() {
                           
                           {/* Nichos (apenas para banner de anúncios) */}
                           {banner.niches && (
-                            <div className="flex flex-wrap gap-1.5 md:gap-2 mb-2 md:mb-3 justify-center md:justify-start">
+                            <div className="flex flex-wrap gap-2 md:gap-2 mb-3 md:mb-4 justify-center md:justify-start">
                               {banner.niches.map((niche, idx) => (
-                                <span key={idx} className="bg-white/20 backdrop-blur-sm px-2 py-1 md:px-3 md:py-1.5 rounded-full text-xs md:text-sm font-semibold border border-white/30">
+                                <span key={idx} className="bg-white/30 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold border-2 border-white/50 shadow-lg">
                                   {niche}
                                 </span>
                               ))}
@@ -473,10 +486,10 @@ export default function MarketplacePage() {
                           </Button>
                         </div>
                         
-                        {/* Imagem do Produto (apenas se existir) - esconde em mobile */}
-                        {banner.image && (
+                        {/* Imagem à direita (quando imagePosition = 'right') */}
+                        {banner.image && banner.imagePosition === 'right' && (
                           <div className="hidden md:flex flex-1 items-center justify-center z-10">
-                            <div className="relative w-full max-w-xs aspect-square">
+                            <div className="relative w-full max-w-md aspect-square">
                               <img 
                                 src={banner.image} 
                                 alt={banner.title}
@@ -602,21 +615,6 @@ export default function MarketplacePage() {
           </div>
         )}
 
-        {/* Publicidade Horizontal - Banner Consultoria Jurídica */}
-        <div className="max-w-6xl mx-auto mb-8">
-          <a 
-            href="/deals/parceiros?ref=banner-juridico" 
-            target="_blank"
-            className="block hover:opacity-90 transition-opacity"
-          >
-            <img 
-              src="/banners/ads/consultoria-juridica.svg" 
-              alt="Consultoria Jurídica - Habeas Corpus para Cultivo"
-              className="w-full rounded-lg shadow-sm"
-            />
-          </a>
-        </div>
-
         {/* Produtos */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
@@ -640,17 +638,18 @@ export default function MarketplacePage() {
               {/* Coluna principal - Produtos */}
               <div className="lg:col-span-9">
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {products.map((product: Product) => {
+                  {products.map((product: Product, index: number) => {
                 const pointsEarned = Math.floor(Number(product.price) * 0.05);
                 const discountPercent = product.comparePrice
                   ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
                   : 0;
 
                 return (
-                  <div 
-                    key={product.id} 
-                    className="group cursor-pointer"
-                  >
+                  <>
+                    <div 
+                      key={product.id} 
+                      className="group cursor-pointer"
+                    >
                     {/* Imagem - aspect ratio quadrado forçado com object-cover */}
                     <Link href={`/produtos/${product.slug}`} className="block mb-3">
                       <div className="relative w-full aspect-square bg-gray-100 overflow-hidden rounded-2xl">
@@ -714,6 +713,40 @@ export default function MarketplacePage() {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Card de Publicidade - Aparece após o 8º produto */}
+                  {index === 7 && (
+                    <div className="col-span-2 sm:col-span-3 xl:col-span-4">
+                      <Card className="bg-gradient-to-br from-indigo-600 to-violet-700 border-none overflow-hidden hover:scale-[1.01] transition-all cursor-pointer">
+                        <CardContent className="p-6 md:p-8">
+                          <div className="flex flex-col md:flex-row items-center gap-6">
+                            <div className="flex-1 text-white text-center md:text-left">
+                              <div className="inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold mb-3">
+                                🎯 Publicidade Segmentada
+                              </div>
+                              <h3 className="text-2xl md:text-3xl font-black mb-2">
+                                Anuncie Aqui Sua Marca
+                              </h3>
+                              <p className="text-lg mb-4 opacity-90">
+                                100% público grower • Alta taxa de conversão
+                              </p>
+                              <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
+                                {['Solo pronto', 'Consultoria', 'Elétrica', 'Impressão 3D', 'Fertilizantes', 'Camisetas', 'Grow Shop'].map((niche, idx) => (
+                                  <span key={idx} className="bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold border-2 border-white/50">
+                                    {niche}
+                                  </span>
+                                ))}
+                              </div>
+                              <Button className="bg-white text-indigo-900 hover:bg-yellow-300 hover:text-gray-900 font-bold">
+                                Saiba Mais →
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
+                  </>
                 );
               })}
             </div>
