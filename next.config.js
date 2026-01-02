@@ -27,6 +27,11 @@ const nextConfig = {
       rules: {}, // desabilita configs especiais
     },
   },
+  // Suprime logs de requisições 404 conhecidas
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
 }
 
 export default nextConfig

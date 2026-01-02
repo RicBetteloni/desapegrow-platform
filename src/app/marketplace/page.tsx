@@ -1,8 +1,5 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
-export const runtime = 'edge'
-
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -181,7 +178,7 @@ export default function MarketplacePage() {
       description: 'Controle perfeito de temperatura e odor',
       price: 'de R$ 899 por R$ 549',
       image: '/Exaustor1.png',
-      bgColor: 'bg-gradient-to-br from-cyan-600 to-blue-700',
+      bgColor: 'bg-gradient-to-br from-red-600 to-red-700',
       textColor: 'text-white',
       link: '/marketplace',
       badge: '40% OFF',
@@ -204,14 +201,14 @@ export default function MarketplacePage() {
       id: 6,
       title: 'Anuncie Aqui',
       subtitle: 'Sua Marca',
-      description: '100% público grower, alta taxa de conversão',
+      description: '100% público grower • Alta taxa de conversão',
       price: 'Público altamente segmentado',
       image: null,
       bgColor: 'bg-gradient-to-br from-indigo-600 to-violet-700',
       textColor: 'text-white',
       link: '/vendedor/produtos/novo',
-      badge: '🎯 Máxima Conversão',
-      imagePosition: 'center',
+      badge: '🎯 Publicidade Segmentada',
+      imagePosition: null,
       niches: ['Solo pronto', 'Consultoria', 'Elétrica', 'Impressão 3D', 'Fertilizantes', 'Camisetas', 'Grow Shop']
     }
   ]
@@ -462,12 +459,12 @@ export default function MarketplacePage() {
                         banner.image 
                           ? (banner.imagePosition === 'left' ? 'md:flex-row-reverse' : 'md:flex-row')
                           : 'justify-center'
-                      } gap-4 md:gap-8 px-4 md:px-16 py-6 md:py-8`}>
+                      } gap-4 md:gap-8 px-6 md:px-16 py-6 md:py-8`}>
                         
                         {/* Conteúdo de Texto */}
                         <div className={`${banner.image ? 'flex-1 max-w-xl' : 'max-w-2xl'} ${banner.textColor} z-10 text-center ${banner.image ? 'md:text-left' : ''}`}>
                           {/* Badge */}
-                          <div className="inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold mb-2">
+                          <div className="inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold mb-3">
                             {banner.badge}
                           </div>
                           
@@ -488,9 +485,9 @@ export default function MarketplacePage() {
                           
                           {/* Nichos (apenas para banner de anúncios) */}
                           {banner.niches && (
-                            <div className="flex flex-wrap gap-2 md:gap-2 mb-3 md:mb-4 justify-center md:justify-start">
+                            <div className="flex flex-nowrap gap-2 md:gap-2 mb-3 md:mb-4 justify-center md:justify-start overflow-x-auto scrollbar-hide px-2">
                               {banner.niches.map((niche, idx) => (
-                                <span key={idx} className="bg-white/30 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold border-2 border-white/50 shadow-lg">
+                                <span key={`niche-${index}-${idx}-${niche}`} className="bg-white/30 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold border-2 border-white/50 shadow-lg whitespace-nowrap flex-shrink-0">
                                   {niche}
                                 </span>
                               ))}
@@ -503,7 +500,7 @@ export default function MarketplacePage() {
                           </p>
                           
                           {/* CTA */}
-                          <Button size="sm" className="md:h-12 bg-white text-gray-900 hover:bg-yellow-300 hover:text-gray-900 font-bold px-5 md:px-6 py-4 md:py-5 shadow-2xl hover:scale-105 transition-all">
+                          <Button size="sm" className="h-8 md:h-10 bg-white text-gray-900 hover:bg-yellow-300 hover:text-gray-900 font-bold px-3 md:px-5 py-1.5 md:py-2.5 text-xs md:text-sm shadow-2xl hover:scale-105 transition-all">
                             Ver ofertas
                           </Button>
                         </div>
@@ -546,10 +543,10 @@ export default function MarketplacePage() {
             </button>
 
             {/* Indicadores */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-              {banners.map((_, index) => (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {banners.map((banner, index) => (
                 <button
-                  key={index}
+                  key={`indicator-${index}-${banner.title}`}
                   onClick={() => setCurrentBanner(index)}
                   className={`w-2 h-2 rounded-full transition-all ${
                     index === currentBanner 
@@ -643,10 +640,10 @@ export default function MarketplacePage() {
             <CardContent className="p-6">
               <div className="text-white text-center">
                 <div className="inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold mb-3">
-                  ⚖️ Consultoria Jurídica
+                  📢 Publicidade
                 </div>
                 <h3 className="text-xl font-black mb-2">
-                  Habeas Corpus Medicinal
+                  ⚖️ Habeas Corpus Medicinal
                 </h3>
                 <p className="text-sm mb-4 opacity-90">
                   Cultivo legal com autorização judicial
@@ -659,7 +656,7 @@ export default function MarketplacePage() {
                     Acompanhamento completo
                   </span>
                 </div>
-                <Button className="bg-white text-blue-900 hover:bg-yellow-300 hover:text-gray-900 font-bold w-full">
+                <Button size="sm" className="h-9 bg-white text-blue-900 hover:bg-white/90 font-bold">
                   Saiba Mais →
                 </Button>
               </div>
@@ -784,12 +781,12 @@ export default function MarketplacePage() {
                               </p>
                               <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
                                 {['Solo pronto', 'Consultoria', 'Elétrica', 'Impressão 3D', 'Fertilizantes', 'Camisetas', 'Grow Shop'].map((niche, idx) => (
-                                  <span key={idx} className="bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold border-2 border-white/50">
+                                  <span key={`ad-niche-${idx}-${niche}`} className="bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold border-2 border-white/50">
                                     {niche}
                                   </span>
                                 ))}
                               </div>
-                              <Button className="bg-white text-indigo-900 hover:bg-yellow-300 hover:text-gray-900 font-bold">
+                              <Button size="sm" className="h-9 bg-white text-indigo-900 hover:bg-yellow-300 hover:text-gray-900 font-bold">
                                 Saiba Mais →
                               </Button>
                             </div>

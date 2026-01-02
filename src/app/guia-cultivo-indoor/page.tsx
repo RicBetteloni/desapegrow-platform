@@ -27,7 +27,7 @@ interface FAQ {
   id: number
   question: string
   category: string
-  icon: any
+  icon: React.ComponentType<any>
   answer: {
     summary: string
     details: string[]
