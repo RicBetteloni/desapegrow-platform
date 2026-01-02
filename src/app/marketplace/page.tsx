@@ -76,6 +76,8 @@ export default function MarketplacePage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [currentBanner, setCurrentBanner] = useState(0)
   const [currentTip, setCurrentTip] = useState(0)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
 
   // Dicas rotativas de cultivo
   const growTips = [
@@ -360,6 +362,32 @@ export default function MarketplacePage() {
     setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length)
   }
 
+  // Distância mínima de swipe (em pixels)
+  const minSwipeDistance = 50
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (isLeftSwipe) {
+      nextBanner()
+    } else if (isRightSwipe) {
+      prevBanner()
+    }
+  }
+
   // Auto-advance carousel
   useEffect(() => {
     const interval = setInterval(nextBanner, 8000)
@@ -409,7 +437,12 @@ export default function MarketplacePage() {
 
         {/* Banner Carousel */}
         <div className="max-w-6xl mx-auto mb-8 px-4">
-          <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-2xl group">
+          <div 
+            className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-2xl group"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
             {/* Banner atual */}
             <div className="relative h-auto min-h-[320px] md:h-80">
               {banners.map((banner, index) => (
@@ -425,25 +458,14 @@ export default function MarketplacePage() {
                 >
                   <Link href={banner.link}>
                     <div className={`w-full h-full ${banner.bgColor} cursor-pointer hover:scale-[1.01] transition-all relative overflow-hidden`}>
-                      <div className={`h-full flex flex-col md:flex-row items-center ${
-                        banner.image ? (banner.imagePosition === 'right' ? 'md:flex-row' : 'md:flex-row-reverse') : 'justify-center'
+                      <div className={`h-full flex flex-col items-center ${
+                        banner.image 
+                          ? (banner.imagePosition === 'left' ? 'md:flex-row-reverse' : 'md:flex-row')
+                          : 'justify-center'
                       } gap-4 md:gap-8 px-4 md:px-16 py-6 md:py-8`}>
                         
-                        {/* Imagem à esquerda (quando imagePosition = 'left') */}
-                        {banner.image && banner.imagePosition === 'left' && (
-                          <div className="hidden md:flex flex-1 items-center justify-center z-10">
-                            <div className="relative w-full max-w-md aspect-square">
-                              <img 
-                                src={banner.image} 
-                                alt={banner.title}
-                                className="w-full h-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300"
-                              />
-                            </div>
-                          </div>
-                        )}
-                        
                         {/* Conteúdo de Texto */}
-                        <div className={`${banner.image ? 'flex-1' : 'max-w-3xl'} ${banner.textColor} z-10 text-center ${banner.image ? 'md:text-left' : ''}`}>
+                        <div className={`${banner.image ? 'flex-1 max-w-xl' : 'max-w-2xl'} ${banner.textColor} z-10 text-center ${banner.image ? 'md:text-left' : ''}`}>
                           {/* Badge */}
                           <div className="inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold mb-2">
                             {banner.badge}
@@ -486,8 +508,8 @@ export default function MarketplacePage() {
                           </Button>
                         </div>
                         
-                        {/* Imagem à direita (quando imagePosition = 'right') */}
-                        {banner.image && banner.imagePosition === 'right' && (
+                        {/* Imagem do Produto (apenas se existir) - esconde em mobile */}
+                        {banner.image && (
                           <div className="hidden md:flex flex-1 items-center justify-center z-10">
                             <div className="relative w-full max-w-md aspect-square">
                               <img 
@@ -509,16 +531,16 @@ export default function MarketplacePage() {
               ))}
             </div>
 
-            {/* Botões de navegação */}
+            {/* Botões de navegação - Sempre visíveis em mobile, aparecem no hover em desktop */}
             <button
               onClick={prevBanner}
-              className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 md:p-3 rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-all z-50 hover:scale-110"
+              className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 md:p-3 rounded-full shadow-xl opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all z-50 hover:scale-110"
             >
               <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
             </button>
             <button
               onClick={nextBanner}
-              className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 md:p-3 rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-all z-50 hover:scale-110"
+              className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 md:p-3 rounded-full shadow-xl opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all z-50 hover:scale-110"
             >
               <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
             </button>
@@ -614,6 +636,36 @@ export default function MarketplacePage() {
             </div>
           </div>
         )}
+
+        {/* Banner Habeas Corpus - Aparece ANTES dos produtos */}
+        <div className="max-w-6xl mx-auto mb-6 px-4">
+          <Card className="bg-gradient-to-br from-blue-600 to-indigo-700 border-none overflow-hidden">
+            <CardContent className="p-6">
+              <div className="text-white text-center">
+                <div className="inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold mb-3">
+                  ⚖️ Consultoria Jurídica
+                </div>
+                <h3 className="text-xl font-black mb-2">
+                  Habeas Corpus Medicinal
+                </h3>
+                <p className="text-sm mb-4 opacity-90">
+                  Cultivo legal com autorização judicial
+                </p>
+                <div className="flex flex-wrap gap-2 mb-4 justify-center">
+                  <span className="bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold border-2 border-white/50">
+                    Segurança jurídica
+                  </span>
+                  <span className="bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold border-2 border-white/50">
+                    Acompanhamento completo
+                  </span>
+                </div>
+                <Button className="bg-white text-blue-900 hover:bg-yellow-300 hover:text-gray-900 font-bold w-full">
+                  Saiba Mais →
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Produtos */}
         <div className="mb-12">
