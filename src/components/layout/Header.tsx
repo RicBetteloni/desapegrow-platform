@@ -72,6 +72,7 @@ export default function Header() {
   // Menu items dinâmicos baseados no role
   const menuItems = [
     { href: '/marketplace', label: 'Marketplace', icon: '🛒', roles: ['BUYER', 'SELLER', 'ADMIN'] },
+    { href: '/guia-cultivo-indoor', label: 'Guia de Cultivo', icon: '📚', roles: ['BUYER', 'SELLER', 'ADMIN'] },
     { href: '/grow-virtual', label: 'Grow Virtual', icon: '🌱', roles: ['BUYER', 'SELLER', 'ADMIN'] },
     { href: '/gamification', label: 'Gamificação', icon: '🎮', roles: ['BUYER', 'SELLER', 'ADMIN'] },
     { href: '/deals/parceiros', label: 'Deals', icon: '🔥', roles: ['BUYER', 'SELLER', 'ADMIN'] },
