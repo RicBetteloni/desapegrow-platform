@@ -133,72 +133,46 @@ function MarketplaceContent() {
     }
   ]
 
-  // Banners do carousel - Estilo OLX com imagens reais
+  // Banners do carousel - Design limpo e profissional
   const banners = [
     {
       id: 1,
-      title: 'Monte seu Grow',
-      subtitle: 'Completo',
-      description: 'Kit Grow Box com iluminação LED + exaustor',
-      price: 'a partir de R$ 899',
+      title: 'Equipamentos Seminovos',
+      subtitle: 'Até 60% mais barato',
+      description: 'Encontre kits completos, iluminação LED e muito mais',
+      price: 'a partir de R$ 299',
       image: '/kit-dark-box-eco-120.jpg',
-      bgColor: 'bg-gradient-to-br from-purple-600 to-purple-800',
+      bgColor: 'bg-gradient-to-br from-[#2F5F39] to-[#3A7347]',
       textColor: 'text-white',
       link: '/marketplace',
-      badge: 'Economia de até 60%',
+      badge: 'Economia Real',
       imagePosition: 'right'
     },
     {
       id: 2,
-      title: 'Iluminação LED',
-      subtitle: 'Quantum Board',
-      description: 'A melhor tecnologia para seu cultivo indoor',
-      price: 'de R$ 2.499 por R$ 1.299',
+      title: 'Venda Rápido',
+      subtitle: 'Anuncie Grátis',
+      description: 'Milhares de compradores procurando equipamentos',
+      price: 'Sem taxas abusivas',
       image: null,
-      bgColor: 'bg-gradient-to-br from-amber-500 to-orange-600',
+      bgColor: 'bg-gradient-to-br from-[#E5A12A] to-[#F5B13A]',
       textColor: 'text-white',
-      link: '/marketplace',
-      badge: 'Frete Grátis',
+      link: '/vendedor/produtos/novo',
+      badge: 'Destaque Seu Anúncio',
       imagePosition: null
     },
     {
       id: 3,
-      title: 'Grow Tents',
-      subtitle: 'Profissionais',
-      description: 'Tendas refletivas de alta qualidade seminovas',
-      price: 'a partir de R$ 349',
+      title: 'Iluminação LED',
+      subtitle: 'Quantum Board',
+      description: 'Tecnologia de ponta com preços acessíveis',
+      price: 'de R$ 2.499 por R$ 1.299',
       image: '/tenda2.jpg',
-      bgColor: 'bg-gradient-to-br from-green-600 to-emerald-700',
+      bgColor: 'bg-gradient-to-br from-[#2F5F39] to-[#3A7347]',
       textColor: 'text-white',
       link: '/marketplace',
-      badge: 'Condição Impecável',
+      badge: 'Frete Grátis',
       imagePosition: 'right'
-    },
-    {
-      id: 4,
-      title: 'Kit Completo',
-      subtitle: 'Tudo Incluído',
-      description: 'Kit completo para iniciar seu cultivo',
-      price: 'de R$ 899 por R$ 549',
-      image: '/kit-60_1_4.jpg',
-      bgColor: 'bg-gradient-to-br from-red-600 to-red-700',
-      textColor: 'text-white',
-      link: '/marketplace',
-      badge: '40% OFF',
-      imagePosition: 'left'
-    },
-    {
-      id: 5,
-      title: 'Venda seu',
-      subtitle: 'Equipamento',
-      description: 'Anuncie grátis e venda rápido',
-      price: 'Sem taxas abusivas',
-      image: null,
-      bgColor: 'bg-gradient-to-br from-pink-600 to-rose-700',
-      textColor: 'text-white',
-      link: '/vendedor/produtos/novo',
-      badge: '🎯 Milhares de compradores',
-      imagePosition: null
     },
     {
       id: 6,
@@ -381,11 +355,11 @@ function MarketplaceContent() {
     }
   }
 
-  // Auto-advance carousel
+  // Auto-advance carousel - reinicia quando currentBanner muda (navegação manual)
   useEffect(() => {
     const interval = setInterval(nextBanner, 8000)
     return () => clearInterval(interval)
-  }, [])
+  }, [currentBanner]) // Reinicia o timer quando muda de banner
 
   // Rotacionar dicas a cada visita (baseado em número aleatório salvo)
   useEffect(() => {
@@ -406,23 +380,23 @@ function MarketplaceContent() {
   }, [currentTip])
 
   return (
-    <div className="bg-gradient-to-br from-green-50 to-blue-50 pb-12">
-      <div className="container mx-auto p-6">
+    <div className="bg-[#FAF9F6] min-h-screen pb-12">
+      <div className="max-w-[1280px] mx-auto px-6 py-8">
         {/* Badge de Conta Verificada */}
         {session?.user && (
-          <div className="mb-6 max-w-4xl mx-auto">
-            <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
+          <div className="mb-6">
+            <Card className="border-[#E9EDE7] bg-white rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,.04)]">
               <CardContent className="p-4 flex items-center gap-3">
-                <ShieldCheck className="w-6 h-6 text-green-600 flex-shrink-0" />
+                <ShieldCheck className="w-5 h-5 text-[#2F5F39] flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="font-semibold text-green-900">
-                    Sua conta está verificada, isso fortalece a confiança.
+                  <p className="font-semibold text-[#1F1F1F] text-sm">
+                    Sua conta está verificada
                   </p>
-                  <p className="text-sm text-green-700">
-                    A verificação de identidade ajuda a manter o ambiente seguro para todos.
+                  <p className="text-xs text-[#6E6E6E]">
+                    A verificação fortalece a confiança na comunidade
                   </p>
                 </div>
-                <Badge className="bg-green-600 text-white">✓ Verificado</Badge>
+                <Badge className="bg-[#2F5F39] text-white text-xs rounded-full">✓ Verificado</Badge>
               </CardContent>
             </Card>
           </div>
@@ -559,19 +533,19 @@ function MarketplaceContent() {
         </div>
 
         {/* Busca */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="max-w-2xl mx-auto mb-10">
+          <form onSubmit={handleSearch} className="flex gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6E6E6E]" />
               <Input
                 type="text"
                 placeholder="Buscar produtos..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 h-12 text-lg"
+                className="pl-12 h-12 text-base bg-white border-[#E9EDE7] rounded-xl focus:border-[#2F5F39] focus:ring-[#2F5F39]"
               />
             </div>
-            <Button type="submit" size="lg" className="px-8">
+            <Button type="submit" size="lg" className="px-8 h-12 bg-[#2F5F39] hover:bg-[#3A7347] rounded-xl font-semibold">
               Buscar
             </Button>
           </form>
@@ -581,7 +555,7 @@ function MarketplaceContent() {
         {categories.length > 0 && (
           <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">📂 Filtrar por Categoria</h2>
+            <h2 className="text-2xl font-bold text-[#1F1F1F]">📂 Categorias</h2>
               {selectedCategories.length > 0 && (
                 <Button 
                   variant="outline" 
@@ -763,20 +737,20 @@ function MarketplaceContent() {
         {/* Banner Habeas Corpus - Aparece ANTES dos produtos */}
         <div className="max-w-6xl mx-auto mb-6 px-4">
           <Card className="bg-gradient-to-br from-blue-600 to-indigo-700 border-none overflow-hidden">
-            <CardContent className="p-4 relative">
+            <CardContent className="px-3 py-1 relative">
               {/* PUBLICIDADE - Canto superior esquerdo */}
-              <div className="absolute top-2 left-4 text-white/60 text-[10px] font-bold tracking-wider uppercase">
+              <div className="absolute top-1 left-3 text-white/60 text-[10px] font-bold tracking-wider uppercase">
                 PUBLICIDADE
               </div>
               
-              <div className="text-white text-center pt-3">
+              <div className="text-white text-center pt-4">
                 <h3 className="text-lg font-black mb-1">
                   ⚖️ Habeas Corpus Medicinal
                 </h3>
-                <p className="text-xs mb-3 opacity-90">
+                <p className="text-xs mb-2 opacity-90">
                   Cultivo legal com autorização judicial
                 </p>
-                <div className="flex flex-wrap gap-2 mb-3 justify-center">
+                <div className="flex flex-wrap gap-2 mb-2 justify-center">
                   <span className="bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-bold border border-white/50">
                     Segurança jurídica
                   </span>
@@ -795,7 +769,7 @@ function MarketplaceContent() {
         {/* Produtos */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">🌿 Produtos Disponíveis</h2>
+            <h2 className="text-2xl font-bold text-[#1F1F1F]">🌿 Produtos Disponíveis</h2>
             {/* Espaço para filtros adicionais */}
           </div>
           {loading ? (
@@ -829,7 +803,7 @@ function MarketplaceContent() {
                     >
                     {/* Imagem - aspect ratio quadrado forçado com object-cover */}
                     <Link href={`/produtos/${product.slug}`} className="block mb-3">
-                      <div className="relative w-full aspect-square bg-gray-100 overflow-hidden rounded-2xl">
+                      <div className="relative w-full aspect-square bg-gray-100 overflow-hidden rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,.04)] group-hover:shadow-[0_12px_28px_rgba(0,0,0,.08)] transition-shadow">
                         <img
                           src={product.images?.[0]?.url || '/placeholder.png'}
                           alt={product.name}
@@ -853,7 +827,7 @@ function MarketplaceContent() {
                         {/* Badge desconto (somente se houver) */}
                         {discountPercent > 0 && (
                           <div className="absolute top-3 left-3">
-                            <Badge className="bg-red-500 text-white text-xs font-semibold shadow-sm">
+                            <Badge className="bg-[#E5A12A] text-white text-xs font-bold shadow-lg rounded-full px-3">
                               -{discountPercent}%
                             </Badge>
                           </div>
@@ -865,7 +839,7 @@ function MarketplaceContent() {
                     <div className="flex flex-col gap-1">
                       {/* Nome do Produto */}
                       <Link href={`/produtos/${product.slug}`}>
-                        <h3 className="font-normal text-sm line-clamp-2 text-gray-900 hover:text-gray-600 leading-tight">
+                        <h3 className="font-medium text-sm line-clamp-2 text-[#1F1F1F] hover:text-[#2F5F39] leading-tight transition-colors">
                           {product.name}
                         </h3>
                       </Link>
@@ -873,17 +847,17 @@ function MarketplaceContent() {
                       {/* Preços - formato limpo sem centavos */}
                       <div className="flex items-baseline gap-2">
                         {product.comparePrice && (
-                          <span className="text-xs text-gray-400 line-through">
+                          <span className="text-xs text-[#6E6E6E] line-through">
                             R$ {Math.floor(Number(product.comparePrice))}
                           </span>
                         )}
-                        <span className="text-xl font-semibold text-gray-900">
+                        <span className="text-xl font-bold text-[#2F5F39]">
                           R$ {Math.floor(Number(product.price))}
                         </span>
                       </div>
 
                       {/* Metadata simples: Data e Localização */}
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <div className="flex items-center gap-1.5 text-xs text-[#6E6E6E]">
                         <span>Hoje</span>
                         <span>•</span>
                         <span>São Paulo</span>
@@ -894,27 +868,29 @@ function MarketplaceContent() {
                   {/* Card de Publicidade - Aparece após o 8º produto */}
                   {index === 7 && (
                     <div className="col-span-2 sm:col-span-3 xl:col-span-4">
-                      <Card className="bg-gradient-to-br from-indigo-600 to-violet-700 border-none overflow-hidden hover:scale-[1.01] transition-all cursor-pointer">
-                        <CardContent className="p-6 md:p-8">
-                          <div className="flex flex-col md:flex-row items-center gap-6">
+                      <Card className="bg-gradient-to-br from-[#2F5F39] to-[#3A7347] border-none overflow-hidden hover:scale-[1.01] transition-all cursor-pointer shadow-[0_20px_50px_rgba(47,95,57,0.15)] rounded-3xl">
+                        <CardContent className="px-4 md:px-5 py-1 relative">
+                          {/* PUBLICIDADE label */}
+                          <div className="absolute top-1 left-3 text-white/60 text-[10px] font-bold tracking-wider uppercase">
+                            PUBLICIDADE
+                          </div>
+                          
+                          <div className="flex flex-col md:flex-row items-center gap-4 pt-4">
                             <div className="flex-1 text-white text-center md:text-left">
-                              <div className="inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold mb-3">
-                                🎯 Publicidade Segmentada
-                              </div>
-                              <h3 className="text-2xl md:text-3xl font-black mb-2">
+                              <h3 className="text-2xl md:text-3xl font-black mb-1.5">
                                 Anuncie Aqui Sua Marca
                               </h3>
-                              <p className="text-lg mb-4 opacity-90">
+                              <p className="text-base mb-3 opacity-90">
                                 100% público grower • Alta taxa de conversão
                               </p>
-                              <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
-                                {['Solo pronto', 'Consultoria', 'Elétrica', 'Impressão 3D', 'Fertilizantes', 'Camisetas', 'Grow Shop'].map((niche, idx) => (
-                                  <span key={`ad-niche-${idx}-${niche}`} className="bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold border-2 border-white/50">
+                              <div className="flex flex-wrap gap-2 mb-3 justify-center md:justify-start">
+                                {['Solo pronto', 'Consultoria', 'Elétrica', 'Impressão 3D', 'Fertilizantes'].map((niche, idx) => (
+                                  <span key={`ad-niche-${idx}-${niche}`} className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold border border-white/40">
                                     {niche}
                                   </span>
                                 ))}
                               </div>
-                              <Button size="sm" className="h-9 bg-white text-indigo-900 hover:bg-yellow-300 hover:text-gray-900 font-bold">
+                              <Button size="sm" className="h-9 bg-white text-[#2F5F39] hover:bg-gray-50 font-bold rounded-xl">
                                 Saiba Mais →
                               </Button>
                             </div>
@@ -959,21 +935,21 @@ function MarketplaceContent() {
               </a>
 
               {/* Dicas / Call to Action */}
-              <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+              <Card className="bg-white border-[#E9EDE7] shadow-[0_12px_28px_rgba(0,0,0,.05)] rounded-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-3 mb-3">
                     <span className="text-3xl flex-shrink-0">{growTips[currentTip].icon}</span>
                     <div>
-                      <h3 className="font-bold text-green-900 mb-1">{growTips[currentTip].title}</h3>
-                      <p className="text-xs text-gray-500">Dica {currentTip + 1} de {growTips.length}</p>
+                      <h3 className="font-bold text-[#1F1F1F] mb-1">{growTips[currentTip].title}</h3>
+                      <p className="text-xs text-[#6E6E6E]">Dica {currentTip + 1} de {growTips.length}</p>
                     </div>
                   </div>
-                  <p className="text-sm text-green-800 leading-relaxed">
+                  <p className="text-sm text-[#6E6E6E] leading-relaxed">
                     {growTips[currentTip].text}
                   </p>
                   <Button 
                     size="sm" 
-                    className="w-full mt-4 bg-green-600 hover:bg-green-700"
+                    className="w-full mt-4 bg-[#2F5F39] hover:bg-[#3A7347] rounded-xl"
                     onClick={() => setCurrentTip((currentTip + 1) % growTips.length)}
                   >
                     Próxima Dica →

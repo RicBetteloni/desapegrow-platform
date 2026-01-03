@@ -17,7 +17,12 @@ export default function Home() {
       setCurrentCTA((prev) => (prev === 0 ? 1 : 0))
     }, 5000)
     return () => clearInterval(interval)
-  }, [])
+  }, [currentCTA]) // Reinicia o timer quando currentCTA muda
+
+  // Função para navegar manualmente (reinicia o timer automaticamente via useEffect)
+  const handleCTAChange = (index: number) => {
+    setCurrentCTA(index)
+  }
 
   const categories = [
     { name: 'Climatização', icon: '❄️', slug: 'climatizacao' },
@@ -317,7 +322,7 @@ export default function Home() {
             
             {/* Botão Anterior */}
             <button
-              onClick={() => setCurrentCTA((prev) => (prev === 0 ? 1 : 0))}
+              onClick={() => handleCTAChange(currentCTA === 0 ? 1 : 0)}
               className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:shadow-xl transition-all -ml-6"
               aria-label="CTA anterior"
             >
@@ -328,7 +333,7 @@ export default function Home() {
 
             {/* Botão Próximo */}
             <button
-              onClick={() => setCurrentCTA((prev) => (prev === 0 ? 1 : 0))}
+              onClick={() => handleCTAChange(currentCTA === 0 ? 1 : 0)}
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:shadow-xl transition-all -mr-6"
               aria-label="Próximo CTA"
             >
@@ -412,14 +417,14 @@ export default function Home() {
             {/* Indicadores de navegação */}
             <div className="flex items-center justify-center gap-2 mt-6">
               <button
-                onClick={() => setCurrentCTA(0)}
+                onClick={() => handleCTAChange(0)}
                 className={`w-2 h-2 rounded-full transition-all ${
                   currentCTA === 0 ? 'bg-[#2F5F39] w-8' : 'bg-gray-300'
                 }`}
                 aria-label="Ver CTA vendedores"
               />
               <button
-                onClick={() => setCurrentCTA(1)}
+                onClick={() => handleCTAChange(1)}
                 className={`w-2 h-2 rounded-full transition-all ${
                   currentCTA === 1 ? 'bg-[#E5A12A] w-8' : 'bg-gray-300'
                 }`}
