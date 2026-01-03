@@ -134,19 +134,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 mt-24">
-        <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <span className="text-2xl">🌱</span>
-            <span className="text-xl font-bold">Desapegrow</span>
-          </div>
-          <p className="text-gray-400">
-            O marketplace de cultivo gamificado que está revolucionando o Brasil
-          </p>
-        </div>
-      </footer>
     </main>
   )
 }

@@ -5,61 +5,30 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Iniciando seed do banco de dados...')
 
-  // Criar categorias
-  const categories = await Promise.all([
-    prisma.category.upsert({
-      where: { slug: 'iluminacao' },
-      update: {},
-      create: {
-        name: 'Iluminação',
-        slug: 'iluminacao',
-        description: 'LEDs, lâmpadas e sistemas de iluminação',
-        icon: '💡'
-      }
-    }),
-    prisma.category.upsert({
-      where: { slug: 'ventilacao' },
-      update: {},
-      create: {
-        name: 'Ventilação',
-        slug: 'ventilacao',
-        description: 'Exaustores, ventiladores e filtros',
-        icon: '🌀'
-      }
-    }),
-    prisma.category.upsert({
-      where: { slug: 'nutrientes' },
-      update: {},
-      create: {
-        name: 'Nutrientes',
-        slug: 'nutrientes',
-        description: 'Fertilizantes e suplementos',
-        icon: '🧪'
-      }
-    }),
-    prisma.category.upsert({
-      where: { slug: 'tendas' },
-      update: {},
-      create: {
-        name: 'Tendas',
-        slug: 'tendas',
-        description: 'Estufas e grow boxes',
-        icon: '🏠'
-      }
-    }),
-    prisma.category.upsert({
-      where: { slug: 'ferramentas' },
-      update: {},
-      create: {
-        name: 'Ferramentas',
-        slug: 'ferramentas',
-        description: 'Tesouras, medidores e acessórios',
-        icon: '🔧'
-      }
-    })
+  // Buscar subcategorias existentes para usar nos produtos
+  const subcategories = {
+    lampadasLed: await prisma.category.findUnique({ where: { slug: 'lampadas-led' } }),
+    growTent: await prisma.category.findUnique({ where: { slug: 'grow-tent' } }),
+    exaustores: await prisma.category.findUnique({ where: { slug: 'exaustores' } }),
+    ventiladores: await prisma.category.findUnique({ where: { slug: 'ventiladores' } }),
+    npkBasico: await prisma.category.findUnique({ where: { slug: 'npk-basico' } }),
+    floracao: await prisma.category.findUnique({ where: { slug: 'floracao' } }),
+    tesourasPoda: await prisma.category.findUnique({ where: { slug: 'tesouras-poda' } }),
+    vasos: await prisma.category.findUnique({ where: { slug: 'vasos' } }),
+    medidorPh: await prisma.category.findUnique({ where: { slug: 'medidor-ph' } }),
+    kitsCompletos: await prisma.category.findUnique({ where: { slug: 'kits-completos' } }),
+  }
+
+  // Se alguma subcategoria não existir, buscar categorias principais como fallback
+  const fallbackCategories = await Promise.all([
+    prisma.category.findFirst({ where: { slug: 'iluminacao' } }),
+    prisma.category.findFirst({ where: { slug: 'climatizacao' } }),
+    prisma.category.findFirst({ where: { slug: 'nutricao' } }),
+    prisma.category.findFirst({ where: { slug: 'tendas-kits' } }),
+    prisma.category.findFirst({ where: { slug: 'ferramentas' } }),
   ])
 
-  console.log('✅ Categorias criadas:', categories.length)
+  console.log('✅ Subcategorias encontradas para seed')
 
   // Criar usuário vendedor de teste
   const seller = await prisma.user.upsert({

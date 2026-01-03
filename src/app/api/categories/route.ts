@@ -1,16 +1,58 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     console.log('📂 Buscando categorias...')
 
     // Verificar conexão com o banco
     await prisma.$connect()
 
+    const { searchParams } = new URL(request.url)
+    const includeAll = searchParams.get('includeAll') === 'true'
+
+    // Se includeAll=true (para formulário de cadastro), retorna todas
+    if (includeAll) {
+      const categories = await prisma.category.findMany({
+        orderBy: { name: 'asc' },
+        include: {
+          _count: {
+            select: {
+              products: {
+                where: {
+                  status: 'ACTIVE'
+                }
+              }
+            }
+          }
+        }
+      })
+      console.log('✅ Todas as categorias encontradas:', categories.length)
+      return NextResponse.json({ categories })
+    }
+
+    // Caso contrário, retorna apenas categorias principais com TODAS as subcategorias
     const categories = await prisma.category.findMany({
+      where: {
+        parentId: null // Apenas categorias principais
+      },
       orderBy: { name: 'asc' },
       include: {
+        subcategories: {
+          // Retornar TODAS as subcategorias, independente de terem produtos
+          orderBy: { name: 'asc' },
+          include: {
+            _count: {
+              select: {
+                products: {
+                  where: {
+                    status: 'ACTIVE'
+                  }
+                }
+              }
+            }
+          }
+        },
         _count: {
           select: {
             products: {
@@ -23,7 +65,7 @@ export async function GET() {
       }
     })
 
-    console.log('✅ Categorias encontradas:', categories.length)
+    console.log('✅ Categorias principais encontradas:', categories.length)
 
     return NextResponse.json({ categories })
 

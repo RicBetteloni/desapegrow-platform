@@ -29,7 +29,24 @@ export async function GET(request: Request) {
     }
 
     if (category) {
-      where.category = { slug: category }
+      // Buscar a categoria pelo slug
+      const categoryData = await prisma.category.findUnique({
+        where: { slug: category },
+        include: {
+          subcategories: true
+        }
+      })
+
+      if (categoryData) {
+        // Se for uma categoria PAI (tem subcategorias), buscar produtos dela E das subcategorias
+        if (categoryData.subcategories && categoryData.subcategories.length > 0) {
+          const categoryIds = [categoryData.id, ...categoryData.subcategories.map(sub => sub.id)]
+          where.categoryId = { in: categoryIds }
+        } else {
+          // Se for subcategoria ou categoria sem filhas, buscar apenas dela
+          where.category = { slug: category }
+        }
+      }
     }
 
     const products = await prisma.product.findMany({

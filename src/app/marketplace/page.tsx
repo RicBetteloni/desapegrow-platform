@@ -50,6 +50,10 @@ interface Category {
   slug: string
   name: string
   icon: string
+  subcategories?: Category[]
+  _count?: {
+    products: number
+  }
 }
 
 interface CartItem {
@@ -71,6 +75,7 @@ export default function MarketplacePage() {
     searchParams.get('category') ? [searchParams.get('category')!] : []
   )
   const [categories, setCategories] = useState<Category[]>([])
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
   const [currentBanner, setCurrentBanner] = useState(0)
   const [currentTip, setCurrentTip] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
@@ -290,6 +295,7 @@ export default function MarketplacePage() {
 
   const clearCategories = () => {
     setSelectedCategories([])
+    setExpandedCategory(null)
   }
 
   const addToCart = (product: Product) => {
@@ -594,43 +600,170 @@ export default function MarketplacePage() {
                 </Button>
               )}
             </div>
-            <div className="flex flex-wrap justify-center gap-4 max-w-6xl mx-auto">
+            {/* Grid 5 colunas em desktop, 3 no tablet, 2 no mobile */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 max-w-6xl mx-auto">
               {/* Botão TODOS */}
-              <Card 
-                className={`hover:shadow-md transition-all cursor-pointer ${
+              <button 
+                className={`relative overflow-hidden rounded-lg border-2 transition-all duration-200 ${
                   selectedCategories.length === 0 
-                    ? 'ring-2 ring-green-500 bg-green-50' 
-                    : 'hover:border-green-200'
+                    ? 'border-green-600 bg-green-50 shadow-md' 
+                    : 'border-gray-200 bg-white hover:border-green-400 hover:shadow-sm'
                 }`}
                 onClick={clearCategories}
               >
-                <CardContent className="p-3 text-center min-w-[110px]">
-                  <div className="text-2xl mb-1">📦</div>
-                  <h3 className="font-medium text-xs">Todos</h3>
-                </CardContent>
-              </Card>
+                <div className="p-4 flex items-center gap-3">
+                  <div className="text-xl opacity-60">📦</div>
+                  <span className="font-semibold text-sm text-gray-900">Todos</span>
+                </div>
+              </button>
 
-              {/* Categorias */}
+              {/* Categorias Principais */}
               {categories.map((cat: Category) => {
                 const isSelected = selectedCategories.includes(cat.slug)
+                const isExpanded = expandedCategory === cat.slug
+                const hasSubcategories = cat.subcategories && cat.subcategories.length > 0
+                
                 return (
-                  <Card 
+                  <button 
                     key={cat.id} 
-                    className={`hover:shadow-md transition-all cursor-pointer ${
+                    className={`relative overflow-hidden rounded-lg border-2 transition-all duration-200 ${
                       isSelected 
-                        ? 'ring-2 ring-green-500 bg-green-50' 
-                        : 'hover:border-green-200'
+                        ? 'border-green-600 bg-green-50 shadow-md' 
+                        : 'border-gray-200 bg-white hover:border-green-400 hover:shadow-sm'
                     }`}
-                    onClick={() => toggleCategory(cat.slug)}
+                    onClick={() => {
+                      // Se clicar em categoria já selecionada, remove seleção
+                      if (isSelected) {
+                        setSelectedCategories(prev => prev.filter(c => c !== cat.slug))
+                        setExpandedCategory(null)
+                      } else {
+                        // Se nenhuma está selecionada, seleciona esta e expande
+                        if (selectedCategories.length === 0) {
+                          setSelectedCategories([cat.slug])
+                          if (hasSubcategories) {
+                            setExpandedCategory(cat.slug)
+                          }
+                        } else {
+                          // Se já tem outras selecionadas, apenas adiciona (multi-select)
+                          setSelectedCategories(prev => [...prev, cat.slug])
+                          // Mas não expande (para não poluir com múltiplas subcategorias)
+                          setExpandedCategory(null)
+                        }
+                      }
+                    }}
                   >
-                    <CardContent className="p-3 text-center min-w-[110px]">
-                      <div className="text-2xl mb-1">{cat.icon}</div>
-                      <h3 className="font-medium text-xs line-clamp-2">{cat.name}</h3>
-                    </CardContent>
-                  </Card>
+                    <div className="p-4 flex items-center gap-3">
+                      <div className="text-xl opacity-60">{cat.icon}</div>
+                      <span className="font-semibold text-sm text-gray-900 text-left line-clamp-2">{cat.name}</span>
+                      {hasSubcategories && (
+                        <ChevronRight 
+                          className={`ml-auto h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                        />
+                      )}
+                    </div>
+                  </button>
                 )
               })}
             </div>
+
+            {/* Subcategorias (aparecem quando UMA categoria principal está selecionada OU quando múltiplas subcategorias da mesma categoria) */}
+            {expandedCategory && categories.find(c => c.slug === expandedCategory)?.subcategories && (
+              <div className="mt-4 max-w-6xl mx-auto">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-sm font-semibold text-gray-600">
+                      Refinar por subcategoria:
+                    </span>
+                    <Badge variant="secondary" className="text-xs">
+                      {categories.find(c => c.slug === expandedCategory)?.subcategories?.length} opções
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {categories
+                      .find(c => c.slug === expandedCategory)
+                      ?.subcategories?.map((subcat: Category) => {
+                        const isSelected = selectedCategories.includes(subcat.slug)
+                        const productCount = subcat._count?.products || 0
+                        return (
+                          <button
+                            key={subcat.id}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              // Quando clica em subcategoria:
+                              if (isSelected) {
+                                // Se já está selecionada, remove ela
+                                const newCategories = selectedCategories.filter(c => c !== subcat.slug)
+                                // Se não sobrou nenhuma, volta para a categoria pai
+                                setSelectedCategories(newCategories.length > 0 ? newCategories : [expandedCategory!])
+                              } else {
+                                // Se não está, adiciona (permite múltiplas subcategorias)
+                                // Remove categoria pai se estiver no filtro
+                                const withoutParent = selectedCategories.filter(c => c !== expandedCategory)
+                                setSelectedCategories([...withoutParent, subcat.slug])
+                              }
+                            }}
+                            className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                              isSelected
+                                ? 'bg-green-600 text-white shadow-sm'
+                                : productCount > 0
+                                  ? 'bg-white border border-gray-300 text-gray-700 hover:border-green-400 hover:bg-green-50'
+                                  : 'bg-white border border-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                            }`}
+                            disabled={productCount === 0 && !isSelected}
+                          >
+                            <span className="text-base">{subcat.icon}</span>
+                            <span>{subcat.name}</span>
+                            {productCount > 0 && (
+                              <Badge 
+                                variant={isSelected ? "secondary" : "default"} 
+                                className={`ml-1 text-xs ${isSelected ? 'bg-white/20 text-white' : 'bg-green-100 text-green-700'}`}
+                              >
+                                {productCount}
+                              </Badge>
+                            )}
+                          </button>
+                        )
+                      })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Mensagem quando múltiplas CATEGORIAS PRINCIPAIS selecionadas */}
+            {selectedCategories.length > 1 && !expandedCategory && (
+              <div className="mt-4 max-w-6xl mx-auto">
+                <div className="bg-blue-50 rounded-lg p-3 border border-blue-200 text-center">
+                  <p className="text-sm text-blue-700">
+                    💡 <strong>{selectedCategories.length} categorias principais</strong> selecionadas. Mostrando todos os produtos. 
+                    <button 
+                      onClick={clearCategories}
+                      className="ml-2 underline font-semibold hover:text-blue-900"
+                    >
+                      Limpar filtros
+                    </button>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Mensagem quando múltiplas SUBCATEGORIAS selecionadas */}
+            {selectedCategories.length > 1 && expandedCategory && (
+              <div className="mt-4 max-w-6xl mx-auto">
+                <div className="bg-green-50 rounded-lg p-3 border border-green-200 text-center">
+                  <p className="text-sm text-green-700">
+                    🔍 Filtrando por <strong>{selectedCategories.length} subcategorias</strong>. 
+                    <button 
+                      onClick={() => {
+                        setSelectedCategories([expandedCategory!])
+                      }}
+                      className="ml-2 underline font-semibold hover:text-green-900"
+                    >
+                      Ver todas de {categories.find(c => c.slug === expandedCategory)?.name}
+                    </button>
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
