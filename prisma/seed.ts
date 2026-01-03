@@ -1,9 +1,18 @@
 import { PrismaClient } from '@prisma/client'
+import { execSync } from 'child_process'
 
 const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Iniciando seed do banco de dados...')
+
+  // Primeiro, executar o seed de categorias
+  console.log('📂 Criando categorias hierárquicas...')
+  try {
+    execSync('npx tsx prisma/seed-categories-hierarchy.ts', { stdio: 'inherit' })
+  } catch (error) {
+    console.log('⚠️  Erro ao criar categorias, mas continuando...')
+  }
 
   // Buscar subcategorias existentes para usar nos produtos
   const subcategories = {

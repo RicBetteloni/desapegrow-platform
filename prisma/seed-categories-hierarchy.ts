@@ -5,17 +5,6 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Iniciando seed de categorias hierárquicas...')
 
-  // Verificar se já existem categorias
-  const existingCategories = await prisma.category.findMany()
-  console.log(`📊 Categorias existentes: ${existingCategories.length}`)
-  
-  // Se já existem categorias, apenas adicionar as novas (não deletar)
-  if (existingCategories.length > 0) {
-    console.log('⚠️  Categorias já existem. Pulando criação...')
-    console.log('💡 Para recriar, delete manualmente os produtos primeiro ou use o Prisma Studio')
-    return
-  }
-
   // Estrutura baseada na pesquisa de SEO
   const categoriesData = [
     {
