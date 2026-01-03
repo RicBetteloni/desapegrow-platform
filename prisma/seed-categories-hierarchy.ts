@@ -136,8 +136,10 @@ async function main() {
     const { subcategories, ...mainCategoryData } = categoryData
     
     // Criar categoria principal
-    const mainCategory = await prisma.category.create({
-      data: mainCategoryData,
+    const mainCategory = await prisma.category.upsert({
+      where: { slug: mainCategoryData.slug },
+      update: mainCategoryData,
+      create: mainCategoryData,
     })
 
     console.log(`✅ Categoria principal criada: ${mainCategory.name}`)
@@ -145,8 +147,13 @@ async function main() {
     // Criar subcategorias
     if (subcategories && subcategories.length > 0) {
       for (const subData of subcategories) {
-        const subCategory = await prisma.category.create({
-          data: {
+        const subCategory = await prisma.category.upsert({
+          where: { slug: subData.slug },
+          update: {
+            ...subData,
+            parentId: mainCategory.id,
+          },
+          create: {
             ...subData,
             parentId: mainCategory.id,
           },
