@@ -763,26 +763,28 @@ function MarketplaceContent() {
         {/* Banner Habeas Corpus - Aparece ANTES dos produtos */}
         <div className="max-w-6xl mx-auto mb-6 px-4">
           <Card className="bg-gradient-to-br from-blue-600 to-indigo-700 border-none overflow-hidden">
-            <CardContent className="p-6">
-              <div className="text-white text-center">
-                <div className="inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold mb-3">
-                  📢 Publicidade
-                </div>
-                <h3 className="text-xl font-black mb-2">
+            <CardContent className="p-4 relative">
+              {/* PUBLICIDADE - Canto superior esquerdo */}
+              <div className="absolute top-2 left-4 text-white/60 text-[10px] font-bold tracking-wider uppercase">
+                PUBLICIDADE
+              </div>
+              
+              <div className="text-white text-center pt-3">
+                <h3 className="text-lg font-black mb-1">
                   ⚖️ Habeas Corpus Medicinal
                 </h3>
-                <p className="text-sm mb-4 opacity-90">
+                <p className="text-xs mb-3 opacity-90">
                   Cultivo legal com autorização judicial
                 </p>
-                <div className="flex flex-wrap gap-2 mb-4 justify-center">
-                  <span className="bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold border-2 border-white/50">
+                <div className="flex flex-wrap gap-2 mb-3 justify-center">
+                  <span className="bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-bold border border-white/50">
                     Segurança jurídica
                   </span>
-                  <span className="bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold border-2 border-white/50">
+                  <span className="bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-bold border border-white/50">
                     Acompanhamento completo
                   </span>
                 </div>
-                <Button size="sm" className="h-9 bg-white text-blue-900 hover:bg-white/90 font-bold">
+                <Button size="sm" className="h-8 bg-white text-blue-900 hover:bg-white/90 font-bold text-sm">
                   Saiba Mais →
                 </Button>
               </div>

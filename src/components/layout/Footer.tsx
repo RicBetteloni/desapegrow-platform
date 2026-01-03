@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -10,8 +11,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Sobre */}
           <div>
-            <h3 className="text-white font-bold text-lg mb-4">🌱 Desapegrow</h3>
-            <p className="text-sm text-gray-400 mb-4">
+            <div className="mb-4 flex justify-center overflow-hidden">
+              <Image 
+                src="/logo/logo.svg" 
+                alt="Desapegrow" 
+                width={800}
+                height={224}
+                className="h-56 w-auto brightness-0 invert scale-150 object-cover"
+              />
+            </div>
+            <p className="text-sm text-gray-400 mb-4 text-center">
               Marketplace sustentável de equipamentos para cultivo indoor. Compre e venda com segurança.
             </p>
             <div className="flex gap-4">

@@ -1,9 +1,11 @@
 'use client'
+
 import Link from 'next/link'
-import { useSession, signOut } from 'next-auth/react'
-import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { Search, ShoppingCart, User, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ShoppingCart, User, Menu, X } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 
 type CartItem = {
   quantity: number
@@ -11,10 +13,8 @@ type CartItem = {
 
 export default function Header() {
   const { data: session } = useSession()
-  const isSeller = session?.user?.role === 'SELLER'
-  const isAdmin = session?.user?.role === 'ADMIN'
+  const [query, setQuery] = useState('')
   const [cartCount, setCartCount] = useState(0)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     // Contador carrinho em tempo real
@@ -47,194 +47,88 @@ export default function Header() {
     }
   }, [])
 
-  // Limpar carrinho quando usuário deslogar
-  useEffect(() => {
-    if (!session) {
-      // Se não há sessão, limpar carrinho
-      if (typeof window !== 'undefined') {
-        window.localStorage.removeItem('cart')
-        window.localStorage.removeItem('favorites')
-        setCartCount(0)
-      }
-    }
-  }, [session])
-
-  const handleLogout = () => {
-    // Limpar localStorage antes de deslogar
-    if (typeof window !== 'undefined') {
-      window.localStorage.removeItem('cart')
-      window.localStorage.removeItem('favorites')
-      setCartCount(0)
-    }
-    signOut({ callbackUrl: '/auth/signin' })
-  }
-
-  // Menu items dinâmicos baseados no role
-  const menuItems = [
-    { href: '/marketplace', label: 'Marketplace', icon: '🛒', roles: ['BUYER', 'SELLER', 'ADMIN'] },
-    { href: '/guia-cultivo-indoor', label: 'Guia de Cultivo', icon: '📚', roles: ['BUYER', 'SELLER', 'ADMIN'] },
-    { href: '/grow-virtual', label: 'Grow Virtual', icon: '🌱', roles: ['BUYER', 'SELLER', 'ADMIN'] },
-    { href: '/gamification', label: 'Gamificação', icon: '🎮', roles: ['BUYER', 'SELLER', 'ADMIN'] },
-    { href: '/deals/parceiros', label: 'Deals', icon: '🔥', roles: ['BUYER', 'SELLER', 'ADMIN'] },
-    { href: '/meus-pedidos', label: 'Meus Pedidos', icon: '📦', roles: ['BUYER', 'SELLER', 'ADMIN'] },
-    { href: '/dashboard', label: 'Dashboard', icon: '📊', roles: ['ADMIN'] },
-    { href: '/analytics', label: 'Analytics', icon: '📈', roles: ['ADMIN'] },
-  ].filter(item => !session?.user?.role || item.roles.includes(session.user.role))
 
   return (
-    <>
-      <header className="sticky top-0 z-50 border-b bg-white shadow-md">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          {/* Logo */}
-          <Link href="/marketplace" className="flex items-center gap-2 font-bold text-lg md:text-xl text-gray-900 hover:text-green-600 transition-colors">
-            <span className="text-2xl">🌱</span>
-            <span>Desapegrow</span>
-          </Link>
-          
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-2">
-            {session ? (
-              <>
-                {menuItems.map((item) => (
-                  <Link key={item.href} href={item.href} className="cursor-pointer">
-                    <Button variant="ghost" size="sm" className="cursor-pointer text-xs xl:text-sm">
-                      <span className="hidden xl:inline">{item.icon} </span>{item.label}
-                    </Button>
-                  </Link>
-                ))}
-                
-                {isSeller && (
-                  <Link href="/vendedor" className="cursor-pointer">
-                    <Button variant="ghost" size="sm" className="bg-green-50 text-green-700 hover:bg-green-100 cursor-pointer text-xs xl:text-sm">
-                      <span className="hidden xl:inline">🏪 </span>Área do Vendedor
-                    </Button>
-                  </Link>
-                )}
-                
-                <Link href="/carrinho" className="cursor-pointer">
-                  <Button variant="ghost" size="sm" className="relative cursor-pointer">
-                    <ShoppingCart className="h-5 w-5" />
-                    {cartCount > 0 && (
-                      <div className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">
-                        {cartCount > 9 ? '9+' : cartCount}
-                      </div>
-                    )}
-                  </Button>
-                </Link>
-                
-                <Link href="/perfil" className="cursor-pointer">
-                  <Button variant="ghost" size="sm" className="cursor-pointer">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </Link>
-              </>
-            ) : (
-              <Link href="/auth/signin">
-                <Button>Entrar</Button>
-              </Link>
-            )}
-          </nav>
+    <header className="sticky top-0 z-40 bg-white shadow-[0_6px_24px_rgba(0,0,0,0.04)]">
+      <div className="max-w-[1280px] mx-auto h-24 px-4 py-5 flex items-center gap-6">
 
-          {/* Mobile Navigation */}
-          <nav className="flex lg:hidden items-center gap-2">
-            {session ? (
-              <>
-                {/* Carrinho Mobile */}
-                <Link href="/carrinho">
-                  <Button variant="ghost" size="icon" className="relative">
-                    <ShoppingCart className="h-6 w-6 text-gray-700" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">
-                        {cartCount > 9 ? '9+' : cartCount}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
+        {/* LOGO */}
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/logo/logo.svg"
+            alt="Desapegrow"
+            width={200}
+            height={60}
+            priority
+          />
+        </Link>
 
-                {/* Menu Hamburguer */}
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  aria-label="Menu"
-                >
-                  {mobileMenuOpen ? (
-                    <X className="h-7 w-7 text-gray-700" />
-                  ) : (
-                    <Menu className="h-7 w-7 text-gray-700" />
+        {/* SEARCH */}
+        <div className="hidden md:flex flex-1">
+          <div className="w-full relative">
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Buscar produtos…"
+              className="
+                w-full h-10 pl-10 pr-4
+                rounded-xl
+                bg-[#F4F6F2]
+                text-sm
+                outline-none
+                border border-transparent
+                focus:border-[#DDE7D8]
+              "
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+          </div>
+        </div>
+
+        {/* ACTIONS */}
+        <div className="flex items-center gap-2">
+          {session ? (
+            <>
+              <Link href="/carrinho">
+                <Button variant="ghost" size="icon" className="relative">
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">
+                      {cartCount > 9 ? '9+' : cartCount}
+                    </span>
                   )}
                 </Button>
-              </>
-            ) : (
+              </Link>
+              
+              <Link href="/perfil">
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                </Button>
+              </Link>
+
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </>
+          ) : (
+            <>
               <Link href="/auth/signin">
-                <Button className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6">
+                <Button
+                  variant="ghost"
+                  className="text-sm font-medium hover:bg-gray-100"
+                >
                   Entrar
                 </Button>
               </Link>
-            )}
-          </nav>
-        </div>
-      </header>
 
-      {/* Mobile Menu Dropdown - Outside header for better positioning */}
-      {mobileMenuOpen && session && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="lg:hidden fixed inset-0 bg-black/20 z-40 top-16"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          
-          {/* Menu */}
-          <div className="lg:hidden fixed top-16 left-0 right-0 bg-white border-b shadow-xl z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
-            <div className="px-4 py-4 flex flex-col gap-2">
-              {menuItems.map((item) => (
-                <Link 
-                  key={item.href} 
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-4 rounded-lg hover:bg-green-50 active:bg-green-100 transition-colors border border-transparent hover:border-green-200"
-                >
-                  <span className="text-2xl">{item.icon}</span>
-                  <span className="font-medium text-base">{item.label}</span>
-                </Link>
-              ))}
-
-              {isSeller && (
-                <Link 
-                  href="/vendedor"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-4 rounded-lg bg-green-50 hover:bg-green-100 active:bg-green-200 transition-colors border border-green-200"
-                >
-                  <span className="text-2xl">🏪</span>
-                  <span className="font-medium text-green-700 text-base">Painel Vendedor</span>
-                </Link>
-              )}
-
-              <div className="border-t pt-3 mt-2 flex flex-col gap-2">
-                <Link 
-                  href="/perfil"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors"
-                >
-                  <User className="h-6 w-6" />
-                  <span className="font-medium text-base">Meu Perfil</span>
-                </Link>
-                <Button 
-                  variant="outline" 
-                  className="w-full h-12 text-base"
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    handleLogout()
-                  }}
-                >
-                  Sair
+              <Link href="/auth/signup">
+                <Button className="bg-[#2F5F39] hover:bg-[#3A7347] text-white rounded-lg px-4 text-sm font-semibold">
+                  Criar conta
                 </Button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-    </>
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+    </header>
   )
 }
