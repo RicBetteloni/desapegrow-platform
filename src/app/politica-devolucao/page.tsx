@@ -60,8 +60,8 @@ export default function PoliticaDevolucaoPage() {
 
               <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-sm text-gray-700">
-                  <strong>💡 Como solicitar:</strong> Acesse "Meus Pedidos", selecione o produto e clique em 
-                  "Solicitar Devolução". O vendedor tem até 2 dias úteis para aprovar.
+                  <strong>💡 Como solicitar:</strong> Acesse &quot;Meus Pedidos&quot;, selecione o produto e clique em 
+                  &quot;Solicitar Devolução&quot;. O vendedor tem até 2 dias úteis para aprovar.
                 </p>
               </div>
             </section>
@@ -142,7 +142,7 @@ export default function PoliticaDevolucaoPage() {
               <ol className="list-decimal pl-6 text-gray-700 space-y-2 mb-4">
                 <li>Tire fotos do produto e da embalagem</li>
                 <li>Não use o produto</li>
-                <li>Abra uma reclamação em "Meus Pedidos"</li>
+                <li>Abra uma reclamação em &quot;Meus Pedidos&quot;</li>
                 <li>Anexe as fotos como prova</li>
                 <li>Aguarde análise do vendedor (até 2 dias úteis)</li>
               </ol>
@@ -170,7 +170,7 @@ export default function PoliticaDevolucaoPage() {
                   <div>
                     <h4 className="font-semibold text-gray-900">Solicitação</h4>
                     <p className="text-sm text-gray-700">
-                      Acesse "Meus Pedidos" e clique em "Solicitar Devolução/Troca". Informe o motivo 
+                      Acesse &quot;Meus Pedidos&quot; e clique em &quot;Solicitar Devolução/Troca&quot;. Informe o motivo 
                       e anexe fotos se necessário.
                     </p>
                   </div>
@@ -307,7 +307,7 @@ export default function PoliticaDevolucaoPage() {
                 <div className="p-3 bg-green-50 rounded-lg border border-green-200">
                   <p className="font-semibold text-gray-900">✓ Antes do Envio</p>
                   <p className="text-sm text-gray-700">
-                    Se o vendedor ainda não postou, cancele diretamente em "Meus Pedidos". 
+                    Se o vendedor ainda não postou, cancele diretamente em &quot;Meus Pedidos&quot;. 
                     Reembolso automático em até 24h.
                   </p>
                 </div>

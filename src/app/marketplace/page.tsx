@@ -8,12 +8,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { 
-  ShoppingCart, 
   Search, 
-  Star,
   AlertCircle,
   Heart,
-  TrendingUp,
   ShieldCheck,
   ChevronLeft,
   ChevronRight
@@ -224,6 +221,7 @@ export default function MarketplacePage() {
 
   useEffect(() => {
     fetchProducts()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, selectedCategories])
 
   const fetchCategories = async () => {
@@ -283,15 +281,6 @@ export default function MarketplacePage() {
     }
   }
 
-  const toggleCategory = (categorySlug: string) => {
-    setSelectedCategories(prev => {
-      if (prev.includes(categorySlug)) {
-        return prev.filter(c => c !== categorySlug)
-      } else {
-        return [...prev, categorySlug]
-      }
-    })
-  }
 
   const clearCategories = () => {
     setSelectedCategories([])
