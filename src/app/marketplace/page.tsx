@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -153,7 +154,7 @@ function MarketplaceContent() {
       subtitle: 'Quantum Board',
       description: 'A melhor tecnologia para seu cultivo indoor',
       price: 'de R$ 2.499 por R$ 1.299',
-      image: '/Iluminacao5.png',
+      image: '/Iluminacao7.jpg',
       bgColor: 'bg-gradient-to-br from-amber-500 to-orange-600',
       textColor: 'text-white',
       link: '/marketplace',
@@ -166,7 +167,7 @@ function MarketplaceContent() {
       subtitle: 'Profissionais',
       description: 'Tendas refletivas de alta qualidade seminovas',
       price: 'a partir de R$ 349',
-      image: '/tenda5.png',
+      image: '/tenda2.jpg',
       bgColor: 'bg-gradient-to-br from-green-600 to-emerald-700',
       textColor: 'text-white',
       link: '/marketplace',
@@ -504,10 +505,13 @@ function MarketplaceContent() {
                         {banner.image && (
                           <div className="hidden md:flex flex-1 items-center justify-center z-10">
                             <div className="relative w-full max-w-md aspect-square">
-                              <img 
+                              <Image 
                                 src={banner.image} 
                                 alt={banner.title}
-                                className="w-full h-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+                                fill
+                                className="object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+                                sizes="(max-width: 768px) 0vw, 400px"
+                                priority={index === currentBanner}
                               />
                             </div>
                           </div>

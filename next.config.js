@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    unoptimized: true, // Necessário para imagens locais no Vercel
     remotePatterns: [
       {
         protocol: 'https',
