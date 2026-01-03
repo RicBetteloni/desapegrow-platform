@@ -61,14 +61,14 @@ async function main() {
 
   console.log('✅ Vendedor criado:', seller.email)
 
-  // Criar produtos
+  // Criar produtos usando subcategorias (ou fallback para categorias principais)
   const products = [
     {
       name: 'LED Grow Light 300W Full Spectrum',
       slug: 'led-grow-light-300w',
       description: 'Painel LED de alta eficiência com espectro completo para todas as fases de crescimento. Economia de energia e melhor produtividade.',
       shortDesc: 'LED 300W com espectro completo',
-      categoryId: categories[0].id, // Iluminação
+      categoryId: subcategories.lampadasLed?.id || fallbackCategories[0]?.id || '',
       price: 450.00,
       comparePrice: 650.00,
       stock: 15,
@@ -79,7 +79,7 @@ async function main() {
       slug: 'tenda-cultivo-80x80',
       description: 'Grow box de alta qualidade com revestimento refletivo 95%. Estrutura robusta em metal e tecido 600D resistente.',
       shortDesc: 'Grow Box 80x80x160cm',
-      categoryId: categories[3].id, // Tendas
+      categoryId: subcategories.growTent?.id || fallbackCategories[3]?.id || ''
       price: 380.00,
       comparePrice: 520.00,
       stock: 8,
@@ -90,7 +90,7 @@ async function main() {
       slug: 'exaustor-inline-150mm',
       description: 'Exaustor inline silencioso de alta vazão. Motor duplo rolamento para maior durabilidade. Ideal para tendas médias.',
       shortDesc: 'Exaustor 150mm silencioso',
-      categoryId: categories[1].id, // Ventilação
+      categoryId: subcategories.exaustores?.id || fallbackCategories[1]?.id || ''
       price: 280.00,
       comparePrice: 380.00,
       stock: 12,
@@ -101,7 +101,7 @@ async function main() {
       slug: 'kit-nutrientes-organicos',
       description: 'Kit completo de nutrientes orgânicos para todas as fases. Inclui Grow, Bloom e Micro. Rende até 200L de solução.',
       shortDesc: 'Kit nutrição completa orgânica',
-      categoryId: categories[2].id, // Nutrientes
+      categoryId: subcategories.npkBasico?.id || fallbackCategories[2]?.id || ''
       price: 165.00,
       comparePrice: 220.00,
       stock: 25,
@@ -112,7 +112,7 @@ async function main() {
       slug: 'medidor-ph-ec-digital',
       description: 'Medidor digital de pH e condutividade elétrica com tela LCD. Calibração automática e compensação de temperatura.',
       shortDesc: 'Medidor pH/EC preciso',
-      categoryId: categories[4].id, // Ferramentas
+      categoryId: subcategories.medidorPh?.id || fallbackCategories[4]?.id || ''
       price: 95.00,
       comparePrice: 140.00,
       stock: 30,
@@ -123,7 +123,7 @@ async function main() {
       slug: 'ventilador-oscilante-40cm',
       description: 'Ventilador de parede com oscilação automática. 3 velocidades e silencioso. Essencial para circulação de ar.',
       shortDesc: 'Ventilador oscilante 40cm',
-      categoryId: categories[1].id, // Ventilação
+      categoryId: subcategories.ventiladores?.id || fallbackCategories[1]?.id || ''
       price: 120.00,
       comparePrice: 160.00,
       stock: 18,
@@ -134,7 +134,7 @@ async function main() {
       slug: 'tesoura-poda-premium',
       description: 'Tesoura profissional em aço inox com lâminas curvas. Cabo ergonômico com revestimento antiderrapante.',
       shortDesc: 'Tesoura profissional curva',
-      categoryId: categories[4].id, // Ferramentas
+      categoryId: subcategories.tesourasPoda?.id || fallbackCategories[4]?.id || ''
       price: 58.00,
       comparePrice: 85.00,
       stock: 45,
@@ -145,7 +145,7 @@ async function main() {
       slug: 'timer-digital-programavel',
       description: 'Timer digital com 8 programações diárias. Display LCD e backup de bateria. Controle preciso de iluminação.',
       shortDesc: 'Timer 8 programações/dia',
-      categoryId: categories[4].id, // Ferramentas
+      categoryId: fallbackCategories[4]?.id || ''
       price: 42.00,
       comparePrice: 65.00,
       stock: 35,
@@ -157,7 +157,7 @@ async function main() {
       slug: 'vaso-tecido-15l-smart-pot',
       description: 'Vaso de tecido respirável que promove melhor desenvolvimento radicular. Previne enovelamento de raízes.',
       shortDesc: 'Smart Pot 15L respirável',
-      categoryId: categories[4].id,
+      categoryId: subcategories.vasos?.id || fallbackCategories[4]?.id || ''
       price: 35.00,
       comparePrice: 55.00,
       stock: 40,
@@ -168,7 +168,7 @@ async function main() {
       slug: 'substrato-fibra-coco-50l',
       description: 'Substrato de fibra de coco 100% natural. Excelente retenção de água e aeração. pH balanceado.',
       shortDesc: 'Fibra Coco 50L premium',
-      categoryId: categories[2].id,
+      categoryId: fallbackCategories[2]?.id || ''
       price: 45.00,
       comparePrice: 70.00,
       stock: 30,
@@ -179,7 +179,7 @@ async function main() {
       slug: 'perlita-expandida-10l-cultivo',
       description: 'Perlita expandida para melhorar drenagem e aeração do substrato. Material inerte e reutilizável.',
       shortDesc: 'Perlita 10L drenagem',
-      categoryId: categories[2].id,
+      categoryId: fallbackCategories[2]?.id || ''
       price: 28.00,
       comparePrice: 42.00,
       stock: 50,
@@ -190,7 +190,7 @@ async function main() {
       slug: 'termohigrometro-digital-sonda',
       description: 'Medidor de temperatura e umidade com sensor externo. Display LCD grande e alarme configurável.',
       shortDesc: 'Termohigrômetro preciso',
-      categoryId: categories[4].id,
+      categoryId: fallbackCategories[4]?.id || ''
       price: 68.00,
       comparePrice: 95.00,
       stock: 25,
@@ -201,7 +201,7 @@ async function main() {
       slug: 'refletor-cooltube-150mm',
       description: 'Refletor refrigerado a ar para HPS/MH. Reduz temperatura e aumenta eficiência luminosa.',
       shortDesc: 'Cooltube 150mm refrigerado',
-      categoryId: categories[0].id,
+      categoryId: fallbackCategories[0]?.id || ''
       price: 180.00,
       comparePrice: 250.00,
       stock: 12,
@@ -212,7 +212,7 @@ async function main() {
       slug: 'filtro-carvao-ativado-150mm',
       description: 'Filtro anti-odor profissional com carvão ativado australiano. Remove 99% dos odores.',
       shortDesc: 'Filtro carvão 150mm',
-      categoryId: categories[1].id,
+      categoryId: subcategories.exaustores?.id || fallbackCategories[1]?.id || ''
       price: 320.00,
       comparePrice: 450.00,
       stock: 10,
@@ -223,7 +223,7 @@ async function main() {
       slug: 'kit-poda-profissional-5-pecas',
       description: 'Kit completo: tesoura reta, tesoura curva, tesoura colheita, pinça e lupa 60x. Case organizador incluído.',
       shortDesc: 'Kit 5 ferramentas poda',
-      categoryId: categories[4].id,
+      categoryId: subcategories.tesourasPoda?.id || fallbackCategories[4]?.id || ''
       price: 135.00,
       comparePrice: 190.00,
       stock: 20,
@@ -234,7 +234,7 @@ async function main() {
       slug: 'mangueira-flexivel-150mm-3m',
       description: 'Mangueira sanfonada com camada refletiva. Flexível e resistente a altas temperaturas.',
       shortDesc: 'Mangueira 150mm 3m',
-      categoryId: categories[1].id,
+      categoryId: subcategories.ventiladores?.id || fallbackCategories[1]?.id || ''
       price: 48.00,
       comparePrice: 75.00,
       stock: 35,
@@ -245,7 +245,7 @@ async function main() {
       slug: 'lupa-60x-led-iluminada',
       description: 'Lupa de bolso com LED UV. Ideal para verificar tricomas e detectar pragas. Bateria incluída.',
       shortDesc: 'Lupa 60x com LED UV',
-      categoryId: categories[4].id,
+      categoryId: fallbackCategories[4]?.id || ''
       price: 38.00,
       comparePrice: 58.00,
       stock: 55,
@@ -256,7 +256,7 @@ async function main() {
       slug: 'kit-30-budclip-lst-training',
       description: 'Clips reutilizáveis para técnicas LST. Material flexível que não danifica plantas. Pack com 30 unidades.',
       shortDesc: 'Kit 30 clips LST',
-      categoryId: categories[4].id,
+      categoryId: fallbackCategories[4]?.id || ''
       price: 25.00,
       comparePrice: 40.00,
       stock: 60,
@@ -267,7 +267,7 @@ async function main() {
       slug: 'tela-scrog-120x120-ajustavel',
       description: 'Rede elástica para técnica Screen of Green. Malha 5x5cm com ganchos ajustáveis. Aumenta produção.',
       shortDesc: 'Rede SCROG 120x120cm',
-      categoryId: categories[4].id,
+      categoryId: fallbackCategories[4]?.id || ''
       price: 55.00,
       comparePrice: 85.00,
       stock: 28,
@@ -278,7 +278,7 @@ async function main() {
       slug: 'balanca-digital-precisao-001g',
       description: 'Balança de precisão com tela LCD retroiluminada. 6 unidades de medida. Calibração incluída.',
       shortDesc: 'Balança 0.01g precisão',
-      categoryId: categories[4].id,
+      categoryId: fallbackCategories[4]?.id || ''
       price: 72.00,
       comparePrice: 105.00,
       stock: 32,
@@ -289,7 +289,7 @@ async function main() {
       slug: 'bomba-ar-4-saidas-15w',
       description: 'Bomba de ar silenciosa para DWC/hidroponia. 4 saídas independentes, 15W. Inclui pedras difusoras.',
       shortDesc: 'Bomba ar 4x 15W silenciosa',
-      categoryId: categories[4].id,
+      categoryId: fallbackCategories[4]?.id || ''
       price: 85.00,
       comparePrice: 125.00,
       stock: 22,
@@ -300,7 +300,7 @@ async function main() {
       slug: 'solucao-calibracao-ph-250ml',
       description: 'Kit calibração com 2 soluções buffer pH 4.0 e 7.0. Essencial para medidores digitais. Validade 2 anos.',
       shortDesc: 'Kit calibração pH 250ml',
-      categoryId: categories[2].id,
+      categoryId: fallbackCategories[2]?.id || ''
       price: 42.00,
       comparePrice: 65.00,
       stock: 45,
