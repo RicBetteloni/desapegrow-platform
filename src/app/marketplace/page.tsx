@@ -154,12 +154,12 @@ function MarketplaceContent() {
       subtitle: 'Quantum Board',
       description: 'A melhor tecnologia para seu cultivo indoor',
       price: 'de R$ 2.499 por R$ 1.299',
-      image: '/Iluminacao7.jpg',
+      image: null,
       bgColor: 'bg-gradient-to-br from-amber-500 to-orange-600',
       textColor: 'text-white',
       link: '/marketplace',
       badge: 'Frete Grátis',
-      imagePosition: 'left'
+      imagePosition: null
     },
     {
       id: 3,
@@ -193,12 +193,12 @@ function MarketplaceContent() {
       subtitle: 'Equipamento',
       description: 'Anuncie grátis e venda rápido',
       price: 'Sem taxas abusivas',
-      image: '/kit-60_1_4.jpg',
+      image: null,
       bgColor: 'bg-gradient-to-br from-pink-600 to-rose-700',
       textColor: 'text-white',
       link: '/vendedor/produtos/novo',
       badge: '🎯 Milhares de compradores',
-      imagePosition: 'right'
+      imagePosition: null
     },
     {
       id: 6,
