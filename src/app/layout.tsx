@@ -13,8 +13,10 @@ export const metadata: Metadata = {
   description: 'Compre e venda equipamentos para cultivo indoor',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
   icons: {
-    icon: '/logo/logo.svg',
-    shortcut: '/logo/logo.svg',
+    icon: [
+      { url: '/logo/logo.svg', type: 'image/svg+xml' },
+      { url: '/logo/logo.svg', sizes: '32x32', type: 'image/svg+xml' },
+    ],
     apple: '/logo/logo.svg',
   },
 }
@@ -26,6 +28,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
+      <head>
+        <link rel="icon" href="/logo/logo.svg" type="image/svg+xml" />
+        <link rel="shortcut icon" href="/logo/logo.svg" type="image/svg+xml" />
+      </head>
       <body className={`${inter.className} flex flex-col min-h-screen overflow-x-hidden`}>
         <Providers>
           <AgeVerification />
