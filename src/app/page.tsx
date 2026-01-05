@@ -40,7 +40,7 @@ export default function Home() {
       <section className="w-full bg-white relative overflow-hidden">
         {/* Background decorativo com folhas */}
         <div className="absolute inset-0 pointer-events-none opacity-30">
-          <img src="/newlayout/hero-main.png" alt="" className="w-full h-full object-cover" />
+          <img src="https://res.cloudinary.com/dasx39hlf/image/upload/v1767583834/desapegrow/home/hero-main.png" alt="" className="w-full h-full object-cover" />
         </div>
         
         <div className="max-w-[1280px] mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-[60%_40%] gap-12 items-center relative z-10">
@@ -120,7 +120,7 @@ export default function Home() {
           <div className="relative hidden md:block">
             <div className="relative w-full h-[520px] rounded-[24px] overflow-hidden shadow-[0_24px_48px_rgba(0,0,0,.15)]">
               <img
-                src="/newlayout/hero-grow.png"
+                src="https://res.cloudinary.com/dasx39hlf/image/upload/v1767583836/desapegrow/home/hero-grow.png"
                 alt="Grow indoor"
                 className="w-full h-full object-cover"
               />
@@ -168,7 +168,7 @@ export default function Home() {
 
               <div className="relative h-[190px] bg-gray-100">
                 <img
-                  src="/newlayout/hero-feature-1.png"
+                  src="https://res.cloudinary.com/dasx39hlf/image/upload/v1767583838/desapegrow/home/hero-feature-1.png"
                   alt="Climatização"
                   className="w-full h-full object-cover"
                 />
@@ -205,7 +205,7 @@ export default function Home() {
 
               <div className="relative h-[190px] bg-gray-100">
                 <img
-                  src="/newlayout/hero-feature-2.png"
+                  src="https://res.cloudinary.com/dasx39hlf/image/upload/v1767583840/desapegrow/home/hero-feature-2.png"
                   alt="Kit Grow"
                   className="w-full h-full object-cover"
                 />
@@ -242,7 +242,7 @@ export default function Home() {
 
               <div className="relative h-[190px] bg-gray-100">
                 <img
-                  src="/newlayout/hero-feature-3.png"
+                  src="https://res.cloudinary.com/dasx39hlf/image/upload/v1767583841/desapegrow/home/hero-feature-3.png"
                   alt="Tenda Grow"
                   className="w-full h-full object-cover"
                 />
