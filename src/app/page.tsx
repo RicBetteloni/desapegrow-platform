@@ -40,7 +40,7 @@ export default function Home() {
       <section className="w-full bg-white relative overflow-hidden">
         {/* Background decorativo com folhas */}
         <div className="absolute inset-0 pointer-events-none opacity-30">
-          <Image src="/newlayout/ChatGPT Image 3 de jan. de 2026, 12_10_55.png" alt="" fill className="object-cover" />
+          <Image src="/newlayout/hero-main.png" alt="" fill className="object-cover" />
         </div>
         
         <div className="max-w-[1280px] mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-[60%_40%] gap-12 items-center relative z-10">
@@ -120,7 +120,7 @@ export default function Home() {
           <div className="relative hidden md:block">
             <div className="relative w-full h-[520px] rounded-[24px] overflow-hidden shadow-[0_24px_48px_rgba(0,0,0,.15)]">
               <Image
-                src="/newlayout/ChatGPT Image 3 de jan. de 2026, 12_10_57.png"
+                src="/newlayout/hero-grow.png"
                 alt="Grow indoor"
                 fill
                 className="object-cover"
@@ -170,7 +170,7 @@ export default function Home() {
 
               <div className="relative h-[190px] bg-gray-100">
                 <Image
-                  src="/newlayout/ChatGPT Image 3 de jan. de 2026, 12_10_47.png"
+                  src="/newlayout/hero-feature-1.png"
                   alt="Climatização"
                   fill
                   className="object-cover"
@@ -208,7 +208,7 @@ export default function Home() {
 
               <div className="relative h-[190px] bg-gray-100">
                 <Image
-                  src="/newlayout/ChatGPT Image 3 de jan. de 2026, 12_10_51.png"
+                  src="/newlayout/hero-feature-2.png"
                   alt="Kit Grow"
                   fill
                   className="object-cover"
@@ -246,7 +246,7 @@ export default function Home() {
 
               <div className="relative h-[190px] bg-gray-100">
                 <Image
-                  src="/newlayout/ChatGPT Image 3 de jan. de 2026, 12_10_53.png"
+                  src="/newlayout/hero-feature-3.png"
                   alt="Tenda Grow"
                   fill
                   className="object-cover"
