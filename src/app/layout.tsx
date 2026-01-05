@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   title: 'Desapegrow - Marketplace de Equipamentos Grow',
   description: 'Compre e venda equipamentos para cultivo indoor',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
+  icons: {
+    icon: '/logo/logo.svg',
+    shortcut: '/logo/logo.svg',
+    apple: '/logo/logo.svg',
+  },
 }
 
 export default function RootLayout({

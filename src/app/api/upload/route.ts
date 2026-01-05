@@ -1,9 +1,6 @@
 // src/app/api/upload/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-
-// Simulação de um armazenamento em memória.
-// EM UM AMBIENTE DE PRODUÇÃO, substitua por um serviço real como Cloudinary, S3, etc.
-const uploadedFiles: { [key: string]: string } = {};
+import { uploadImage } from '@/lib/cloudinary';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,12 +12,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Nenhum arquivo encontrado' }, { status: 400 });
     }
 
-    // Gerar uma URL simulada e armazenar em memória.
-    // A URL real seria o link do bucket/serviço de armazenamento.
-    const fileUrl = `https://images.unsplash.com/photo-${Date.now()}?w=600&q=80`;
-    
-    // Simular o armazenamento do arquivo
-    uploadedFiles[fileUrl] = `Arquivo para ${type}`;
+    // Validar tipo de arquivo
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      return NextResponse.json({ error: 'Tipo de arquivo inválido' }, { status: 400 });
+    }
+
+    // Validar tamanho (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json({ error: 'Arquivo muito grande (max 5MB)' }, { status: 400 });
+    }
+
+    // Determinar a pasta baseado no tipo
+    const folder = type === 'produto' ? 'produtos' : type === 'perfil' ? 'usuarios' : 'outros';
+
+    // Upload para Cloudinary
+    const fileUrl = await uploadImage(file, folder);
 
     return NextResponse.json({ url: fileUrl });
   } catch (error) {
