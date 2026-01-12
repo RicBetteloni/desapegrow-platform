@@ -1,0 +1,21 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fundo verde -->
+  <rect width="32" height="32" fill="#2F5F39"/>
+  
+  <!-- Círculo branco -->
+  <circle cx="16" cy="16" r="12" fill="white"/>
+  
+  <!-- Planta simplificada -->
+  <g transform="translate(16, 16)">
+    <!-- Folhas -->
+    <ellipse cx="-3" cy="-2" rx="3" ry="2" fill="#2F5F39" transform="rotate(-30 -3 -2)"/>
+    <ellipse cx="3" cy="-2" rx="3" ry="2" fill="#2F5F39" transform="rotate(30 3 -2)"/>
+    <ellipse cx="0" cy="-4" rx="2.5" ry="1.8" fill="#2F5F39"/>
+    
+    <!-- Caule -->
+    <rect x="-0.5" y="-2" width="1" height="4" fill="#2F5F39"/>
+    
+    <!-- Vaso -->
+    <path d="M -3 2 L -2 5 L 2 5 L 3 2 Z" fill="#2F5F39"/>
+  </g>
+</svg>

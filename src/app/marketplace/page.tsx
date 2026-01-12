@@ -734,36 +734,15 @@ function MarketplaceContent() {
           </div>
         )}
 
-        {/* Banner Habeas Corpus - Aparece ANTES dos produtos */}
-        <div className="max-w-6xl mx-auto mb-6 px-4">
-          <Card className="bg-gradient-to-br from-blue-600 to-indigo-700 border-none overflow-hidden">
-            <CardContent className="px-3 py-1 relative">
-              {/* PUBLICIDADE - Canto superior esquerdo */}
-              <div className="absolute top-1 left-3 text-white/60 text-[10px] font-bold tracking-wider uppercase">
-                PUBLICIDADE
-              </div>
-              
-              <div className="text-white text-center pt-4">
-                <h3 className="text-lg font-black mb-1">
-                  ⚖️ Habeas Corpus Medicinal
-                </h3>
-                <p className="text-xs mb-2 opacity-90">
-                  Cultivo legal com autorização judicial
-                </p>
-                <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                  <span className="bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-bold border border-white/50">
-                    Segurança jurídica
-                  </span>
-                  <span className="bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-bold border border-white/50">
-                    Acompanhamento completo
-                  </span>
-                </div>
-                <Button size="sm" className="h-8 bg-white text-blue-900 hover:bg-white/90 font-bold text-sm">
-                  Saiba Mais →
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Banner Espaço Publicitário - Aparece ANTES dos produtos */}
+        <div className="max-w-6xl mx-auto mb-8 px-4">
+          <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-3xl border-2 border-dashed border-gray-300 p-8 md:p-10 shadow-sm relative">
+            <div className="text-center">
+              <div className="text-4xl mb-2">📢</div>
+              <h3 className="text-xl font-bold text-gray-600 mb-2">Espaço Publicitário</h3>
+              <p className="text-sm text-gray-500">728×90 • Entre em contato para anunciar</p>
+            </div>
+          </div>
         </div>
 
         {/* Produtos */}
@@ -868,35 +847,13 @@ function MarketplaceContent() {
                   {/* Card de Publicidade - Aparece após o 8º produto */}
                   {index === 7 && (
                     <div className="col-span-2 sm:col-span-3 xl:col-span-4">
-                      <Card className="bg-gradient-to-br from-[#2F5F39] to-[#3A7347] border-none overflow-hidden hover:scale-[1.01] transition-all cursor-pointer shadow-[0_20px_50px_rgba(47,95,57,0.15)] rounded-3xl">
-                        <CardContent className="px-4 md:px-5 py-1 relative">
-                          {/* PUBLICIDADE label */}
-                          <div className="absolute top-1 left-3 text-white/60 text-[10px] font-bold tracking-wider uppercase">
-                            PUBLICIDADE
-                          </div>
-                          
-                          <div className="flex flex-col md:flex-row items-center gap-4 pt-4">
-                            <div className="flex-1 text-white text-center md:text-left">
-                              <h3 className="text-2xl md:text-3xl font-black mb-1.5">
-                                Anuncie Aqui Sua Marca
-                              </h3>
-                              <p className="text-base mb-3 opacity-90">
-                                100% público grower • Alta taxa de conversão
-                              </p>
-                              <div className="flex flex-wrap gap-2 mb-3 justify-center md:justify-start">
-                                {['Solo pronto', 'Consultoria', 'Elétrica', 'Impressão 3D', 'Fertilizantes'].map((niche, idx) => (
-                                  <span key={`ad-niche-${idx}-${niche}`} className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold border border-white/40">
-                                    {niche}
-                                  </span>
-                                ))}
-                              </div>
-                              <Button size="sm" className="h-9 bg-white text-[#2F5F39] hover:bg-gray-50 font-bold rounded-xl">
-                                Saiba Mais →
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-3xl border-2 border-dashed border-gray-300 p-8 md:p-10 shadow-sm relative min-h-[200px] flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-4xl mb-2">📢</div>
+                          <h3 className="text-xl font-bold text-gray-600 mb-2">Espaço Publicitário</h3>
+                          <p className="text-sm text-gray-500">Entre em contato para anunciar</p>
+                        </div>
+                      </div>
                     </div>
                   )}
                   </>
