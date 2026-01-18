@@ -120,7 +120,7 @@ export default function Home() {
           <div className="relative hidden md:block">
             <div className="relative w-full h-[520px] rounded-[24px] overflow-hidden shadow-[0_24px_48px_rgba(0,0,0,.15)]">
               <img
-                src="/newlayout/Hero-grow-logo.png"
+                src="https://res.cloudinary.com/dasx39hlf/image/upload/v1768727003/desapegrow/home/hero-grow-logo.png"
                 alt="Grow indoor"
                 className="w-full h-full object-cover"
               />
