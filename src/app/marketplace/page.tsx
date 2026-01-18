@@ -194,6 +194,34 @@ function MarketplaceContent() {
     fetchCategories()
   }, [])
 
+  // Sincronizar selectedCategories com URL params
+  useEffect(() => {
+    const categoryParam = searchParams.get('category')
+    if (categoryParam) {
+      setSelectedCategories([categoryParam])
+      
+      // Verificar se é uma subcategoria e expandir a categoria pai
+      for (const cat of categories) {
+        if (cat.subcategories) {
+          const isSubcategory = cat.subcategories.some(sub => sub.slug === categoryParam)
+          if (isSubcategory) {
+            setExpandedCategory(cat.slug)
+            break
+          }
+        }
+      }
+      
+      // Se for categoria pai com subcategorias, expande
+      const category = categories.find(c => c.slug === categoryParam)
+      if (category?.subcategories && category.subcategories.length > 0) {
+        setExpandedCategory(categoryParam)
+      }
+    } else {
+      setSelectedCategories([])
+      setExpandedCategory(null)
+    }
+  }, [searchParams, categories])
+
   useEffect(() => {
     fetchProducts()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -590,11 +618,18 @@ function MarketplaceContent() {
                 const isExpanded = expandedCategory === cat.slug
                 const hasSubcategories = cat.subcategories && cat.subcategories.length > 0
                 
+                // Verificar se alguma subcategoria desta categoria está selecionada
+                const hasSelectedSubcategory = hasSubcategories && 
+                  cat.subcategories?.some(sub => selectedCategories.includes(sub.slug))
+                
+                // Categoria está "ativa" se ela própria ou alguma subcategoria está selecionada
+                const isActive = isSelected || hasSelectedSubcategory
+                
                 return (
                   <button 
                     key={cat.id} 
                     className={`relative overflow-hidden rounded-lg border-2 transition-all duration-200 ${
-                      isSelected 
+                      isActive 
                         ? 'border-green-600 bg-green-50 shadow-md' 
                         : 'border-gray-200 bg-white hover:border-green-400 hover:shadow-sm'
                     }`}

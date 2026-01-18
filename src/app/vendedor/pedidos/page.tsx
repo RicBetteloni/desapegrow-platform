@@ -45,7 +45,7 @@ export default function PedidosVendedorPage() {
   const [updating, setUpdating] = useState<string | null>(null)
 
   useEffect(() => {
-    if (session?.user?.role === 'SELLER') {
+    if (session) {
       fetchOrders()
     }
   }, [session])
@@ -109,14 +109,6 @@ export default function PedidosVendedorPage() {
 
   if (loading || !session) return <AuthLoading />
 
-  if (session.user.role !== 'SELLER') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Apenas vendedores podem acessar esta página.</p>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       <nav className="bg-white/80 backdrop-blur-sm border-b p-4">
@@ -138,8 +130,8 @@ export default function PedidosVendedorPage() {
 
       <div className="container mx-auto p-6 max-w-5xl">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-1">📦 Pedidos Recebidos</h1>
-          <p className="text-gray-600">Acompanhe e atualize o status dos pedidos dos seus produtos</p>
+          <h1 className="text-3xl font-bold mb-1">💰 Minhas Vendas</h1>
+          <p className="text-gray-600">Acompanhe e gerencie os pedidos dos seus produtos</p>
         </div>
 
         {loadingOrders ? (

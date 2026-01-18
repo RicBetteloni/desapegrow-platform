@@ -46,8 +46,7 @@ async function resetAndCreateUser() {
         data: {
           email: 'vendedor@desapegrow.com',
           name: 'Vendedor Teste',
-          password: hashedPassword,
-          role: 'SELLER'
+          password: hashedPassword
         }
       });
       

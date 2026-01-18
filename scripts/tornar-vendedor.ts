@@ -21,12 +21,6 @@ async function tornarVendedor(email: string) {
       return
     }
 
-    // Atualizar role para SELLER
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { role: 'SELLER' }
-    })
-
     // Criar perfil de vendedor
     await prisma.sellerProfile.create({
       data: {

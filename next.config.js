@@ -36,6 +36,21 @@ const nextConfig = {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
+  // Desabilitar logs desnecessários
+  logging: {
+    fetches: {
+      fullUrl: false,
+    },
+  },
+  // Suprimir warnings específicos
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.ignoreWarnings = [
+        /Unsupported metadata viewport/,
+      ]
+    }
+    return config
+  },
 }
 
 export default nextConfig

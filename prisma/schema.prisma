@@ -15,7 +15,7 @@ model User {
   name              String
   phone             String?
   avatar            String?
-  role              Role                    @default(BUYER)
+  isAdmin           Boolean                 @default(false)
   isEmailVerified   Boolean                 @default(false)
   password          String
   createdAt         DateTime                @default(now())
@@ -460,12 +460,6 @@ model SellerProfile {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("seller_profiles")
-}
-
-enum Role {
-  BUYER
-  SELLER
-  ADMIN
 }
 
 enum GameLevel {

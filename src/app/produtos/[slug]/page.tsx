@@ -211,13 +211,13 @@ export default function ProductDetailPage() {
                   {product.comparePrice && (
                     <div className="flex items-center gap-2">
                       <span className="text-gray-500 line-through text-lg">
-                        R$ {product.comparePrice.toFixed(2)}
+                        R$ {Math.floor(Number(product.comparePrice))}
                       </span>
                       <Badge className="bg-red-500">-{discount}%</Badge>
                     </div>
                   )}
                   <div className="text-4xl font-bold text-green-600">
-                    R$ {product.price.toFixed(2)}
+                    R$ {Math.floor(Number(product.price))}
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Package className="w-4 h-4" />

@@ -57,9 +57,10 @@ export default function Header() {
           <Image
             src="/logo/logo.svg"
             alt="Desapegrow"
-            width={200}
-            height={60}
+            width={180}
+            height={50}
             priority
+            className="h-auto"
           />
         </Link>
 
@@ -88,6 +89,13 @@ export default function Header() {
         <div className="flex items-center gap-2">
           {session ? (
             <>
+              {/* Botão Anunciar - destaque */}
+              <Link href="/vendedor/produtos/novo" className="hidden md:block">
+                <Button className="bg-[#E5A12A] hover:bg-[#F5B13A] text-white rounded-lg px-4 text-sm font-semibold">
+                  + Anunciar Grátis
+                </Button>
+              </Link>
+
               <Link href="/carrinho">
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart className="h-5 w-5" />

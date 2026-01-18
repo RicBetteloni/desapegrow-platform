@@ -47,7 +47,6 @@ async function main() {
       email: 'vendedor@desapegrow.com',
       name: 'Vendedor Teste',
       password: '$2a$10$X8qZ9Z8Z8Z8Z8Z8Z8Z8Z8u', // senha: "123456"
-      role: 'SELLER',
       gameProfile: {
         create: {
           totalPoints: 0,

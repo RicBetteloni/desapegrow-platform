@@ -12,7 +12,7 @@ async function main() {
       id: true,
       name: true,
       email: true,
-      role: true
+      isAdmin: true
     }
   });
 
@@ -21,7 +21,7 @@ async function main() {
     console.log(`${index + 1}. ${user.name || 'Sem nome'}`);
     console.log(`   Email: ${user.email}`);
     console.log(`   ID: ${user.id}`);
-    console.log(`   Role: ${user.role}\n`);
+    console.log(`   Admin: ${user.isAdmin ? 'Sim' : 'Não'}\n`);
   });
 
   // Verificar quantas plantas cada um tem

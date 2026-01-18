@@ -12,7 +12,8 @@ import {
   TrendingUp,
   Plus,
   Edit,
-  Trash2
+  Trash2,
+  ExternalLink
 } from 'lucide-react'
 
 interface Product {
@@ -126,8 +127,8 @@ export default function VendedorDashboard() {
         {/* Header da Página */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">🏪 Painel do Vendedor</h1>
-            <p className="text-gray-600">Gerencie seus produtos e vendas</p>
+            <h1 className="text-3xl font-bold mb-2">📢 Meus Anúncios</h1>
+            <p className="text-gray-600">Gerencie seus produtos à venda</p>
           </div>
           <div className="flex gap-2">
             <Link href="/vendedor/produtos/novo">
@@ -138,7 +139,8 @@ export default function VendedorDashboard() {
             </Link>
             <Link href="/vendedor/pedidos">
               <Button variant="outline" size="lg">
-                📋 Ver Pedidos
+                <ShoppingBag className="w-5 h-5 mr-2" />
+                Ver Minhas Vendas
               </Button>
             </Link>
           </div>
@@ -289,8 +291,8 @@ export default function VendedorDashboard() {
                         {/* Ações */}
                         <div className="flex gap-2">
                           <Link href={`/produtos/${product.slug}`} target="_blank">
-                            <Button variant="outline" size="sm" title="Ver como aparece no marketplace">
-                              👁️
+                            <Button variant="outline" size="sm" title="Ver no marketplace">
+                              <ExternalLink className="w-4 h-4" />
                             </Button>
                           </Link>
 

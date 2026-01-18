@@ -143,7 +143,7 @@ async function createTestPlants() {
         OR: [
           { email: 'ricardo@teste.com' },
           { email: 'ricbetteloni@hotmail.com' },
-          { role: 'ADMIN' }
+          { isAdmin: true }
         ]
       }
     });

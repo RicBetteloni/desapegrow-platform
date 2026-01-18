@@ -35,8 +35,7 @@ export async function POST(request: Request) {
         name,
         email,
         password: hashedPassword,
-        phone: phone || null,
-        role: 'BUYER'
+        phone: phone || null
       }
     })
 

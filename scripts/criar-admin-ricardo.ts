@@ -15,13 +15,13 @@ async function criarAdmin() {
       console.log('✅ Usuário já existe!')
       
       // Garantir que é ADMIN
-      if (user.role !== 'ADMIN') {
+      if (!user.isAdmin) {
         console.log('🔄 Atualizando para ADMIN...')
         await prisma.user.update({
           where: { id: user.id },
-          data: { role: 'ADMIN' }
+          data: { isAdmin: true }
         })
-        console.log('✅ Role atualizado para ADMIN!')
+        console.log('✅ Usuário atualizado para ADMIN!')
       } else {
         console.log('✅ Usuário já é ADMIN!')
       }
@@ -45,7 +45,7 @@ async function criarAdmin() {
         email: 'ricardo@teste.com',
         name: 'Ricardo Admin',
         password: hashedPassword,
-        role: 'ADMIN',
+        isAdmin: true,
         phone: '11988888888',
         isEmailVerified: true
       }

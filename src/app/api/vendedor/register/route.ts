@@ -25,14 +25,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Você já é um vendedor' }, { status: 400 })
     }
 
-    // Atualizar role do usuário
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { 
-        role: 'SELLER',
-        phone: phone || undefined
-      }
-    })
+    // Atualizar telefone do usuário se fornecido
+    if (phone) {
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { phone }
+      })
+    }
 
     // Criar perfil de vendedor
     await prisma.sellerProfile.create({

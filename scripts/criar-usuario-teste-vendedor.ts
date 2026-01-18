@@ -15,15 +15,6 @@ async function criarUsuarioVendedor() {
     if (user) {
       console.log('✅ Usuário já existe!')
       
-      // Garantir que é vendedor
-      if (user.role !== 'SELLER') {
-        console.log('🔄 Atualizando para SELLER...')
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { role: 'SELLER' }
-        })
-      }
-
       // Criar perfil de vendedor se não existir
       if (!user.sellerProfile) {
         console.log('🏪 Criando perfil de vendedor...')
@@ -54,7 +45,6 @@ async function criarUsuarioVendedor() {
         email: 'joao@teste.com',
         name: 'João Vendedor',
         password: hashedPassword,
-        role: 'SELLER',
         phone: '11999999999',
         isEmailVerified: true
       },

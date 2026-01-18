@@ -22,8 +22,8 @@ async function main() {
     where: {
       OR: [
         { email: 'ricardo@desapegrow.com' },
-        { role: 'ADMIN' },
-        { role: 'SELLER' }
+        { isAdmin: true },
+        { sellerProfile: { isNot: null } }
       ]
     },
     include: {
@@ -46,7 +46,6 @@ async function main() {
         name: 'Vendedor OLX',
         email: 'vendedor-olx@desapegrow.com',
         password: 'temp123',
-        role: 'SELLER',
         isEmailVerified: true
       },
       include: {

@@ -8,7 +8,7 @@ interface ExtendedUser extends User {
   id: string
   email: string
   name: string
-  role: string
+  isAdmin: boolean
   avatar?: string | null
   isSeller: boolean
 }
@@ -58,7 +58,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
+          isAdmin: user.isAdmin,
           avatar: user.avatar,
           isSeller: !!user.sellerProfile
         }
@@ -66,28 +66,79 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         const extendedUser = user as ExtendedUser
         token.id = extendedUser.id
-        token.role = extendedUser.role
+        token.isAdmin = extendedUser.isAdmin
         token.isSeller = extendedUser.isSeller
+        
+        // Buscar phone e avatar do banco no login
+        const dbUser = await prisma.user.findUnique({
+          where: { id: extendedUser.id },
+          select: { phone: true, avatar: true }
+        })
+        if (dbUser) {
+          token.phone = dbUser.phone
+          token.avatar = dbUser.avatar
+        }
       }
+      
+      // Se foi chamado update() manualmente, recarrega os dados do banco
+      if (trigger === 'update') {
+        console.log('🔄 JWT Update trigger - recarregando dados do banco...', session)
+        
+        if (token.id) {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            include: { sellerProfile: true }
+          })
+          if (dbUser) {
+            token.name = dbUser.name
+            token.email = dbUser.email
+            token.phone = dbUser.phone
+            token.isAdmin = dbUser.isAdmin
+            token.isSeller = !!dbUser.sellerProfile
+            console.log('✅ Token JWT atualizado:', { name: token.name, phone: token.phone })
+          }
+        }
+      }
+      
       return token
     },
     async session({ session, token }) {
-      // Type assertion para evitar erro de tipagem
-      const user = session.user as {
-        id: string
-        name: string
-        email: string
-        role: string
-        isSeller: boolean
+      // Buscar dados do banco para garantir dados atualizados
+      if (token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            isAdmin: true,
+            avatar: true,
+            createdAt: true,
+            sellerProfile: {
+              select: { id: true }
+            }
+          }
+        })
+        
+        if (dbUser) {
+          session.user = {
+            ...session.user,
+            id: dbUser.id,
+            name: dbUser.name,
+            email: dbUser.email,
+            phone: dbUser.phone,
+            isAdmin: dbUser.isAdmin,
+            avatar: dbUser.avatar,
+            createdAt: dbUser.createdAt.toISOString(),
+            isSeller: !!dbUser.sellerProfile
+          }
+        }
       }
-      
-      user.id = token.id as string
-      user.role = token.role as string
-      user.isSeller = token.isSeller as boolean
       
       return session
     }

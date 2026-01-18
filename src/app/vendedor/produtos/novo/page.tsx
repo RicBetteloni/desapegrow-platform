@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -11,18 +11,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowLeft, Upload, X } from 'lucide-react'
 
-const CATEGORIAS = [
-  { id: 'iluminacao', nome: 'Iluminação', icone: '💡' },
-  { id: 'ventilacao', nome: 'Ventilação', icone: '🌀' },
-  { id: 'nutrientes', nome: 'Nutrientes', icone: '🧪' },
-  { id: 'tendas', nome: 'Tendas', icone: '🏠' },
-  { id: 'ferramentas', nome: 'Ferramentas', icone: '🔧' }
-]
+interface Category {
+  id: string
+  name: string
+  slug: string
+  icon?: string
+  subcategories?: Category[]
+}
 
 export default function NovoProdutoPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [imageUrls, setImageUrls] = useState<string[]>([''])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+  const [uploadedImages, setUploadedImages] = useState<string[]>([''])
+  const [uploadingImages, setUploadingImages] = useState<boolean[]>([false])
   const [formData, setFormData] = useState({
     name: '',
     shortDesc: '',
@@ -35,18 +38,88 @@ export default function NovoProdutoPage() {
     status: 'ACTIVE'
   })
 
+  // Carregar categorias do banco
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories')
+        const data = await response.json()
+        setCategories(data.categories || [])
+      } catch (error) {
+        console.error('Erro ao carregar categorias:', error)
+        alert('Erro ao carregar categorias. Recarregue a página.')
+      }
+    }
+    fetchCategories()
+  }, [])
+
   const addImageUrl = () => {
-    setImageUrls([...imageUrls, ''])
+    setUploadedImages([...uploadedImages, ''])
+    setUploadingImages([...uploadingImages, false])
   }
 
-  const updateImageUrl = (index: number, value: string) => {
-    const newUrls = [...imageUrls]
-    newUrls[index] = value
-    setImageUrls(newUrls)
+  const handleImageUpload = async (index: number, file: File) => {
+    try {
+      // Marcar como fazendo upload
+      const newUploadingStates = [...uploadingImages]
+      newUploadingStates[index] = true
+      setUploadingImages(newUploadingStates)
+
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('type', 'produto')
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || data.details || 'Erro ao fazer upload')
+      }
+      
+      // Atualizar URL da imagem
+      const newImages = [...uploadedImages]
+      newImages[index] = data.url
+      setUploadedImages(newImages)
+
+      alert('✅ Imagem enviada com sucesso!')
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error)
+      const message = error instanceof Error ? error.message : 'Erro ao fazer upload da imagem'
+      alert('❌ ' + message)
+    } finally {
+      // Desmarcar upload
+      const newUploadingStates = [...uploadingImages]
+      newUploadingStates[index] = false
+      setUploadingImages(newUploadingStates)
+    }
   }
 
   const removeImageUrl = (index: number) => {
-    setImageUrls(imageUrls.filter((_, i) => i !== index))
+    setUploadedImages(uploadedImages.filter((_, i) => i !== index))
+    setUploadingImages(uploadingImages.filter((_, i) => i !== index))
+  }
+
+  const handleCategoryChange = (categoryId: string) => {
+    const category = categories.find(c => c.id === categoryId)
+    setSelectedCategory(category || null)
+    
+    // Se a categoria não tem subcategorias, já seleciona ela mesma
+    if (category && (!category.subcategories || category.subcategories.length === 0)) {
+      setFormData({ ...formData, categorySlug: category.slug })
+    } else {
+      setFormData({ ...formData, categorySlug: '' })
+    }
+  }
+
+  const handleSubcategoryChange = (subcategoryId: string) => {
+    const subcategory = selectedCategory?.subcategories?.find(c => c.id === subcategoryId)
+    if (subcategory) {
+      setFormData({ ...formData, categorySlug: subcategory.slug })
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,7 +127,7 @@ export default function NovoProdutoPage() {
     setLoading(true)
 
     try {
-      const validImageUrls = imageUrls.filter(url => url.trim() !== '')
+      const validImageUrls = uploadedImages.filter(url => url.trim() !== '')
 
       if (validImageUrls.length === 0) {
         alert('Adicione pelo menos uma imagem!')
@@ -91,8 +164,8 @@ export default function NovoProdutoPage() {
 
     } catch (error) {
       console.error('❌ Erro completo:', error)
-      const message = error instanceof Error ? error.message : 'Erro desconhecido'
-      alert('❌ Erro: ' + message)
+      const message = error instanceof Error ? error.message : 'Erro ao criar produto'
+      alert('❌ ' + message)
     } finally {
       setLoading(false)
     }
@@ -100,23 +173,14 @@ export default function NovoProdutoPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      <nav className="bg-white/80 backdrop-blur-sm border-b p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2 text-xl font-bold text-green-700">
-            <span>🌱</span>
-            <span>Desapegrow</span>
-          </Link>
+      <div className="container mx-auto p-6 max-w-3xl">
+        <div className="mb-6">
           <Link href="/vendedor">
-            <Button variant="ghost">
+            <Button variant="ghost" className="mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar
             </Button>
           </Link>
-        </div>
-      </nav>
-
-      <div className="container mx-auto p-6 max-w-3xl">
-        <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">📦 Novo Produto</h1>
           <p className="text-gray-600">Preencha as informações do produto</p>
         </div>
@@ -163,24 +227,50 @@ export default function NovoProdutoPage() {
               </div>
 
               <div>
-                <Label htmlFor="category">Categoria *</Label>
+                <Label htmlFor="category">Categoria Principal *</Label>
                 <Select
-                  value={formData.categorySlug}
-                  onValueChange={(value) => setFormData({...formData, categorySlug: value})}
+                  value={selectedCategory?.id || ''}
+                  onValueChange={handleCategoryChange}
                   required
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORIAS.map((cat) => (
+                    {categories.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>
-                        {cat.icone} {cat.nome}
+                        {cat.icon} {cat.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+
+              {selectedCategory && selectedCategory.subcategories && selectedCategory.subcategories.length > 0 && (
+                <div>
+                  <Label htmlFor="subcategory">Subcategoria *</Label>
+                  <Select
+                    value={formData.categoryId}
+                    onValueChange={handleSubcategoryChange}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione uma subcategoria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectedCategory.subcategories.map((subcat) => (
+                        <SelectItem key={subcat.id} value={subcat.id}>
+                          {subcat.icon} {subcat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {selectedCategory && (!selectedCategory.subcategories || selectedCategory.subcategories.length === 0) && (
+                <input type="hidden" value={formData.categoryId} />
+              )}
             </CardContent>
           </Card>
 
@@ -255,56 +345,76 @@ export default function NovoProdutoPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg text-sm text-blue-800">
-                💡 <strong>Dica:</strong> Use URLs de imagens do Unsplash ou hospedadas online
+                � <strong>Upload de Imagens:</strong> Selecione até 5 imagens do seu computador (JPG, PNG, WEBP - máx 5MB cada)
               </div>
 
-              {imageUrls.map((url, index) => (
-                <div key={index} className="flex gap-2">
-                  <Input
-                    value={url}
-                    onChange={(e) => updateImageUrl(index, e.target.value)}
-                    placeholder="https://exemplo.com/imagem.jpg"
-                  />
-                  {imageUrls.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeImageUrl(index)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+              {uploadedImages.map((url, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <Label htmlFor={`file-${index}`} className="cursor-pointer">
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-green-500 transition-colors">
+                          <div className="flex items-center justify-center gap-2">
+                            <Upload className="w-5 h-5 text-gray-500" />
+                            <span className="text-sm text-gray-600">
+                              {url ? 'Alterar imagem' : 'Selecionar imagem'}
+                            </span>
+                          </div>
+                          <input
+                            id={`file-${index}`}
+                            type="file"
+                            accept="image/jpeg,image/jpg,image/png,image/webp"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0]
+                              if (file) handleImageUpload(index, file)
+                            }}
+                            className="hidden"
+                            disabled={uploadingImages[index]}
+                          />
+                        </div>
+                      </Label>
+                    </div>
+                    {uploadedImages.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeImageUrl(index)}
+                        disabled={uploadingImages[index]}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {uploadingImages[index] && (
+                    <div className="text-sm text-blue-600 flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      Fazendo upload...
+                    </div>
+                  )}
+                  
+                  {url && !uploadingImages[index] && (
+                    <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden">
+                      <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                      <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs">
+                        ✓ Enviada
+                      </div>
+                    </div>
                   )}
                 </div>
               ))}
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addImageUrl}
-                className="w-full"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Adicionar Mais Imagens
-              </Button>
-
-              {/* Preview */}
-              {imageUrls.some(url => url.trim()) && (
-                <div className="grid grid-cols-3 gap-2 mt-4">
-                  {imageUrls
-                    .filter(url => url.trim())
-                    .map((url, index) => (
-                      <img
-                        key={index}
-                        src={url}
-                        alt={`Preview ${index + 1}`}
-                        className="w-full aspect-square object-cover rounded-lg"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/placeholder.png'
-                        }}
-                      />
-                    ))}
-                </div>
+              {uploadedImages.length < 5 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addImageUrl}
+                  className="w-full"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Adicionar Mais Imagens
+                </Button>
               )}
             </CardContent>
           </Card>

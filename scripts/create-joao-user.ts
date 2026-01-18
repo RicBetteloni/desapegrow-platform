@@ -29,8 +29,7 @@ async function main() {
     data: {
       email,
       name,
-      password: hashedPassword,
-      role: 'SELLER'
+      password: hashedPassword
     }
   })
 
