@@ -117,8 +117,8 @@ export default function Home() {
           </div>
 
           {/* RIGHT — tent / grow image */}
-          <div className="relative hidden md:block">
-            <div className="relative w-full h-[520px] rounded-[24px] overflow-hidden shadow-[0_24px_48px_rgba(0,0,0,.15)]">
+          <div className="relative w-full md:w-auto mt-8 md:mt-0">
+            <div className="relative w-full h-[280px] md:h-[520px] rounded-[24px] overflow-hidden shadow-[0_24px_48px_rgba(0,0,0,.15)]">
               <img
                 src="https://res.cloudinary.com/dasx39hlf/image/upload/v1768727003/desapegrow/home/hero-grow-logo.png"
                 alt="Grow indoor"
