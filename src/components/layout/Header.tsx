@@ -54,14 +54,15 @@ export default function Header() {
       <div className="max-w-[1280px] mx-auto h-24 px-4 py-5 flex items-center gap-6">
 
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
           <Image
             src="/logo/logo.svg"
             alt="Desapegrow"
             width={180}
             height={50}
             priority
-            className="h-auto"
+            quality={100}
+            className="h-10 md:h-12 w-auto"
           />
         </Link>
 
@@ -90,13 +91,14 @@ export default function Header() {
         <div className="flex items-center gap-2">
           {session ? (
             <>
-              {/* Botão Anunciar - destaque */}
+              {/* Botão Anunciar - destaque - apenas desktop */}
               <Link href="/vendedor/produtos/novo" className="hidden md:block">
                 <Button className="bg-[#E5A12A] hover:bg-[#F5B13A] text-white rounded-lg px-4 text-sm font-semibold">
                   + Anunciar Grátis
                 </Button>
               </Link>
 
+              {/* Carrinho */}
               <Link href="/carrinho">
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart className="h-5 w-5" />
@@ -108,15 +110,17 @@ export default function Header() {
                 </Button>
               </Link>
               
-              <Link href="/perfil">
+              {/* Ícone Perfil - apenas desktop */}
+              <Link href="/perfil" className="hidden md:block">
                 <Button variant="ghost" size="icon">
                   <User className="h-5 w-5" />
                 </Button>
               </Link>
 
+              {/* Hambúrguer - apenas mobile */}
               <Button 
                 variant="ghost" 
-                size="icon" 
+                size="icon"
                 className="md:hidden"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >

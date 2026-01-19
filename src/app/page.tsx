@@ -134,20 +134,20 @@ export default function Home() {
         <div className="max-w-[1280px] mx-auto px-6 py-14 space-y-6">
 
           {/* Title */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">⭐</span>
-              <h2 className="text-[24px] md:text-[26px] font-semibold text-[#1F1F1F]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xl sm:text-2xl">⭐</span>
+              <h2 className="text-[20px] sm:text-[24px] md:text-[26px] font-semibold text-[#1F1F1F]">
                 Produtos em Destaque
               </h2>
-              <span className="ml-2 bg-[#E5A12A] text-white text-xs font-bold px-2 py-1 rounded-full">
+              <span className="bg-[#E5A12A] text-white text-xs font-bold px-2 py-1 rounded-full">
                 PREMIUM
               </span>
             </div>
 
             <Link
               href="/marketplace"
-              className="text-[#2F5F39] font-semibold hover:text-[#3A7347]"
+              className="text-[#2F5F39] font-semibold hover:text-[#3A7347] whitespace-nowrap text-sm sm:text-base"
             >
               Ver todos →
             </Link>
