@@ -58,11 +58,11 @@ export default function Header() {
           <Image
             src="/logo/logo.svg"
             alt="Desapegrow"
-            width={180}
-            height={50}
+            width={200}
+            height={56}
             priority
             quality={100}
-            className="h-12 md:h-14 w-auto"
+            className="h-14 md:h-16 w-auto"
           />
         </Link>
 

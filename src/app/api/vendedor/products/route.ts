@@ -79,10 +79,21 @@ export async function POST(request: Request) {
   try {
     const session = await getSession()
 
-    console.log('🔐 POST Session:', session)
+    console.log('🔐 POST Session completa:', JSON.stringify(session, null, 2))
+    console.log('📋 Headers:', Object.fromEntries(request.headers.entries()))
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
+      console.error('❌ Sessão inválida. Session:', session)
+      console.error('❌ User ID:', session?.user?.id)
+      return NextResponse.json({ 
+        error: 'Não autenticado',
+        details: 'Sessão expirou ou inválida. Faça login novamente.',
+        debug: {
+          hasSession: !!session,
+          hasUser: !!session?.user,
+          userId: session?.user?.id
+        }
+      }, { status: 401 })
     }
 
     // Verificar se o usuário existe
