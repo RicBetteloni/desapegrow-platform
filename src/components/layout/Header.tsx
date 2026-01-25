@@ -55,15 +55,15 @@ export default function Header() {
 
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <div className="relative w-[160px] h-[48px] md:w-[240px] md:h-[72px]">
+          <div className="relative w-[200px] h-[60px] md:w-[320px] md:h-[96px]">
             <Image
               src="/logo/logo.svg"
               alt="Desapegrow"
               fill
               priority
               quality={100}
-              sizes="(max-width: 768px) 160px, 240px"
-              style={{ objectFit: 'contain' }}
+              sizes="(max-width: 768px) 200px, 320px"
+              className="object-contain md:scale-[1.6]"
             />
           </div>
         </Link>
