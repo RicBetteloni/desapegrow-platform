@@ -35,7 +35,9 @@ export default function PerfilPage() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch('/api/user/profile')
+        const response = await fetch('/api/user/profile', {
+          credentials: 'include'
+        })
         if (response.ok) {
           const data = await response.json()
           setUserData({
@@ -92,6 +94,7 @@ export default function PerfilPage() {
       
       const response = await fetch('/api/user/profile', {
         method: 'PATCH',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })

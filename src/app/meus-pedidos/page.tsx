@@ -43,7 +43,9 @@ export default function MeusPedidosPage() {
   const fetchOrders = async () => {
     try {
       console.log('🛒 Buscando pedidos do COMPRADOR:', session?.user?.id)
-      const response = await fetch('/api/orders/my-orders')
+      const response = await fetch('/api/orders/my-orders', {
+        credentials: 'include'
+      })
       
       if (!response.ok) {
         throw new Error(`Erro ${response.status}: ${response.statusText}`)

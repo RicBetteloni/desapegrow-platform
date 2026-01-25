@@ -70,8 +70,12 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         const extendedUser = user as ExtendedUser
         token.id = extendedUser.id
+        token.email = extendedUser.email
+        token.name = extendedUser.name
         token.isAdmin = extendedUser.isAdmin
         token.isSeller = extendedUser.isSeller
+        
+        console.log('🔑 JWT criado com ID:', token.id)
         
         // Buscar phone e avatar do banco no login
         const dbUser = await prisma.user.findUnique({
@@ -107,6 +111,13 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
+      // SEMPRE incluir o ID do token na session
+      if (token.id) {
+        session.user.id = token.id as string
+      }
+      
+      console.log('📋 Session callback - token.id:', token.id, 'session.user:', session.user)
+      
       // Buscar dados do banco para garantir dados atualizados
       if (token.id) {
         const dbUser = await prisma.user.findUnique({

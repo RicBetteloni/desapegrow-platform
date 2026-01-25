@@ -51,19 +51,21 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40 bg-white shadow-[0_6px_24px_rgba(0,0,0,0.04)]">
-      <div className="max-w-[1280px] mx-auto h-24 px-4 py-5 flex items-center gap-6">
+      <div className="max-w-[1280px] mx-auto h-24 md:h-32 px-4 py-3 md:py-5 flex items-center gap-4 md:gap-6">
 
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <Image
-            src="/logo/logo.svg"
-            alt="Desapegrow"
-            width={200}
-            height={56}
-            priority
-            quality={100}
-            className="h-14 md:h-16 w-auto"
-          />
+          <div className="relative w-[180px] h-[54px] md:w-[320px] md:h-[96px]">
+            <Image
+              src="/logo/logo_png.png"
+              alt="Desapegrow"
+              fill
+              priority
+              quality={100}
+              sizes="(max-width: 768px) 180px, 320px"
+              className="object-contain scale-[2.2] md:scale-[1.8]"
+            />
+          </div>
         </Link>
 
         {/* SEARCH */}

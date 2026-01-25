@@ -136,7 +136,11 @@ export function DailyRewards() {
     setResetting(true)
     try {
       const response = await fetch('/api/grow/daily-reward/reset', {
-        method: 'POST'
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
       
       const data = await response.json()

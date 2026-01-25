@@ -65,6 +65,7 @@ export function GrowVirtualDashboard() {
   const [claimingReward, setClaimingReward] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [newItemsCount, setNewItemsCount] = useState(0)
+  const [newPlantsCount, setNewPlantsCount] = useState(0)
 
   useEffect(() => {
     setMounted(true)
@@ -97,6 +98,8 @@ export function GrowVirtualDashboard() {
         const lastViewedCount = parseInt(localStorage.getItem('lastViewedInventoryCount') || '0')
         const currentCount = data.stats.totalItems
         
+        console.log('📦 Inventário - Last:', lastViewedCount, 'Current:', currentCount)
+        
         if (currentCount > lastViewedCount) {
           const newItems = currentCount - lastViewedCount
           setNewItemsCount(newItems)
@@ -105,6 +108,27 @@ export function GrowVirtualDashboard() {
           if (lastViewedCount > 0) {
             toast.success(`${newItems} ${newItems === 1 ? 'novo item' : 'novos itens'} no inventário!`, {
               icon: '🎁',
+              duration: 4000
+            })
+          }
+        } else if (currentCount < lastViewedCount) {
+          // Se diminuiu, atualizar o contador
+          setNewItemsCount(0)
+        }
+        
+        // Detectar novas plantas desde o último acesso
+        const lastViewedPlants = parseInt(localStorage.getItem('lastViewedPlantsCount') || '0')
+        const currentPlants = data.stats.totalPlants
+        
+        console.log('🌱 Plantas - Last:', lastViewedPlants, 'Current:', currentPlants)
+        
+        if (currentPlants > lastViewedPlants) {
+          const newPlants = currentPlants - lastViewedPlants
+          setNewPlantsCount(newPlants)
+          
+          if (lastViewedPlants > 0) {
+            toast.success(`${newPlants} ${newPlants === 1 ? 'nova planta' : 'novas plantas'} germinada(s)!`, {
+              icon: '🌱',
               duration: 4000
             })
           }
@@ -357,11 +381,24 @@ export function GrowVirtualDashboard() {
           localStorage.setItem('lastViewedInventoryCount', growData.stats.totalItems.toString())
           setNewItemsCount(0)
         }
+        if (value === 'plants' && growData) {
+          // Marcar plantas como visualizadas
+          localStorage.setItem('lastViewedPlantsCount', growData.stats.totalPlants.toString())
+          setNewPlantsCount(0)
+        }
       }}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="plants" className="flex items-center gap-2">
+          <TabsTrigger value="plants" className="flex items-center gap-2 relative">
             <Sprout className="h-4 w-4" />
             Plantas
+            {newPlantsCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 z-50">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-5 w-5 bg-green-500 items-center justify-center text-[10px] font-bold text-white">
+                  {newPlantsCount}
+                </span>
+              </span>
+            )}
           </TabsTrigger>
           <TabsTrigger value="inventory" className="flex items-center gap-2 relative">
             <Package className="h-4 w-4" />
@@ -433,51 +470,55 @@ export function GrowVirtualDashboard() {
                 Sementes e items virtuais desbloqueados
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-8">
-              {/* Seção de Seeds */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Sprout className="w-5 h-5 text-green-600" />
-                  Sementes Disponíveis
-                </h3>
-                <SeedInventory 
-                  seeds={growData.inventory.filter(item => item.itemType === 'GENETICS')}
-                  onPlant={fetchGrowData}
-                />
-              </div>
-
-              {/* Seção de Outros Items */}
-              {growData.inventory.filter(item => item.itemType !== 'GENETICS').length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    Outros Items
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    {growData.inventory
-                      .filter(item => item.itemType !== 'GENETICS')
-                      .map((item) => (
-                        <div key={item.id} className="border rounded-lg p-4 text-center hover:shadow-md transition-shadow bg-white">
-                          <div className="text-3xl mb-3">📦</div>
-                          <h4 className="font-medium text-sm mb-2 line-clamp-2">{item.name}</h4>
-                          <Badge className={`${getRarityColor(item.rarity)} text-xs mb-2`}>
-                            {item.rarity}
-                          </Badge>
-                          <p className="text-xs text-gray-500">
-                            {item.itemType.replace('_', ' ')}
-                          </p>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
-              
-              {growData.inventory.length === 0 && (
+            <CardContent className="space-y-6">
+              {growData.inventory.length === 0 ? (
                 <div className="text-center py-12">
                   <Package className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Inventário vazio</h3>
                   <p className="text-gray-500 mb-4">Reivindique seu pacote de boas-vindas para começar!</p>
                 </div>
+              ) : (
+                <>
+                  {/* Seção de Seeds */}
+                  {growData.inventory.filter(item => item.itemType === 'GENETICS').length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <Sprout className="w-5 h-5 text-green-600" />
+                        Sementes Disponíveis
+                      </h3>
+                      <SeedInventory 
+                        seeds={growData.inventory.filter(item => item.itemType === 'GENETICS')}
+                        onPlant={fetchGrowData}
+                      />
+                    </div>
+                  )}
+
+                  {/* Seção de Outros Items */}
+                  {growData.inventory.filter(item => item.itemType !== 'GENETICS').length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <Package className="w-5 h-5 text-blue-600" />
+                        Outros Items
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                        {growData.inventory
+                          .filter(item => item.itemType !== 'GENETICS')
+                          .map((item) => (
+                            <div key={item.id} className="border rounded-lg p-4 text-center hover:shadow-md transition-shadow bg-white">
+                              <div className="text-3xl mb-3">📦</div>
+                              <h4 className="font-medium text-sm mb-2 line-clamp-2">{item.name}</h4>
+                              <Badge className={`${getRarityColor(item.rarity)} text-xs mb-2`}>
+                                {item.rarity}
+                              </Badge>
+                              <p className="text-xs text-gray-500">
+                                {item.itemType.replace('_', ' ')}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>

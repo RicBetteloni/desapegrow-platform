@@ -17,7 +17,7 @@ interface Seed {
 
 interface SeedInventoryProps {
   seeds: Seed[]
-  onPlant: () => void
+  onPlant: () => Promise<void> | void
 }
 
 export function SeedInventory({ seeds, onPlant }: SeedInventoryProps) {
@@ -45,7 +45,15 @@ export function SeedInventory({ seeds, onPlant }: SeedInventoryProps) {
           </div>,
           { duration: 5000 }
         )
-        onPlant()
+        
+        // Forçar atualização do localStorage para refletir mudança no inventário
+        const currentCount = parseInt(localStorage.getItem('lastViewedInventoryCount') || '0')
+        if (currentCount > 0) {
+          localStorage.setItem('lastViewedInventoryCount', (currentCount - 1).toString())
+        }
+        
+        // Aguardar recarregamento dos dados para detectar nova planta
+        await onPlant()
       } else {
         toast.error(data.error || 'Erro ao germinar semente')
       }

@@ -45,9 +45,19 @@ export default function GrowVirtualPage() {
       {/* Footer */}
       <footer className="mt-12 bg-white/50 backdrop-blur-sm border-t border-green-100">
         <div className="container mx-auto px-4 py-6">
-          <div className="text-center text-sm text-gray-600">
-            <p>🌱 Grow Virtual - Sistema de Gamificação Desapegrow</p>
-            <p className="mt-1 text-xs">Cultive, colecione e evolua no mundo virtual do cultivo!</p>
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 shadow-md">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl flex-shrink-0">⚠️</div>
+                <div className="text-center flex-1">
+                  <p className="text-base font-bold text-yellow-900 mb-2">🎮 Grow Virtual - Jogo Educativo e Ilustrativo</p>
+                  <p className="text-sm font-semibold text-yellow-800 leading-relaxed">
+                    Sistema de gamificação puramente virtual e fictício. Não incentiva, promove ou ensina práticas ilegais. 
+                    Todas as recompensas, moedas e itens são exclusivamente virtuais, sem qualquer valor monetário ou benefício real.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </footer>

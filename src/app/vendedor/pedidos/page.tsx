@@ -52,7 +52,9 @@ export default function PedidosVendedorPage() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('/api/vendedor/orders')
+      const response = await fetch('/api/vendedor/orders', {
+        credentials: 'include'
+      })
       const data = await response.json()
       setOrders(data.orders || [])
     } catch (error) {
@@ -111,23 +113,6 @@ export default function PedidosVendedorPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      <nav className="bg-white/80 backdrop-blur-sm border-b p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2 text-xl font-bold text-green-700">
-            <span>🌱</span>
-            <span>Desapegrow</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <Link href="/vendedor">
-              <Button variant="ghost">
-                <ArrowLeft className="w-4 h-4 mr-1" />
-                Painel do Vendedor
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
-
       <div className="container mx-auto p-6 max-w-5xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-1">💰 Minhas Vendas</h1>

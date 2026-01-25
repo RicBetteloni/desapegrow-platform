@@ -1,4 +1,4 @@
-﻿import type { Metadata } from 'next'
+﻿import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Providers } from '@/components/providers'
 import Header from '@/components/layout/Header'
@@ -11,7 +11,6 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Desapegrow - Marketplace de Equipamentos Grow',
   description: 'Compre e venda equipamentos para cultivo indoor',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
   icons: {
     icon: [
       { url: '/favicon.png', type: 'image/png' },
@@ -19,6 +18,12 @@ export const metadata: Metadata = {
     ],
     apple: '/favicon.png',
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 }
 
 export default function RootLayout({
