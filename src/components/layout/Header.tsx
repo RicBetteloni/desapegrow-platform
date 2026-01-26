@@ -33,8 +33,21 @@ export default function Header() {
 
       try {
         const cart = JSON.parse(savedCart) as CartItem[]
-        const total = cart.reduce((sum: number, item: CartItem) => sum + (item.quantity ?? 0), 0)
-        setCartCount(total)
+        
+        // Filtrar itens válidos
+        const validCart = cart.filter(item => 
+          item && 
+          typeof item === 'object' && 
+          typeof item.quantity === 'number' &&
+          item.quantity > 0
+        )
+        
+        // Contar total de itens diferentes (não quantidade)
+        const totalItems = validCart.length
+        
+        console.log('🛒 Carrinho - Itens:', validCart.length, 'Dados:', validCart)
+        
+        setCartCount(totalItems)
       } catch {
         setCartCount(0)
       }
