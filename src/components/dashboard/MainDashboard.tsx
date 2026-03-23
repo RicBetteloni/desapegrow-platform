@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import type { LucideIcon } from 'lucide-react'
-import { DailyRewards } from '@/components/grow-virtual/DailyRewards'
 import { 
   TrendingUp, 
   TrendingDown,

@@ -10,7 +10,7 @@ async function main() {
   console.log('📂 Criando categorias hierárquicas...')
   try {
     execSync('npx tsx prisma/seed-categories-hierarchy.ts', { stdio: 'inherit' })
-  } catch (error) {
+  } catch {
     console.log('⚠️  Erro ao criar categorias, mas continuando...')
   }
 

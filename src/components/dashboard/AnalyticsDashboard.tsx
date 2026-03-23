@@ -2,27 +2,22 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { 
   Activity,
-  BarChart3,
   Users,
   Eye,
   MousePointer,
-  ShoppingCart,
   TrendingUp,
-  TrendingDown,
   Clock,
   Globe,
   Smartphone,
   Monitor,
   Download,
-  RefreshCw,
-  Filter,
-  Link
+  RefreshCw
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
@@ -101,7 +96,7 @@ export function AnalyticsDashboard() {
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [selectedPeriod, autoRefresh])
+  }, [selectedPeriod, autoRefresh]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchAnalyticsData = async () => {
     try {

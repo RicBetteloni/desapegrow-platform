@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -10,15 +9,11 @@ import {
   Coins, 
   Gem, 
   Sprout, 
-  Gift, 
   Trophy, 
   Star,
-  Zap,
   Package,
   Calendar,
-  TrendingUp,
-  Heart,
-  Settings
+  TrendingUp
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { DailyRewards } from './DailyRewards'
@@ -44,10 +39,15 @@ interface VirtualGrow {
   plants: Array<{
     id: string
     name: string
+    strain: string
     stage: string
     health: number
     daysGrowing: number
     size: number
+    waterLevel: number
+    vpdLevel: number
+    lightHours: number
+    genetics: Record<string, unknown>
   }>
   canClaimDaily: boolean
   stats: {
@@ -59,20 +59,62 @@ interface VirtualGrow {
 }
 
 export function GrowVirtualDashboard() {
-  const { data: session } = useSession()
   const [growData, setGrowData] = useState<VirtualGrow | null>(null)
   const [loading, setLoading] = useState(true)
-  const [claimingReward, setClaimingReward] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [newItemsCount, setNewItemsCount] = useState(0)
   const [newPlantsCount, setNewPlantsCount] = useState(0)
 
-  useEffect(() => {
-    setMounted(true)
-    fetchGrowData()
-  }, [])
+  const getMockData = useCallback((): VirtualGrow => ({
+    id: 'mock-id',
+    cultivoCoins: 150,
+    growthGems: 25,
+    harvestTokens: 5,
+    experiencePoints: 320,
+    prestigeLevel: 1,
+    inventory: [
+      {
+        id: '1',
+        name: 'LED Growth Booster',
+        rarity: 'RARE',
+        itemType: 'LIGHTING',
+        iconUrl: '/icons/led.png',
+        effects: { growth_speed: 1.5 }
+      },
+      {
+        id: '2',
+        name: 'Organic Fertilizer',
+        rarity: 'COMMON',
+        itemType: 'NUTRIENTS',
+        iconUrl: '/icons/fertilizer.png',
+        effects: { health_boost: 10 }
+      }
+    ],
+    plants: [
+      {
+        id: '1',
+        name: 'Mudinha Verde',
+        strain: 'HYBRID',
+        stage: 'VEGETATIVE',
+        health: 85,
+        daysGrowing: 15,
+        size: 0.3,
+        waterLevel: 80,
+        vpdLevel: 1.2,
+        lightHours: 18,
+        genetics: {}
+      }
+    ],
+    canClaimDaily: true,
+    stats: {
+      totalItems: 2,
+      totalPlants: 1,
+      level: 4,
+      nextLevelXP: 80
+    }
+  }), [])
 
-  const fetchGrowData = async () => {
+  const fetchGrowData = useCallback(async () => {
     try {
       const response = await fetch('/api/grow/status')
       
@@ -144,82 +186,12 @@ export function GrowVirtualDashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [getMockData])
 
-  const getMockData = (): VirtualGrow => ({
-    id: 'mock-id',
-    cultivoCoins: 150,
-    growthGems: 25,
-    harvestTokens: 5,
-    experiencePoints: 320,
-    prestigeLevel: 1,
-    inventory: [
-      {
-        id: '1',
-        name: 'LED Growth Booster',
-        rarity: 'RARE',
-        itemType: 'LIGHTING',
-        iconUrl: '/icons/led.png',
-        effects: { growth_speed: 1.5 }
-      },
-      {
-        id: '2',
-        name: 'Organic Fertilizer',
-        rarity: 'COMMON',
-        itemType: 'NUTRIENTS',
-        iconUrl: '/icons/fertilizer.png',
-        effects: { health_boost: 10 }
-      }
-    ],
-    plants: [
-      {
-        id: '1',
-        name: 'Mudinha Verde',
-        stage: 'VEGETATIVE',
-        health: 85,
-        daysGrowing: 15,
-        size: 0.3
-      }
-    ],
-    canClaimDaily: true,
-    stats: {
-      totalItems: 2,
-      totalPlants: 1,
-      level: 4,
-      nextLevelXP: 80
-    }
-  })
-
-  const claimDailyReward = async () => {
-    setClaimingReward(true)
-    try {
-      const response = await fetch('/api/grow/daily-reward', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      })
-      
-      const data = await response.json()
-      
-      if (response.ok) {
-        toast.success(`🎉 Recompensa resgatada! +${data.reward.coins} Cultivo Coins`)
-        fetchGrowData() // Recarregar dados
-      } else {
-        toast.error(data.error || 'Erro ao resgatar recompensa')
-      }
-    } catch (error) {
-      // Mock success para demonstração
-      toast.success('🎉 Recompensa resgatada! +50 Cultivo Coins (Demo)')
-      if (growData) {
-        setGrowData({
-          ...growData,
-          cultivoCoins: growData.cultivoCoins + 50,
-          canClaimDaily: false
-        })
-      }
-    } finally {
-      setClaimingReward(false)
-    }
-  }
+  useEffect(() => {
+    setMounted(true)
+    fetchGrowData()
+  }, [fetchGrowData])
 
   const getRarityColor = (rarity: string) => {
     const colors = {
@@ -229,18 +201,6 @@ export function GrowVirtualDashboard() {
       LEGENDARY: 'bg-yellow-100 text-yellow-800 border-yellow-300'
     }
     return colors[rarity as keyof typeof colors] || colors.COMMON
-  }
-
-  const getStageEmoji = (stage: string) => {
-    const stages = {
-      SEED: '🌰',
-      SEEDLING: '🌱',
-      VEGETATIVE: '🌿',
-      PRE_FLOWER: '🌾',
-      FLOWERING: '🌸',
-      HARVEST_READY: '🍃'
-    }
-    return stages[stage as keyof typeof stages] || '🌱'
   }
 
   if (loading) {
@@ -449,7 +409,7 @@ export function GrowVirtualDashboard() {
                   {growData.plants.map((plant) => (
                     <PlantCarePanel 
                       key={plant.id} 
-                      plant={plant as any}
+                      plant={plant}
                       onUpdate={fetchGrowData}
                     />
                   ))}

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 // Mock de reviews...
 interface Review {
@@ -14,17 +14,18 @@ const mockReviews: Review[] = [
 ];
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ productId: string }> }  // <- aqui sim é 'productId'
+  _request: Request,
+  { params }: { params: { productId: string } }
 ) {
   try {
-    const { productId } = await params  // <- usar 'productId' aqui
+    const { productId } = params
     
     // Filtrar reviews pelo produto
     const productReviews = mockReviews.filter(review => review.productId === productId)
-    
-    // ... resto do código
+
+    return NextResponse.json({ reviews: productReviews })
   } catch (error) {
-    // ...
+    console.error('Erro ao buscar reviews por produto:', error)
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

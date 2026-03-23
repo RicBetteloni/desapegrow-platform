@@ -3,14 +3,19 @@
  * API Route para buscar inventário do Grow Virtual
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+type ItemEffect = {
+  type: string
+  value: number
+}
+
+export async function GET() {
   try {
     // Verificar autenticação
     const session = await getServerSession(authOptions)
@@ -62,10 +67,10 @@ export async function GET(request: NextRequest) {
 
     // Transformar effects de JsonValue para array
     const inventoryWithEffects = virtualGrow.inventory.map(item => {
-      let effects: any[] = []
+      let effects: ItemEffect[] = []
       
       // Se effects for um objeto JSON, converter para array de ItemEffect
-      if (item.effects && typeof item.effects === 'object') {
+      if (item.effects && typeof item.effects === 'object' && !Array.isArray(item.effects)) {
         effects = Object.entries(item.effects).map(([type, value]) => ({
           type,
           value: Number(value)

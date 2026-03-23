@@ -355,7 +355,6 @@ async function main() {
   ]
 
   let totalCreated = 0
-  let totalUpdated = 0
 
   // Processar cada categoria principal
   for (const mainCategory of categoryTree) {

@@ -13,7 +13,6 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { 
   Star, 
-  Upload, 
   X, 
   Zap, 
   Award,
@@ -93,7 +92,7 @@ export function ReviewForm({
   // Update points preview when form changes
   React.useEffect(() => {
     setPointsPreview(calculatePointsPreview())
-  }, [watchedValues, uploadedImages.length, isVerifiedPurchase])
+  }, [watchedValues, uploadedImages.length, isVerifiedPurchase]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleImageUpload = async (files: FileList) => {
     if (files.length === 0) return
@@ -127,7 +126,7 @@ export function ReviewForm({
       form.setValue('images', updatedImages)
 
       toast.success(`${newImages.length} imagem(ns) adicionada(s)!`)
-    } catch (error) {
+    } catch {
       toast.error('Erro ao fazer upload das imagens')
     } finally {
       setUploadingImages(false)

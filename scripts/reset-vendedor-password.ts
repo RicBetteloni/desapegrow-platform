@@ -25,8 +25,9 @@ async function resetVendedorPassword() {
     console.log(`🔑 Nova senha: ${newPassword}`);
     console.log(`\n🔗 Acesse: http://localhost:3000/auth/signin`);
 
-  } catch (error: any) {
-    console.error('❌ Erro:', error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('❌ Erro:', message);
   } finally {
     await prisma.$disconnect();
   }

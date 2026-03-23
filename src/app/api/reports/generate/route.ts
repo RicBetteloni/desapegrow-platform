@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function generateSalesReport(config: ReportConfig) {
-  const { startDate, endDate, groupBy = 'day' } = config
+  const { startDate, endDate } = config
 
   // Mock realistic sales data
   const salesData = []

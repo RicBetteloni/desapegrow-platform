@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -80,9 +81,11 @@ export function ProductCard({ product }: ProductCardProps) {
         <CardContent className="p-0">
           {/* Imagem */}
           <div className="relative aspect-square overflow-hidden rounded-t-lg bg-gray-100">
-            <img
+            <Image
               src={product.images[0]?.url || '/placeholder.png'}
               alt={product.images[0]?.alt || product.name}
+              fill
+              unoptimized
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
             

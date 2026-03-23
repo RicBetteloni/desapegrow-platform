@@ -12,12 +12,8 @@ import {
   Sprout, 
   Coins, 
   Gem, 
-  Trophy, 
-  Package, 
-  Calendar,
-  TrendingUp,
+  Trophy,
   Zap,
-  Award,
   Leaf,
   Star,
   Target

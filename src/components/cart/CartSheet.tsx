@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react'
 
@@ -156,9 +157,12 @@ export function CartSheet() {
                 }}>
                   {/* Imagem */}
                   <div style={{ flexShrink: 0 }}>
-                    <img
+                    <Image
                       src={item.image}
                       alt={item.name}
+                      width={80}
+                      height={80}
+                      unoptimized
                       style={{
                         width: '80px',
                         height: '80px',

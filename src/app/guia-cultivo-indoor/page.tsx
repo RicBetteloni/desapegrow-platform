@@ -27,7 +27,7 @@ interface FAQ {
   id: number
   question: string
   category: string
-  icon: React.ComponentType<any>
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
   answer: {
     summary: string
     details: string[]

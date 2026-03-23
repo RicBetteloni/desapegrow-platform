@@ -1,8 +1,6 @@
-import { PrismaClient, PlantStrain } from '@prisma/client';
+import { PrismaClient, PlantStrain, GrowthStage } from '@prisma/client';
 
 const prisma = new PrismaClient();
-
-const STAGES = ['SEED', 'SEEDLING', 'VEGETATIVE', 'PRE_FLOWER', 'FLOWERING', 'HARVEST_READY'];
 
 const PLANT_CONFIGS = [
   {
@@ -179,7 +177,7 @@ async function createTestPlants() {
           growId: virtualGrow.id,
           name: config.name,
           strain: config.strain,
-          stage: config.stage as any,
+          stage: GrowthStage[config.stage as keyof typeof GrowthStage],
           genetics: config.genetics,
           health: config.health,
           size: config.size,

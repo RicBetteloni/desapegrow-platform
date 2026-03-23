@@ -4,7 +4,7 @@ import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { TrendingUp, Star } from 'lucide-react'
+import { TrendingUp } from 'lucide-react'
 
 interface LevelProgressProps {
   userStats: {

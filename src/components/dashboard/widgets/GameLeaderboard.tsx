@@ -47,7 +47,7 @@ export function GameLeaderboard({
 
   useEffect(() => {
     fetchLeaderboard()
-  }, [selectedMetric, period])
+  }, [selectedMetric, period]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchLeaderboard = async () => {
     try {

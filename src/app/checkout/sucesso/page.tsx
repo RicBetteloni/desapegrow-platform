@@ -4,11 +4,11 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'edge'
 
 import { useEffect, useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle2, ShoppingBag, ArrowRight } from 'lucide-react'
+import { CheckCircle2, ShoppingBag } from 'lucide-react'
 
 interface OrderItem {
   productId: string
@@ -28,7 +28,6 @@ interface Order {
 
 export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
 

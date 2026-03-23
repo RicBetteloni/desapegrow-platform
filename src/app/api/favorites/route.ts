@@ -18,7 +18,7 @@ export async function GET() {
       .map(fav => fav.productId)
 
     return NextResponse.json({ favorites: userFavorites })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       favorites.push({ userId: session.user.id, productId })
       return NextResponse.json({ favorited: true })
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

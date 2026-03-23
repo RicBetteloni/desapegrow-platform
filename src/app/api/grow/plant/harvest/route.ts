@@ -2,15 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { GrowthStage, ItemType, ItemRarity, SourceType } from '@prisma/client';
+import { GrowthStage, ItemType, ItemRarity, SourceType, Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
 function calculateHarvestReward(
   health: number,
-  size: number,
-  _genetics: unknown,
-  _daysGrowing: number
+  size: number
 ): { coins: number; gems: number; rarity: ItemRarity; quality: string } {
   // Garantir valores válidos
   const safeHealth = typeof health === 'number' ? health : 0;
@@ -111,9 +109,7 @@ export async function POST(req: NextRequest) {
     // Calcular recompensas
     const { coins, gems, rarity, quality } = calculateHarvestReward(
       plant.health,
-      plant.size,
-      plant.genetics,
-      plant.daysGrowing
+      plant.size
     );
 
     // Gerar card NFT-style
@@ -125,7 +121,7 @@ export async function POST(req: NextRequest) {
       data: {
         harvestedAt: new Date(),
         cardGenerated: true,
-        cardData: cardData as any
+        cardData: cardData as Prisma.InputJsonValue
       }
     });
 
@@ -147,7 +143,7 @@ export async function POST(req: NextRequest) {
         rarity,
         name: `Card: ${plant.name} (${quality})`,
         iconUrl: `/cards/${rarity.toLowerCase()}-card.png`,
-        effects: cardData as any,
+        effects: cardData as Prisma.InputJsonValue,
         sourceType: SourceType.HARVEST,
         sourceId: plantId
       }

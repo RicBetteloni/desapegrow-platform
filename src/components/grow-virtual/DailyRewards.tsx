@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
-import { Zap, Award, Clock } from 'lucide-react'
+import { Award, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { useSession } from 'next-auth/react'
 import { Badge } from '../ui/badge'
@@ -17,7 +17,7 @@ interface RewardStatus {
 }
 
 export function DailyRewards() {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const [loading, setLoading] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [rewardStatus, setRewardStatus] = useState<RewardStatus | null>(null)

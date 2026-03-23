@@ -345,10 +345,7 @@ export function calculateTotalItemPower(inventory: { rarity: 'COMMON' | 'RARE' |
 /**
  * Verifica se pode fazer ação (baseado em cooldowns)
  */
-export async function canPerformAction(
-  userId: string,
-  actionType: string
-): Promise<boolean> {
+export async function canPerformAction(): Promise<boolean> {
   // Implementar lógica de cooldown
   // Por exemplo: só pode regar plantas a cada 6 horas
   return true // Simplificado por enquanto

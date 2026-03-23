@@ -484,7 +484,7 @@ function getOrderBy(sort?: string) {
   }
 }
 
-function calculateDiscount(price: any, comparePrice: any): number {
+function calculateDiscount(price: number | string, comparePrice: number | string): number {
   const p = Number(price)
   const cp = Number(comparePrice)
   return Math.round(((cp - p) / cp) * 100)

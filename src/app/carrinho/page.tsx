@@ -1,9 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ShoppingCart, ArrowLeft, Plus, Minus, Trash2 } from 'lucide-react'
+import { ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react'
 
 interface CartItem {
   productId: string
@@ -118,9 +119,12 @@ export default function CarrinhoPage() {
                     key={item.productId}
                     className="flex gap-3 border-b pb-3 last:border-b-0 last:pb-0"
                   >
-                    <img
+                    <Image
                       src={item.image}
                       alt={item.name}
+                      width={80}
+                      height={80}
+                      unoptimized
                       className="w-20 h-20 rounded object-cover flex-shrink-0"
                     />
                     <div className="flex-1 min-w-0">

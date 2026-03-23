@@ -1,11 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Button } from '../ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { Droplets, Sun, Thermometer, Heart, Sparkles, Award } from 'lucide-react'
+import React from 'react'
 import { toast } from 'sonner'
-import { Badge } from '../ui/badge'
 import { PlantStageBadges } from './PlantStageBadges'
 
 interface Plant {
@@ -22,29 +18,8 @@ interface Plant {
   genetics: Record<string, unknown>
 }
 
-const STAGE_NAMES: Record<string, string> = {
-  SEED: '🌱 Semente',
-  SEEDLING: '🌿 Muda',
-  VEGETATIVE: '🪴 Vegetativo',
-  PRE_FLOWER: '🌸 Pré-Floração',
-  FLOWERING: '🌺 Floração',
-  HARVEST_READY: '✨ Pronta para Colher'
-}
-
-const STAGE_EMOJIS: Record<string, string> = {
-  SEED: '🌱',
-  SEEDLING: '🌿',
-  VEGETATIVE: '🪴',
-  PRE_FLOWER: '🌸',
-  FLOWERING: '🌺',
-  HARVEST_READY: '✨'
-}
-
 export function PlantCarePanel({ plant, onUpdate }: { plant: Plant; onUpdate: () => void }) {
-  const [caring, setCaring] = useState(false)
-
   const handleCare = async (careType: string, value?: number) => {
-    setCaring(true)
     try {
       const response = await fetch('/api/grow/plant/care', {
         method: 'POST',
@@ -67,8 +42,6 @@ export function PlantCarePanel({ plant, onUpdate }: { plant: Plant; onUpdate: ()
     } catch (err) {
       toast.error('Erro ao cuidar da planta')
       console.error(err)
-    } finally {
-      setCaring(false)
     }
   }
 
@@ -78,7 +51,6 @@ export function PlantCarePanel({ plant, onUpdate }: { plant: Plant; onUpdate: ()
       return
     }
 
-    setCaring(true)
     try {
       const response = await fetch('/api/grow/plant/harvest', {
         method: 'POST',
@@ -108,16 +80,7 @@ export function PlantCarePanel({ plant, onUpdate }: { plant: Plant; onUpdate: ()
     } catch (err) {
       toast.error('Erro ao colher planta')
       console.error(err)
-    } finally {
-      setCaring(false)
     }
-  }
-
-  const getHealthColor = (health: number) => {
-    if (health >= 75) return 'text-green-600'
-    if (health >= 50) return 'text-yellow-600'
-    if (health >= 25) return 'text-orange-600'
-    return 'text-red-600'
   }
 
   return (

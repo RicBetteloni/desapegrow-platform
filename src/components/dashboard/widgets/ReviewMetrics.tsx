@@ -54,7 +54,7 @@ export function ReviewMetrics({
 
   useEffect(() => {
     fetchReviewMetrics()
-  }, [period])
+  }, [period]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchReviewMetrics = async () => {
     try {

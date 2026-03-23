@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { GrowthStage, ItemType } from '@prisma/client';
+import { GrowthStage, ItemType, PlantStrain } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,14 +47,19 @@ export async function POST(req: NextRequest) {
     // Extrair dados da genética
     const effects = seedItem.effects as Record<string, unknown>;
     const genetics = effects.genetics || {};
-    const strain = effects.strain || 'HYBRID';
+    const strainRaw = effects.strain;
+    const strain = (
+      typeof strainRaw === 'string' && strainRaw in PlantStrain
+        ? PlantStrain[strainRaw as keyof typeof PlantStrain]
+        : PlantStrain.HYBRID
+    );
 
     // Criar a planta
     const plant = await prisma.virtualPlant.create({
       data: {
         growId: virtualGrow.id,
         name: plantName || seedItem.name.replace('🌱 ', '').replace('🌿 ', '').replace('✨ ', ''),
-        strain: strain as any,
+        strain,
         genetics: genetics,
         stage: GrowthStage.SEED,
         daysGrowing: 0,

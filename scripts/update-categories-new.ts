@@ -12,7 +12,7 @@ async function updateCategories() {
     console.log(`📊 Encontradas ${categories.length} categorias`)
     
     // 1. Atualizar "Estrutura" para "Tendas / Kits completos"
-    const estrutura = categories.find((c: any) => c.slug === 'estrutura')
+    const estrutura = categories.find(c => c.slug === 'estrutura')
     if (estrutura) {
       await prisma.category.update({
         where: { id: estrutura.id },
@@ -27,7 +27,7 @@ async function updateCategories() {
     }
     
     // 2. Renomear "Ventilação" para "Climatização"
-    const ventilacao = categories.find((c: any) => c.slug === 'ventilacao')
+    const ventilacao = categories.find(c => c.slug === 'ventilacao')
     if (ventilacao) {
       await prisma.category.update({
         where: { id: ventilacao.id },
@@ -48,7 +48,7 @@ async function updateCategories() {
       ]
       
       for (const subcat of subcatsToAdd) {
-        const exists = categories.find((c: any) => c.slug === subcat.slug)
+        const exists = categories.find(c => c.slug === subcat.slug)
         if (!exists) {
           await prisma.category.create({
             data: {

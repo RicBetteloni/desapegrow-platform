@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Star, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -94,27 +93,11 @@ export function ReviewDisplay({
   averageRating,
   ratingDistribution,
   onVoteHelpful,
-  onReply,
   className,
 }: ReviewDisplayProps) {
   const [sortBy, setSortBy] = useState<SortBy>('newest')
   const [filterBy, setFilterBy] = useState<FilterBy>('all')
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
-
-  const handleVote = (reviewId: string, helpful: boolean) => {
-    onVoteHelpful?.(reviewId, helpful)
-  }
-
-  const getReputationBadge = (level: string) => {
-    const badges = {
-      NOVICE: { label: 'Novato', color: 'bg-gray-100 text-gray-800' },
-      CONTRIBUTOR: { label: 'Contribuidor', color: 'bg-blue-100 text-blue-800' },
-      EXPERT: { label: 'Expert', color: 'bg-purple-100 text-purple-800' },
-      MASTER: { label: 'Mestre', color: 'bg-orange-100 text-orange-800' },
-      LEGEND: { label: 'Lenda', color: 'bg-yellow-100 text-yellow-800' },
-    }
-    return badges[level as keyof typeof badges] || badges.NOVICE
-  }
 
   const RatingDistribution = () => (
     <div className="space-y-2">

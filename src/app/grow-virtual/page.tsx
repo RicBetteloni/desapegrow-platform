@@ -3,9 +3,6 @@
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
 // IMPORT CORRETO - caminho relativo ao arquivo page.tsx
 import { GrowVirtualDashboard } from '../../components/grow-virtual/GrowVirtualDashboard'
 

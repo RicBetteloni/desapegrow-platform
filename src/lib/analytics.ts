@@ -103,7 +103,7 @@ class DesapegrowAnalytics {
       }).catch(() => {
         // Ignorar erros de tracking silenciosamente
       })
-    } catch (error) {
+    } catch {
       // Tracking não deve quebrar a aplicação
     }
   }

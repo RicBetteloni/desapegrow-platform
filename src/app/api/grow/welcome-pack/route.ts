@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -399,7 +399,7 @@ function selectRandomSeed(): typeof SEED_POOL[0] {
   return seedsOfRarity[randomIndex];
 }
 
-export async function POST(_req: NextRequest) {
+export async function POST() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -512,7 +512,7 @@ function getRarityMessage(rarity: ItemRarity): string {
   return messages[rarity] || '🌱 Bem-vindo ao cultivo virtual!';
 }
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

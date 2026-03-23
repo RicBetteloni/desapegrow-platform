@@ -36,7 +36,7 @@ export function SalesChart({ period, className }: SalesChartProps) {
 
   useEffect(() => {
     fetchSalesData()
-  }, [period])
+  }, [period]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSalesData = async () => {
     try {

@@ -4,6 +4,7 @@ import { useState, useEffect, type ComponentType, type SVGProps } from 'react'
 import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { AuthLoading } from '@/components/auth/AuthLoading'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -38,7 +39,7 @@ export default function MeusPedidosPage() {
     if (session) {
       fetchOrders()
     }
-  }, [session])
+  }, [session]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchOrders = async () => {
     try {
@@ -198,9 +199,12 @@ export default function MeusPedidosPage() {
                   <div className="space-y-3 mb-4">
                     {order.items.map((item) => (
                       <div key={item.id} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
-                        <img 
-                          src={item.product.images[0]?.url || '/placeholder.png'} 
+                        <Image
+                          src={item.product.images[0]?.url || '/placeholder.png'}
                           alt={item.product.name}
+                          width={64}
+                          height={64}
+                          unoptimized
                           className="w-16 h-16 object-cover rounded"
                         />
                         <div className="flex-1">

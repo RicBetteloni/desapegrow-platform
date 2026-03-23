@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -396,7 +397,13 @@ export default function NovoProdutoPage() {
                   
                   {url && !uploadingImages[index] && (
                     <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden">
-                      <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                      <Image
+                        src={url}
+                        alt={`Preview ${index + 1}`}
+                        fill
+                        unoptimized
+                        className="w-full h-full object-cover"
+                      />
                       <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs">
                         ✓ Enviada
                       </div>

@@ -54,14 +54,6 @@ interface Category {
   }
 }
 
-interface CartItem {
-  productId: string
-  name: string
-  price: number
-  quantity: number
-  image: string
-}
-
 function MarketplaceContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -290,33 +282,7 @@ function MarketplaceContent() {
     setExpandedCategory(null)
   }
 
-  const addToCart = (product: Product) => {
-    if (product.stock === 0) {
-      alert('Este produto está sem estoque!')
-      return
-    }
-
-    const currentCart = localStorage.getItem('cart')
-    const cart: CartItem[] = currentCart ? JSON.parse(currentCart) : []
-
-    const existingItemIndex = cart.findIndex((item: CartItem) => item.productId === product.id)
-
-    if (existingItemIndex >= 0) {
-      cart[existingItemIndex].quantity += 1
-    } else {
-      cart.push({
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        image: product.images?.[0]?.url || '/placeholder.png'
-      })
-    }
-
-    localStorage.setItem('cart', JSON.stringify(cart))
-    window.dispatchEvent(new Event('cartUpdated'))
-    alert('✅ Produto adicionado ao carrinho!')
-  }
+  // Função não utilizada mas deixada para uso futuro
 
   const toggleFavorite = (productId: string, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -387,7 +353,7 @@ function MarketplaceContent() {
   useEffect(() => {
     const interval = setInterval(nextBanner, 8000)
     return () => clearInterval(interval)
-  }, [currentBanner]) // Reinicia o timer quando muda de banner
+  }, [currentBanner]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Rotacionar dicas a cada visita (baseado em número aleatório salvo)
   useEffect(() => {
@@ -399,13 +365,13 @@ function MarketplaceContent() {
       setCurrentTip(randomIndex)
       localStorage.setItem('currentTipIndex', randomIndex.toString())
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Mudar para próxima dica na próxima visita
   useEffect(() => {
     const nextTipIndex = (currentTip + 1) % growTips.length
     localStorage.setItem('currentTipIndex', nextTipIndex.toString())
-  }, [currentTip])
+  }, [currentTip]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="bg-[#FAF9F6] min-h-screen pb-12">
@@ -804,7 +770,6 @@ function MarketplaceContent() {
               <div className="lg:col-span-9">
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
                   {products.map((product: Product, index: number) => {
-                const pointsEarned = Math.floor(Number(product.price) * 0.05);
                 const discountPercent = product.comparePrice
                   ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
                   : 0;
@@ -818,9 +783,11 @@ function MarketplaceContent() {
                     {/* Imagem - aspect ratio quadrado forçado com object-cover */}
                     <Link href={`/produtos/${product.slug}`} className="block mb-3">
                       <div className="relative w-full aspect-square bg-gray-100 overflow-hidden rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,.04)] group-hover:shadow-[0_12px_28px_rgba(0,0,0,.08)] transition-shadow">
-                        <img
+                        <Image
                           src={product.images?.[0]?.url || '/placeholder.png'}
                           alt={product.name}
+                          fill
+                          unoptimized
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
 
@@ -906,10 +873,12 @@ function MarketplaceContent() {
                 target="_blank"
                 className="block hover:opacity-90 transition-opacity"
               >
-                <img 
-                  src="/banners/ads/consultoria-cultivo.svg" 
+                <Image
+                  src="/banners/ads/consultoria-cultivo.svg"
                   alt="Consultoria de Cultivo Indoor com Professor"
-                  className="w-full rounded-lg shadow-sm"
+                  width={728}
+                  height={90}
+                  className="w-full h-auto rounded-lg shadow-sm"
                 />
               </a>
 
@@ -919,10 +888,12 @@ function MarketplaceContent() {
                 target="_blank"
                 className="block hover:opacity-90 transition-opacity"
               >
-                <img 
-                  src="/banners/ads/eletrica-grow.svg" 
+                <Image
+                  src="/banners/ads/eletrica-grow.svg"
                   alt="Instalação Elétrica para Grow Room"
-                  className="w-full rounded-lg shadow-sm"
+                  width={728}
+                  height={90}
+                  className="w-full h-auto rounded-lg shadow-sm"
                 />
               </a>
 

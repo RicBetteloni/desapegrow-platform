@@ -33,8 +33,9 @@ async function checkUsers() {
       console.log(`   A sessão tem um userId que não existe no banco de dados.`);
     }
     
-  } catch (error: any) {
-    console.error('❌ Erro:', error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('❌ Erro:', message);
   } finally {
     await prisma.$disconnect();
   }

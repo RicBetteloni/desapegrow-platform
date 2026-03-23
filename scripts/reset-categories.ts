@@ -9,7 +9,7 @@ async function resetCategories() {
     // Buscar todas as categorias existentes
     const categories = await prisma.category.findMany()
     
-    console.log(`📊 Encontradas ${categories.count} categorias`)
+    console.log(`📊 Encontradas ${categories.length} categorias`)
     
     // Atualizar categorias principais
     const mainCategories = [
@@ -24,7 +24,7 @@ async function resetCategories() {
     ]
     
     for (const cat of mainCategories) {
-      const existing = categories.find((c: any) => c.slug === cat.slug)
+      const existing = categories.find(c => c.slug === cat.slug)
       if (existing) {
         await prisma.category.update({
           where: { id: existing.id },
@@ -35,7 +35,7 @@ async function resetCategories() {
     }
     
     // Atualizar "controle" para "monitoramento"
-    const controle = categories.find((c: any) => c.slug === 'controle')
+    const controle = categories.find(c => c.slug === 'controle')
     if (controle) {
       await prisma.category.update({
         where: { id: controle.id },
@@ -49,7 +49,7 @@ async function resetCategories() {
     }
     
     // Atualizar "grow-box" para "estrutura"
-    const growBox = categories.find((c: any) => c.slug === 'grow-box')
+    const growBox = categories.find(c => c.slug === 'grow-box')
     if (growBox) {
       await prisma.category.update({
         where: { id: growBox.id },
@@ -63,7 +63,7 @@ async function resetCategories() {
     }
     
     // Atualizar "nutrientes" para "nutrição"
-    const nutrientes = categories.find((c: any) => c.slug === 'nutrientes')
+    const nutrientes = categories.find(c => c.slug === 'nutrientes')
     if (nutrientes) {
       await prisma.category.update({
         where: { id: nutrientes.id },

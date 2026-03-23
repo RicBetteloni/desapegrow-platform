@@ -4,8 +4,8 @@
 import { useState, useEffect } from 'react'
 import { use } from 'react'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -27,7 +27,6 @@ interface Product {
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params)
-  const { data: session } = useSession()
   const router = useRouter()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
@@ -35,7 +34,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
   useEffect(() => {
     fetchProduct()
-  }, [resolvedParams.slug])
+  }, [resolvedParams.slug]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchProduct = async () => {
     try {
@@ -111,10 +110,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
           {/* Galeria de Imagens */}
           <div className="space-y-4">
             <div className="aspect-square rounded-2xl overflow-hidden bg-white shadow-2xl border-4 border-white">
-              <img 
-                src={product.images[0]?.url} 
-                alt={product.name} 
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
+              <Image
+                src={product.images[0]?.url || '/placeholder.png'}
+                alt={product.name}
+                width={900}
+                height={900}
+                unoptimized
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
             </div>
           </div>

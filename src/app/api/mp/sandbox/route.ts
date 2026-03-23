@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { items, orderId, customer } = body
+    const { orderId } = body
 
     // 1. Cria Preference ID simulado
     const preferenceId = `TEST-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`

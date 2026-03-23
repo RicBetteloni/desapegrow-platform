@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -41,7 +42,7 @@ export default function EditarProdutoPage() {
 
   useEffect(() => {
     fetchProduct()
-  }, [productId])
+  }, [productId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchProduct = async () => {
     try {
@@ -65,7 +66,7 @@ export default function EditarProdutoPage() {
 
       setImageUrls(product.images.map((img: { url: string }) => img.url))
       
-    } catch (error) {
+    } catch {
       alert('Erro ao carregar produto')
       router.push('/vendedor')
     } finally {
@@ -318,14 +319,14 @@ export default function EditarProdutoPage() {
                   {imageUrls
                     .filter(url => url.trim())
                     .map((url, index) => (
-                      <img
+                      <Image
                         key={index}
                         src={url}
                         alt={`Preview ${index + 1}`}
+                        width={300}
+                        height={300}
+                        unoptimized
                         className="w-full aspect-square object-cover rounded-lg"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/placeholder.png'
-                        }}
                       />
                     ))}
                 </div>

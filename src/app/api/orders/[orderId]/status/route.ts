@@ -32,7 +32,7 @@ export async function PATCH(
       const orderItems = await prisma.orderItem.findMany({ where: { orderId } })
       
       for (const item of orderItems) {
-        const product = await prisma.product.update({
+        await prisma.product.update({
           where: { id: item.productId },
           data: { 
             stock: { increment: item.quantity },

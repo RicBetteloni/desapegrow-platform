@@ -93,17 +93,24 @@ export async function GET() {
 
     return NextResponse.json(response)
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    const stack = error instanceof Error ? error.stack : undefined
+    const name = error instanceof Error ? error.name : 'UnknownError'
+    const code = typeof error === 'object' && error !== null && 'code' in error
+      ? String((error as { code: unknown }).code)
+      : undefined
+
     console.error('❌ [DAILY REWARD STATUS ERROR]:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-      code: error.code
+      message,
+      stack,
+      name,
+      code
     });
     return NextResponse.json(
       { 
         error: 'Erro ao verificar status',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        details: process.env.NODE_ENV === 'development' ? message : undefined
       },
       { status: 500 }
     )

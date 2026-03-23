@@ -201,7 +201,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(realTimeMetrics)
+    return NextResponse.json({ ...realTimeMetrics, period })
 
   } catch (error) {
     console.error('Real-time metrics error:', error)

@@ -48,7 +48,7 @@ export default function SignInPage() {
         router.push('/marketplace')
         router.refresh()
       }
-    } catch (err) {
+    } catch {
       setError('Erro ao fazer login')
     } finally {
       setLoading(false)

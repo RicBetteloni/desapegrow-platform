@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { AuthLoading } from '@/components/auth/AuthLoading'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
@@ -244,7 +245,7 @@ export default function VendedorDashboard() {
                 {products.length === 0 && areaFilter !== 'todos' ? (
                   <div className="text-center py-12">
                     <Package className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                    <p className="text-gray-500 mb-2">Nenhum produto encontrado para "{areas.find(a => a.value === areaFilter)?.label}"</p>
+                    <p className="text-gray-500 mb-2">Nenhum produto encontrado para &quot;{areas.find(a => a.value === areaFilter)?.label}&quot;</p>
                     <Button variant="outline" onClick={() => setAreaFilter('todos')}>
                       Ver todos os produtos
                     </Button>
@@ -268,9 +269,12 @@ export default function VendedorDashboard() {
                         className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                       >
                         {/* Imagem */}
-                        <img
+                        <Image
                           src={product.images[0]?.url || '/placeholder.png'}
                           alt={product.name}
+                          width={80}
+                          height={80}
+                          unoptimized
                           className="w-20 h-20 object-cover rounded-lg"
                         />
 

@@ -77,11 +77,8 @@ export async function GET(request: Request) {
         ? product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length
         : null;
       
-      // Não incluir reviews no retorno para reduzir payload
-      const { reviews, ...productData } = product;
-      
       return {
-        ...productData,
+        ...product,
         avgRating,
         totalReviews: product.reviews.length
       };

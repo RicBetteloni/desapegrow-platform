@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { useCallback } from 'react'
 
 interface CartItem {
   id: string
@@ -26,12 +27,12 @@ export function useCart() {
   const [isInitialized, setIsInitialized] = useState(false)
 
   // Gera a chave do localStorage baseada no usuário
-  const getCartKey = () => {
+  const getCartKey = useCallback(() => {
     if (session?.user?.id) {
       return `cart-items-${session.user.id}`
     }
     return 'cart-items-guest'
-  }
+  }, [session?.user?.id])
 
   // Carregar carrinho do localStorage quando o usuário estiver autenticado
   useEffect(() => {
@@ -58,7 +59,7 @@ export function useCart() {
     }
     
     setIsInitialized(true)
-  }, [session?.user?.id, status])
+  }, [session?.user?.id, status, getCartKey])
 
   // Salvar no localStorage sempre que o carrinho mudar (apenas se já inicializou)
   useEffect(() => {
@@ -66,7 +67,7 @@ export function useCart() {
     
     const cartKey = getCartKey()
     localStorage.setItem(cartKey, JSON.stringify(items))
-  }, [items, session?.user?.id, isInitialized])
+  }, [items, session?.user?.id, isInitialized, getCartKey])
 
   const addToCart = (product: Product, quantity: number = 1) => {
     setItems(current => {

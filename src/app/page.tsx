@@ -2,10 +2,6 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Button } from '../components/ui/button'
-import { Card, CardContent } from '../components/ui/card'
-import { Badge } from '../components/ui/badge'
-import { Check } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 export default function Home() {
@@ -24,23 +20,19 @@ export default function Home() {
     setCurrentCTA(index)
   }
 
-  const categories = [
-    { name: 'Climatização', icon: '❄️', slug: 'climatizacao' },
-    { name: 'Ferramentas', icon: '🔧', slug: 'ferramentas' },
-    { name: 'Iluminação', icon: '💡', slug: 'iluminacao' },
-    { name: 'Irrigação', icon: '💧', slug: 'irrigacao' },
-    { name: 'Nutrição', icon: '🌿', slug: 'nutricao' },
-    { name: 'Substratos', icon: '🏔️', slug: 'substratos' },
-    { name: 'Tendas / Kits', icon: '⛺', slug: 'tendas-kits' }
-  ]
-
   return (
     <main className="bg-[#FAF9F6] min-h-screen">
       {/* Hero Section */}
       <section className="w-full bg-white relative overflow-hidden">
         {/* Background decorativo com folhas */}
         <div className="absolute inset-0 pointer-events-none opacity-30">
-          <img src="https://res.cloudinary.com/dasx39hlf/image/upload/v1767583834/desapegrow/home/hero-main.png" alt="" className="w-full h-full object-cover" />
+          <Image
+            src="https://res.cloudinary.com/dasx39hlf/image/upload/v1767583834/desapegrow/home/hero-main.png"
+            alt=""
+            fill
+            unoptimized
+            className="w-full h-full object-cover"
+          />
         </div>
         
         <div className="max-w-[1280px] mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-[60%_40%] gap-12 items-center relative z-10">
@@ -119,9 +111,11 @@ export default function Home() {
           {/* RIGHT — tent / grow image */}
           <div className="relative w-full md:w-auto mt-8 md:mt-0">
             <div className="relative w-full h-[280px] md:h-[520px] rounded-[24px] overflow-hidden shadow-[0_24px_48px_rgba(0,0,0,.15)]">
-              <img
+              <Image
                 src="https://res.cloudinary.com/dasx39hlf/image/upload/v1768727003/desapegrow/home/hero-grow-logo.png"
                 alt="Grow indoor"
+                fill
+                unoptimized
                 className="w-full h-full object-cover"
               />
             </div>
@@ -167,9 +161,11 @@ export default function Home() {
               </div>
 
               <div className="relative h-[190px] bg-gray-100">
-                <img
+                <Image
                   src="https://res.cloudinary.com/dasx39hlf/image/upload/v1767583838/desapegrow/home/hero-feature-1.png"
                   alt="Climatização"
+                  fill
+                  unoptimized
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -204,9 +200,11 @@ export default function Home() {
               </div>
 
               <div className="relative h-[190px] bg-gray-100">
-                <img
+                <Image
                   src="https://res.cloudinary.com/dasx39hlf/image/upload/v1767583840/desapegrow/home/hero-feature-2.png"
                   alt="Kit Grow"
+                  fill
+                  unoptimized
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -241,9 +239,11 @@ export default function Home() {
               </div>
 
               <div className="relative h-[190px] bg-gray-100">
-                <img
+                <Image
                   src="https://res.cloudinary.com/dasx39hlf/image/upload/v1767583841/desapegrow/home/hero-feature-3.png"
                   alt="Tenda Grow"
+                  fill
+                  unoptimized
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -278,8 +278,8 @@ export default function Home() {
                 </div>
 
                 <p className="text-sm text-gray-700 leading-relaxed">
-                  "Muito bom! Consegui os equipamentos que precisava com um preço ótimo.
-                  Recomendo sempre anunciar e desapegar pelo Desapegrow."
+                  &quot;Muito bom! Consegui os equipamentos que precisava com um preço ótimo.
+                  Recomendo sempre anunciar e desapegar pelo Desapegrow.&quot;
                 </p>
               </div>
 

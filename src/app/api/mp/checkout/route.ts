@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
-  _request: NextRequest,
-  { params }: { params: { slug: string } }
+  request: NextRequest
 ) {
   try {
-    const slug = params.slug
+    const slug = request.nextUrl.searchParams.get('slug')
+
+    if (!slug) {
+      return NextResponse.json(
+        { error: 'Slug do produto é obrigatório' },
+        { status: 400 }
+      )
+    }
 
     const product = await prisma.product.findFirst({
       where: { slug },

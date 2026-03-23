@@ -8,7 +8,11 @@ import { useState, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 
 type CartItem = {
+  productId: string
+  name: string
+  price: number
   quantity: number
+  image: string
 }
 
 export default function Header() {
@@ -32,23 +36,35 @@ export default function Header() {
       }
 
       try {
-        const cart = JSON.parse(savedCart) as CartItem[]
-        
-        // Filtrar itens válidos
-        const validCart = cart.filter(item => 
-          item && 
-          typeof item === 'object' && 
+        const parsed = JSON.parse(savedCart)
+        const cart = Array.isArray(parsed) ? (parsed as CartItem[]) : []
+
+        // Filtrar itens válidos (mesma regra da página de carrinho)
+        const validCart = cart.filter(item => (
+          item &&
+          typeof item === 'object' &&
+          typeof item.productId === 'string' &&
+          item.productId.length > 0 &&
+          typeof item.name === 'string' &&
+          item.name.length > 0 &&
+          typeof item.price === 'number' &&
+          Number.isFinite(item.price) &&
           typeof item.quantity === 'number' &&
-          item.quantity > 0
-        )
-        
-        // Contar total de itens diferentes (não quantidade)
-        const totalItems = validCart.length
-        
-        console.log('🛒 Carrinho - Itens:', validCart.length, 'Dados:', validCart)
-        
-        setCartCount(totalItems)
+          Number.isFinite(item.quantity) &&
+          item.quantity > 0 &&
+          typeof item.image === 'string' &&
+          item.image.length > 0
+        ))
+
+        // Se removeu itens inválidos, persistir limpeza para evitar badge fantasma
+        if (validCart.length !== cart.length) {
+          window.localStorage.setItem('cart', JSON.stringify(validCart))
+        }
+
+        // Contar itens diferentes (não soma de quantidades)
+        setCartCount(validCart.length)
       } catch {
+        window.localStorage.removeItem('cart')
         setCartCount(0)
       }
     }
