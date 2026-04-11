@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ShoppingCart, Heart, Star, Package, ChevronLeft, Store } from 'lucide-react'
+import { trackGA4ViewItem, trackGA4AddToCart, getAnalytics } from '@/lib/analytics'
 
 interface Product {
   id: string
@@ -38,6 +39,28 @@ export default function ProductDetailPage() {
       const data = await response.json()
       if (!response.ok) throw new Error('Produto não encontrado')
       setProduct(data.product)
+      
+      // Track product view in GA4
+      trackGA4ViewItem([
+        {
+          item_id: data.product.id,
+          item_name: data.product.name,
+          item_category: data.product.category?.name,
+          price: data.product.price,
+          item_brand: 'Desapegrow',
+        }
+      ])
+      
+      // Also track in custom analytics
+      const analytics = getAnalytics()
+      analytics.track('PRODUCT_VIEW', {
+        productId: data.product.id,
+        value: data.product.price,
+        metadata: { 
+          category: data.product.category?.name,
+          seller: data.product.seller?.businessName
+        }
+      })
     } catch (error) {
       console.error('Erro ao buscar produto:', error)
       setProduct(null)
@@ -73,6 +96,23 @@ export default function ProductDetailPage() {
       })
     }
     localStorage.setItem('cart', JSON.stringify(cart))
+    
+    // Track add to cart in GA4
+    trackGA4AddToCart([
+      {
+        item_id: product.id,
+        item_name: product.name,
+        item_category: product.category?.name,
+        price: product.price,
+        quantity: 1,
+        item_brand: 'Desapegrow',
+      }
+    ], product.price)
+    
+    // Also track in custom analytics
+    const analytics = getAnalytics()
+    analytics.trackCartAction('add', product.id, 1, product.price)
+    
     window.dispatchEvent(new Event('cartUpdated'))
     setTimeout(() => setAddingToCart(false), 1000)
   }

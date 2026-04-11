@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ShoppingCart, AlertCircle } from 'lucide-react'
+import { trackGA4BeginCheckout, getAnalytics } from '@/lib/analytics'
 
 interface CartItem {
   productId: string
@@ -102,6 +103,30 @@ export default function CheckoutPage() {
       setError('Seu carrinho está vazio')
       return
     }
+
+    // Track begin_checkout in GA4
+    const cartValue = cartItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    )
+    
+    trackGA4BeginCheckout(
+      cartItems.map(item => ({
+        item_id: item.productId,
+        item_name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        item_brand: 'Desapegrow',
+      })),
+      cartValue
+    )
+
+    // Also track in custom analytics
+    const analytics = getAnalytics()
+    analytics.track('CHECKOUT_START', {
+      value: cartValue,
+      metadata: { itemCount: cartItems.length }
+    })
 
     setLoading(true)
 

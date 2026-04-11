@@ -17,6 +17,7 @@ import {
   ChevronRight
 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
+import { trackGA4Search, trackGA4FilterSelect } from '@/lib/analytics'
 
 interface Product {
   id: string
@@ -308,9 +309,15 @@ function MarketplaceContent() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     const newParams = new URLSearchParams()
-    if (search) newParams.append('q', search)
+    if (search) {
+      newParams.append('q', search)
+      // Track search in GA4
+      trackGA4Search(search, products.length)
+    }
     if (selectedCategories.length > 0) {
       newParams.append('category', selectedCategories[0])
+      // Track filter selection in GA4
+      trackGA4FilterSelect('category', selectedCategories[0])
     }
     router.push(`/marketplace?${newParams.toString()}`)
   }

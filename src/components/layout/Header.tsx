@@ -6,6 +6,7 @@ import { Search, ShoppingCart, User, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
+import { trackGA4Logout } from '@/lib/analytics'
 
 type CartItem = {
   productId: string
@@ -252,6 +253,7 @@ export default function Header() {
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false)
+                    trackGA4Logout()
                     signOut({ callbackUrl: '/' })
                   }}
                   className="block w-full text-left py-2 text-red-600 hover:text-red-700"

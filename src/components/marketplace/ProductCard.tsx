@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ShoppingCart, Star } from 'lucide-react'
+import { trackGA4AddToCart, getAnalytics } from '@/lib/analytics'
 
 interface CartItem {
   productId: string
@@ -65,6 +66,21 @@ export function ProductCard({ product }: ProductCardProps) {
 
     // Salvar no localStorage
     localStorage.setItem('cart', JSON.stringify(cart))
+
+    // Track add to cart in GA4
+    trackGA4AddToCart([
+      {
+        item_id: product.id,
+        item_name: product.name,
+        price: product.price,
+        quantity: 1,
+        item_brand: 'Desapegrow',
+      }
+    ], product.price)
+
+    // Also track in custom analytics
+    const analytics = getAnalytics()
+    analytics.trackCartAction('add', product.id, 1, product.price)
 
     // Disparar evento customizado para atualizar CartSheet
     window.dispatchEvent(new Event('cartUpdated'))

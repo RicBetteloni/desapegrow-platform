@@ -36,6 +36,21 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
+        {/* Google Analytics 4 - Global Site Tag (gtag.js) */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-H4Y8WPR3HC" strategy="afterInteractive" />
+        <Script id="ga4-script" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-H4Y8WPR3HC', {
+  'page_path': window.location.pathname,
+  'send_page_view': true,
+  'allow_google_signals': true,
+  'allow_ad_personalization_signals': true
+});`}
+        </Script>
+        
+        {/* Google Tag Manager */}
         <Script id="gtm-script" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react'
+import { trackGA4RemoveFromCart, getAnalytics } from '@/lib/analytics'
 
 interface CartItem {
   productId: string
@@ -46,9 +47,29 @@ export function CartSheet() {
   }
 
   const removeItem = (productId: string) => {
+    const itemToRemove = cartItems.find(item => item.productId === productId)
+    
     const updatedCart = cartItems.filter(item => item.productId !== productId)
     localStorage.setItem('cart', JSON.stringify(updatedCart))
     setCartItems(updatedCart)
+    
+    // Track remove from cart in GA4
+    if (itemToRemove) {
+      trackGA4RemoveFromCart(
+        [{
+          item_id: itemToRemove.productId,
+          item_name: itemToRemove.name,
+          price: itemToRemove.price,
+          quantity: itemToRemove.quantity,
+          item_brand: 'Desapegrow',
+        }],
+        itemToRemove.price * itemToRemove.quantity
+      )
+      
+      // Also track in custom analytics
+      const analytics = getAnalytics()
+      analytics.trackCartAction('remove', itemToRemove.productId, itemToRemove.quantity, itemToRemove.price)
+    }
   }
 
   const clearCart = () => {

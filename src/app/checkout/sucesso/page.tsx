@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CheckCircle2, ShoppingBag } from 'lucide-react'
+import { trackGA4Purchase, getAnalytics } from '@/lib/analytics'
 
 interface OrderItem {
   productId: string
@@ -45,6 +46,37 @@ export default function CheckoutSuccessPage() {
         const data = await res.json()
         const found = (data.orders || []).find((o: Order) => o.id === orderId)
         setOrder(found || null)
+        
+        // Track purchase in GA4
+        if (found) {
+          const total = found.orderItems.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          )
+          
+          trackGA4Purchase({
+            transaction_id: found.id,
+            affiliation: 'Desapegrow',
+            value: total,
+            currency: 'BRL',
+            items: found.orderItems.map(item => ({
+              item_id: item.productId,
+              item_name: item.product?.name || 'Produto',
+              price: item.price,
+              quantity: item.quantity,
+              item_brand: 'Desapegrow',
+            })),
+          })
+          
+          // Also track in custom analytics
+          const analytics = getAnalytics()
+          analytics.trackPurchase(found.id, total, found.orderItems.map(item => ({
+            id: item.productId,
+            name: item.product?.name || 'Produto',
+            price: item.price,
+            quantity: item.quantity,
+          })))
+        }
       } catch (error) {
         console.error('Erro ao carregar pedido:', error)
       } finally {
