@@ -78,7 +78,8 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // 3. Criar orderItems + debitar estoque + status
+    // 3. Criar orderItems (sem debitar estoque aqui)
+    // O débito de estoque acontece apenas após pagamento aprovado (webhook)
     let calculatedTotal = 0
     for (const item of items) {
       calculatedTotal += item.price * item.quantity
@@ -91,18 +92,6 @@ export async function POST(request: NextRequest) {
           price: item.price
         }
       })
-
-      const updatedProduct = await prisma.product.update({
-        where: { id: item.productId },
-        data: { stock: { decrement: item.quantity } }
-      })
-
-      if (updatedProduct.stock === 0) {
-        await prisma.product.update({
-          where: { id: item.productId },
-          data: { status: 'INACTIVE' }
-        })
-      }
     }
 
     const orderItems = await prisma.orderItem.findMany({

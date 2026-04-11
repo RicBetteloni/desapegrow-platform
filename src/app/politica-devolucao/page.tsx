@@ -341,7 +341,7 @@ export default function PoliticaDevolucaoPage() {
                 <div className="p-4 bg-white rounded-lg">
                   <p className="text-sm text-gray-700">
                     <strong>📧 Suporte:</strong> ajuda@desapegrow.com<br />
-                    <strong>📱 WhatsApp:</strong> (11) 0000-0000<br />
+                    <strong>📱 WhatsApp:</strong> (11) 99839-4333 (Ricardo - Desapegrow)<br />
                     <strong>⏰ Horário:</strong> Segunda a Sexta, 9h às 18h
                   </p>
                 </div>

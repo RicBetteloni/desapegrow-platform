@@ -80,7 +80,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/contato" className="hover:text-green-500 transition-colors">
+                <Link href="/ajuda/fale-conosco" className="hover:text-green-500 transition-colors">
                   Fale Conosco
                 </Link>
               </li>

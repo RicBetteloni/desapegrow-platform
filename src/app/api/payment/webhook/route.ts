@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { MercadoPagoConfig, Payment } from 'mercadopago'
 import { prisma } from '@/lib/prisma'
+import { OrderStatus, ProductStatus } from '@prisma/client'
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN || '',
@@ -33,20 +34,95 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true })
     }
 
-    let orderStatus: 'PENDING' | 'PROCESSING' | 'CANCELED' = 'PENDING'
-
     if (status === 'approved') {
-      orderStatus = 'PROCESSING'
-    } else if (status === 'rejected' || status === 'cancelled') {
-      orderStatus = 'CANCELED'
+      await prisma.$transaction(async tx => {
+        // Claim idempotente: só processa uma vez quando ainda está PENDING
+        const claimed = await tx.order.updateMany({
+          where: {
+            id: orderId,
+            status: OrderStatus.PENDING
+          },
+          data: {
+            status: OrderStatus.PROCESSING
+          }
+        })
+
+        if (claimed.count === 0) {
+          // Já processado ou em estado final
+          return
+        }
+
+        const order = await tx.order.findUnique({
+          where: { id: orderId },
+          include: { items: true }
+        })
+
+        if (!order) {
+          throw new Error(`Pedido ${orderId} não encontrado`)
+        }
+
+        for (const item of order.items) {
+          const stockUpdated = await tx.product.updateMany({
+            where: {
+              id: item.productId,
+              stock: { gte: item.quantity }
+            },
+            data: {
+              stock: { decrement: item.quantity }
+            }
+          })
+
+          if (stockUpdated.count === 0) {
+            throw new Error(
+              `Estoque insuficiente ao confirmar pagamento para produto ${item.productId}`
+            )
+          }
+
+          const currentProduct = await tx.product.findUnique({
+            where: { id: item.productId },
+            select: { stock: true }
+          })
+
+          if (currentProduct && currentProduct.stock === 0) {
+            await tx.product.update({
+              where: { id: item.productId },
+              data: { status: ProductStatus.INACTIVE }
+            })
+          }
+        }
+      })
+
+      console.log('Pedido confirmado via webhook:', orderId, '→ PROCESSING')
+      return NextResponse.json({ received: true })
     }
 
-    await prisma.order.update({
-      where: { id: orderId },
-      data: { status: orderStatus }
+    if (status === 'rejected' || status === 'cancelled') {
+      await prisma.order.updateMany({
+        where: {
+          id: orderId,
+          status: OrderStatus.PENDING
+        },
+        data: {
+          status: OrderStatus.CANCELED
+        }
+      })
+
+      console.log('Pedido cancelado via webhook:', orderId, '→ CANCELED')
+      return NextResponse.json({ received: true })
+    }
+
+    // pending / in_process: mantemos o pedido em PENDING
+    await prisma.order.updateMany({
+      where: {
+        id: orderId,
+        status: OrderStatus.PENDING
+      },
+      data: {
+        status: OrderStatus.PENDING
+      }
     })
 
-    console.log('Pedido atualizado via webhook:', orderId, '→', orderStatus)
+    console.log('Pedido mantido em PENDING via webhook:', orderId, 'status MP:', status)
 
     return NextResponse.json({ received: true })
   } catch (error) {

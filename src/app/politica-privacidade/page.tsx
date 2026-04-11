@@ -113,7 +113,7 @@ export default function PoliticaPrivacidadePage() {
               <h2 className="text-xl font-bold mb-4">10. Contato - Encarregado de Dados (DPO)</h2>
               <p className="text-gray-700">
                 E-mail: <a href="mailto:dpo@desapegrow.com" className="text-green-600 hover:underline">dpo@desapegrow.com</a><br />
-                Telefone: (11) 0000-0000
+                Telefone: (11) 99839-4333 (Ricardo - Desapegrow)
               </p>
             </section>
           </div>

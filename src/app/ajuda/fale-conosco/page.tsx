@@ -155,8 +155,8 @@ export default function FaleConoscoPage() {
                   <div className="text-3xl">📱</div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">WhatsApp</h3>
-                    <a href="https://wa.me/5511999999999" target="_blank" className="text-[#2F5F39] hover:underline">
-                      (11) 99999-9999
+                    <a href="https://wa.me/5511998394333" target="_blank" className="text-[#2F5F39] hover:underline">
+                      (11) 99839-4333 (Ricardo - Desapegrow)
                     </a>
                     <p className="text-sm text-gray-600 mt-1">Seg a Sex, 9h às 18h</p>
                   </div>

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
 import { MercadoPagoConfig, Preference } from 'mercadopago'
 import { prisma } from '@/lib/prisma'
+import { getSession } from '@/lib/auth'
 
 type Item = {
   productId: string
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const session = await getServerSession()
+    const session = await getSession()
 
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
@@ -62,22 +62,31 @@ export async function POST(request: Request) {
       process.env.NEXT_PUBLIC_URL ||
       'http://localhost:3000'
 
-    // Preparar dados do payer
-    const payerData: {
-      name: string
-      email: string
-      phone?: { area_code: string; number: string }
-    } = {
-      name: user.name,
-      email: user.email
-    }
+    const isProduction = process.env.NODE_ENV === 'production'
 
-    // Adiciona telefone se disponível e válido
-    if (user.phone && user.phone.length >= 10) {
-      const cleanPhone = user.phone.replace(/\D/g, '')
-      payerData.phone = {
-        area_code: cleanPhone.substring(0, 2),
-        number: cleanPhone.substring(2)
+    // Em sandbox/dev, evitar enviar payer fixo do usuário local para não gerar
+    // bloqueio "uma das partes é de teste" no checkout do Mercado Pago.
+    let payerData:
+      | {
+          name: string
+          email: string
+          phone?: { area_code: string; number: string }
+        }
+      | undefined
+
+    if (isProduction) {
+      payerData = {
+        name: user.name,
+        email: user.email
+      }
+
+      // Adiciona telefone se disponível e válido
+      if (user.phone && user.phone.length >= 10) {
+        const cleanPhone = user.phone.replace(/\D/g, '')
+        payerData.phone = {
+          area_code: cleanPhone.substring(0, 2),
+          number: cleanPhone.substring(2)
+        }
       }
     }
 
@@ -92,14 +101,14 @@ export async function POST(request: Request) {
           unit_price: Number(item.price),
           currency_id: 'BRL'
         })),
-        payer: payerData,
+        ...(payerData ? { payer: payerData } : {}),
         back_urls: {
           success: `${baseUrl}/payment/success?orderId=${orderId}`,
           failure: `${baseUrl}/payment/failure?orderId=${orderId}`,
           pending: `${baseUrl}/payment/pending?orderId=${orderId}`
         },
         // auto_return apenas em produção
-        ...(process.env.NODE_ENV === 'production'
+        ...(isProduction
           ? { auto_return: 'approved' as const }
           : {}),
         notification_url: `${baseUrl}/api/payment/webhook`,
@@ -116,7 +125,8 @@ export async function POST(request: Request) {
       items: items.length,
       orderId,
       userId: user.id,
-      hasPhone: !!payerData.phone
+      hasPayer: !!payerData,
+      hasPhone: !!payerData?.phone
     })
 
     const response = await preference.create(preferenceData)

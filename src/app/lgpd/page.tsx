@@ -297,7 +297,7 @@ export default function LGPDPage() {
 
                 <div className="space-y-2 text-gray-700">
                   <p><strong>E-mail:</strong> dpo@desapegrow.com</p>
-                  <p><strong>Telefone:</strong> (11) 0000-0000</p>
+                  <p><strong>Telefone:</strong> (11) 99839-4333 (Ricardo - Desapegrow)</p>
                   <p><strong>Endereço:</strong> São Paulo - SP</p>
                 </div>
 
